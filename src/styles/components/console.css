@@ -1,0 +1,6 @@
+#console { position: relative; }
+#console > .mini { position: absolute; top: -34px; right: 0; }
+.out { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; height: 180px; overflow: auto; white-space: pre-wrap; }
+.zeile.befehl, .zeile.info { color: var(--muted); }
+.zeile.fehler { color: #b91c1c; }
+.zeile.ergebnis { color: var(--methode); }

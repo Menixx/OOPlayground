@@ -1,0 +1,3 @@
+.class-panel { display: flex; flex-wrap: wrap; gap: 12px; }
+.class-btn { display: grid; justify-items: center; gap: 2px; min-width: 110px; padding: 10px 14px; background: var(--bg); border-color: var(--line); }
+.class-btn small { color: var(--abstrakt); font-size: 11px; }

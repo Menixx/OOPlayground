@@ -1,0 +1,3 @@
+.run, .mini { margin-left: 4px; padding: 1px 8px; font: 12px var(--sans); background: var(--btn); }
+.run { color: var(--methode); }
+.link { padding: 0 6px; font: 13px var(--mono); color: var(--feld); background: transparent; border-bottom: 1px dashed var(--feld); border-radius: 0; }
