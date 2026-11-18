@@ -1,0 +1,239 @@
+<svg id="croc-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 128" width="160" height="128">
+  <defs>
+    <!-- Основний градієнт тіла крокодила -->
+    <linearGradient id="crocBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8BC34A" />
+      <stop offset="55%" stop-color="#689F38" />
+      <stop offset="100%" stop-color="#33691E" />
+    </linearGradient>
+    <!-- Світлий градієнт черевця -->
+    <linearGradient id="crocBelly" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#DCEDC8" />
+      <stop offset="100%" stop-color="#AED581" />
+    </linearGradient>
+    <!-- Градієнт спинних щитків -->
+    <linearGradient id="crocScales" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#558B2F" />
+      <stop offset="100%" stop-color="#2E7D32" />
+    </linearGradient>
+    <!-- Градієнт шматка м'яса -->
+    <linearGradient id="meatGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#EF5350" />
+      <stop offset="60%" stop-color="#D32F2F" />
+      <stop offset="100%" stop-color="#B71C1C" />
+    </linearGradient>
+  </defs>
+
+  <style>
+    /* ==========================================================================
+       БАЗОВІ НАЛАШТУВАННЯ ТА ОПОРНІ ТОЧКИ (TRANSFORM-ORIGIN)
+       ========================================================================== */
+    #croc-body-group {
+      transform-origin: 60px 72px;
+    }
+    /* Суглоби щелеп для відкривання пащі */
+    #upper-jaw {
+      transform-origin: 90px 68px;
+    }
+    #lower-jaw {
+      transform-origin: 90px 76px;
+    }
+    /* Суглоби лап для повзання */
+    #far-back-leg   { transform-origin: 43px 84px; }
+    #far-front-leg  { transform-origin: 83px 84px; }
+    #near-back-leg  { transform-origin: 51px 78px; }
+    #near-front-leg { transform-origin: 81px 78px; }
+
+    /* Елементи, що з'являються лише під час годування */
+    #meat-group, #mouth-interior {
+      opacity: 0;
+    }
+
+    /* ==========================================================================
+       1. АНІМАЦІЯ ПОЇДАННЯ М'ЯСА
+       Класи, що змінюють стани анімації:
+       - .state-eat (на кореневому тегу <svg>) — вмикає повний цикл годування:
+         появу м'яса (#meat-group), розкриття пащі (#upper-jaw, #lower-jaw,
+         #mouth-interior) та зникнення відкушеного шматка (#meat-bite-chunk).
+       ========================================================================== */
+    .state-eat #meat-group {
+      opacity: 1;
+    }
+    .state-eat #mouth-interior {
+      animation: mouthInteriorFade 3s ease-in-out infinite;
+    }
+    .state-eat #upper-jaw {
+      animation: upperJawChomp 3s ease-in-out infinite;
+    }
+    .state-eat #lower-jaw {
+      animation: lowerJawChomp 3s ease-in-out infinite;
+    }
+    .state-eat #meat-bite-chunk {
+      animation: meatChunkBitten 3s linear infinite;
+    }
+    .state-eat #meat-group {
+      animation: meatShakeOnBite 3s ease-in-out infinite;
+    }
+
+    @keyframes upperJawChomp {
+      0%, 10%   { transform: rotate(0deg); }
+      28%, 40%  { transform: rotate(-24deg) translateX(2px); } /* Широке відкриття верхньої щелепи */
+      46%       { transform: rotate(2deg) translateX(4px); }   /* Різкий укус */
+      54%, 62%  { transform: rotate(-6deg); }                  /* Жування 1 */
+      68%, 76%  { transform: rotate(-1deg); }                  /* Жування 2 */
+      82%, 90%  { transform: rotate(-5deg); }                  /* Жування 3 */
+      96%, 100% { transform: rotate(0deg); }
+    }
+
+    @keyframes lowerJawChomp {
+      0%, 10%   { transform: rotate(0deg); }
+      28%, 40%  { transform: rotate(20deg) translateX(2px); }  /* Опускання нижньої щелепи */
+      46%       { transform: rotate(-1deg) translateX(4px); }  /* Змикання пащі при укусі */
+      54%, 62%  { transform: rotate(5deg); }                   /* Жування 1 */
+      68%, 76%  { transform: rotate(0deg); }                   /* Жування 2 */
+      82%, 90%  { transform: rotate(4deg); }                   /* Жування 3 */
+      96%, 100% { transform: rotate(0deg); }
+    }
+
+    @keyframes mouthInteriorFade {
+      0%, 14%   { opacity: 0; }
+      24%, 44%  { opacity: 1; }
+      48%, 100% { opacity: 0; }
+    }
+
+    @keyframes meatChunkBitten {
+      0%, 44%   { opacity: 1; transform: scale(1); }
+      46%, 92%  { opacity: 0; transform: scale(0); } /* Відкушений шматок зникає в пащі */
+      98%, 100% { opacity: 1; transform: scale(1); } /* Відновлення шматка для повтору циклу */
+    }
+
+    @keyframes meatShakeOnBite {
+      0%, 44%   { transform: translate(118px, 64px) rotate(0deg); }
+      47%       { transform: translate(121px, 65px) rotate(8deg); } /* Віддача м'яса від укусу */
+      53%, 100% { transform: translate(118px, 64px) rotate(0deg); }
+    }
+
+    /* ==========================================================================
+       2. АНІМАЦІЯ ПОВЗАННЯ
+       Класи, що змінюють стани анімації:
+       - .state-crawl (на кореневому тегу <svg>) — запускає почерговий рух
+         діагональних пар лап (#near-front-leg + #far-back-leg та
+         #far-front-leg + #near-back-leg) і погойдування тулуба (#croc-body-group).
+       ========================================================================== */
+    .state-crawl #near-front-leg,
+    .state-crawl #far-back-leg {
+      animation: crawlLegSwingA 0.9s ease-in-out infinite;
+    }
+    .state-crawl #far-front-leg,
+    .state-crawl #near-back-leg {
+      animation: crawlLegSwingB 0.9s ease-in-out infinite;
+    }
+    .state-crawl #croc-body-group {
+      animation: crawlBodySway 0.9s ease-in-out infinite;
+    }
+
+    @keyframes crawlLegSwingA {
+      0%, 100% { transform: rotate(-20deg) translateY(-1.5px); }
+      50%      { transform: rotate(22deg) translateY(0.5px); }
+    }
+    @keyframes crawlLegSwingB {
+      0%, 100% { transform: rotate(22deg) translateY(0.5px); }
+      50%      { transform: rotate(-20deg) translateY(-1.5px); }
+    }
+    @keyframes crawlBodySway {
+      0%, 100% { transform: translateY(0px) rotate(-0.8deg); }
+      25%      { transform: translateY(-1.5px) rotate(0deg); }
+      50%      { transform: translateY(0px) rotate(0.8deg); }
+      75%      { transform: translateY(-1.5px) rotate(0deg); }
+    }
+  </svg></svg></style>
+
+  <!-- ШМАТОК М'ЯСА (відображається при активному класі .state-eat) -->
+  <g id="meat-group" transform="translate(118, 64)">
+    <!-- Основний стейк з кісточкою (залишається після укусу) -->
+    <path d="M 14 2 C 24 0, 34 4, 35 12 C 36 20, 26 24, 15 22 C 11 21, 9 17, 10 12 C 11 7, 10 3, 14 2 Z" fill="url(#meatGrad)" stroke="#7F0000" stroke-width="1.6" stroke-linejoin="round" />
+    <!-- Жировий прошарок -->
+    <path d="M 15 5 C 22 4, 29 7, 30 12 C 31 17, 23 20, 15 19" fill="none" stroke="#FFCDD2" stroke-width="1.8" stroke-linecap="round" opacity="0.85" />
+    <!-- Кісточка -->
+    <circle cx="23" cy="12" r="3.5" fill="#FFF8E1" stroke="#D7CCC8" stroke-width="1.2" />
+    <circle cx="23" cy="12" r="1.2" fill="#A1887F" />
+
+    <!-- Лівий шматочок м'яса, який крокодил відкушує -->
+    <g id="meat-bite-chunk">
+      <path d="M 14 2 C 6 2, 1 6, 1 12 C 1 18, 6 22, 15 22 C 11 20, 10 16, 11 12 C 12 7, 11 4, 14 2 Z" fill="url(#meatGrad)" stroke="#7F0000" stroke-width="1.6" stroke-linejoin="round" />
+      <path d="M 13 5 C 8 6, 5 8, 5 12 C 5 16, 8 18, 13 19" fill="none" stroke="#FFCDD2" stroke-width="1.6" stroke-linecap="round" opacity="0.85" />
+    </g>
+  </g>
+
+  <!-- ДАЛЬНІ ЛАПИ -->
+  <g id="far-back-leg">
+    <path d="M 46 84 L 44 96 C 43 99, 39 99, 39 96 L 40 84 Z" fill="#33691E" stroke="#1B5E20" stroke-width="1.8" stroke-linejoin="round" />
+  </g>
+  <g id="far-front-leg">
+    <path d="M 80 84 L 82 96 C 83 99, 87 99, 87 96 L 86 84 Z" fill="#33691E" stroke="#1B5E20" stroke-width="1.8" stroke-linejoin="round" />
+  </g>
+
+  <!-- ОСНОВНА ГРУПА ТІЛА ТА ГОЛОВИ -->
+  <g id="croc-body-group">
+    <!-- Внутрішня порожнина рота (видна при відкриванні пащі) -->
+    <path id="mouth-interior" d="M 88 68 L 122 69 L 118 81 L 88 79 Z" fill="#B71C1C" stroke="#4A0007" stroke-width="1.5" stroke-linejoin="round" />
+
+    <!-- ХВІСТ ТА ТУЛУБ -->
+    <path d="M 6 70
+             C 14 66, 26 63, 38 61
+             C 52 58, 70 58, 84 62
+             L 94 64
+             L 94 83
+             C 76 86, 52 86, 36 82
+             C 22 79, 10 74, 6 70 Z" fill="url(#crocBody)" stroke="#2E5918" stroke-width="2" stroke-linejoin="round" />
+
+    <!-- Світле черевце -->
+    <path d="M 38 77 C 54 81, 74 81, 90 78 C 88 83, 74 85, 56 84 C 45 84, 39 81, 38 77 Z" fill="url(#crocBelly)" />
+
+    <!-- Спинні гребені / щитки -->
+    <path d="M 18 65 L 22 61 L 25 64 L 29 59 L 33 62 L 37 57 L 41 60 L 46 55 L 50 59 L 55 54 L 59 58 L 64 54 L 68 58 L 73 54 L 77 59" fill="url(#crocScales)" stroke="#2E5918" stroke-width="1.4" stroke-linejoin="round" />
+
+    <!-- Плями на спині -->
+    <ellipse cx="48" cy="68" rx="3" ry="2" fill="#33691E" opacity="0.5" />
+    <ellipse cx="60" cy="67" rx="3.5" ry="2.2" fill="#33691E" opacity="0.5" />
+    <ellipse cx="72" cy="68" rx="3" ry="2" fill="#33691E" opacity="0.5" />
+    <ellipse cx="34" cy="70" rx="2.5" ry="1.6" fill="#33691E" opacity="0.5" />
+
+    <!-- НИЖНЯ ЩЕЛЕПА (окрема група для руху при укусі) -->
+    <g id="lower-jaw">
+      <path d="M 88 73 C 102 74, 118 75, 120 79 C 121 82, 114 84, 94 83 L 88 82 Z" fill="url(#crocBody)" stroke="#2E5918" stroke-width="2" stroke-linejoin="round" />
+      <!-- Нижні зуби (проглядають при відкритій пащі) -->
+      <path d="M 101 75 L 103 72.5 L 105 75 L 107 72.5 L 109 75 L 111 72.5 L 113 75" fill="#FFFFFF" stroke="#2E5918" stroke-width="1" stroke-linejoin="round" />
+    </g>
+
+    <!-- ВЕРХНЯ ЩЕЛЕПА ТА ГОЛОВА (окрема група для руху при укусі) -->
+    <g id="upper-jaw">
+      <path d="M 83 62
+               C 89 54, 98 54, 102 60
+               C 110 61, 121 63, 123 68
+               C 124 72, 118 74, 108 75
+               C 100 75, 92 74, 86 73 Z" fill="url(#crocBody)" stroke="#2E5918" stroke-width="2" stroke-linejoin="round" />
+
+      <!-- Верхні зуби -->
+      <path d="M 97 73 L 100 76 L 103 73 L 106 76 L 109 73 L 112 76 L 115 73 L 118 75" fill="#FFFFFF" stroke="#2E5918" stroke-width="1.2" stroke-linejoin="round" />
+
+      <!-- Ніздря -->
+      <circle cx="118" cy="65.5" r="1.4" fill="#1B5E20" />
+
+      <!-- Око -->
+      <circle cx="94" cy="58" r="5" fill="#FFF9C4" stroke="#2E5918" stroke-width="1.8" />
+      <ellipse cx="95" cy="58" rx="1.6" ry="3.2" fill="#1B1B1B" />
+      <circle cx="93.8" cy="56.5" r="1" fill="#FFFFFF" />
+    </g>
+  </g>
+
+  <!-- БЛИЖНЯ ЗАДНЯ ЛАПА -->
+  <g id="near-back-leg">
+    <path d="M 48 77 C 46 84, 48 92, 46 97 L 41 99 C 39 100, 40 102, 43 102 L 53 102 C 55 102, 56 99, 54 98 L 53 96 C 55 90, 56 83, 54 77 Z" fill="url(#crocBody)" stroke="#2E5918" stroke-width="2" stroke-linejoin="round" />
+  </g>
+
+  <!-- БЛИЖНЯ ПЕРЕДНЯ ЛАПА -->
+  <g id="near-front-leg">
+    <path d="M 78 77 C 77 84, 78 92, 77 97 L 73 99 C 71 100, 72 102, 75 102 L 85 102 C 87 102, 88 99, 86 98 L 84 96 C 85 90, 85 83, 84 77 Z" fill="url(#crocBody)" stroke="#2E5918" stroke-width="2" stroke-linejoin="round" />
+  </g>
+</svg>

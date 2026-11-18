@@ -1,0 +1,336 @@
+<svg id="cat-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 145 128" width="145" height="128">
+  <defs>
+    <!-- Основний градієнт шерсті -->
+    <linearGradient id="furMain" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFE066" />
+      <stop offset="55%" stop-color="#FFCA28" />
+      <stop offset="100%" stop-color="#F57C00" />
+    </linearGradient>
+
+    <!-- Світліший градієнт для грудки та мордочки -->
+    <linearGradient id="furLight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF59D" />
+      <stop offset="100%" stop-color="#FFD54F" />
+    </linearGradient>
+
+    <!-- Темніший градієнт для дальніх лап і тіней -->
+    <linearGradient id="furShadow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFB300" />
+      <stop offset="100%" stop-color="#E65100" />
+    </linearGradient>
+
+    <!-- Градієнт для тигрових смужок -->
+    <linearGradient id="stripeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E65100" />
+      <stop offset="100%" stop-color="#BF360C" />
+    </linearGradient>
+
+    <!-- Градієнт для внутрішньої частини вух -->
+    <linearGradient id="earPink" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF8A80" />
+      <stop offset="100%" stop-color="#EC407A" />
+    </linearGradient>
+
+    <!-- Градієнт для рибини (для анімації годування) -->
+    <linearGradient id="fishGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#81D4FA" />
+      <stop offset="50%" stop-color="#29B6F6" />
+      <stop offset="100%" stop-color="#0288D1" />
+    </linearGradient>
+  </defs>
+
+  <style>
+    /* ==========================================================================
+       БАЗОВІ НАЛАШТУВАННЯ ЕЛЕМЕНТІВ
+       ========================================================================== */
+    #tail {
+      transform-origin: 33px 76px;
+    }
+    #body-group {
+      transform-origin: 68px 80px;
+    }
+    #head {
+      transform-origin: 90px 58px;
+    }
+
+    /* Опорні точки (суглоби) для обертання лап при ходьбі */
+    #front-far-leg  { transform-origin: 93.5px 80px; }
+    #back-far-leg   { transform-origin: 51px 80px; }
+    #front-near-leg { transform-origin: 82px 86px; }
+    #back-near-leg  { transform-origin: 42px 86px; }
+
+    /* Приховані за замовчуванням елементи для анімації поїдання риби */
+    #fish-group, #mouth-open, #eyes-happy {
+      opacity: 0;
+    }
+
+    /* ==========================================================================
+       1. АНІМАЦІЯ ХОДЬБИ (активується додаванням класу .state-walk до <svg>)
+       ========================================================================== */
+    /* Рух лап діагональними парами (природна хода кота) */
+    .state-walk #front-near-leg,
+    .state-walk #back-far-leg {
+      animation: legSwingA 0.75s ease-in-out infinite;
+    }
+    .state-walk #front-far-leg,
+    .state-walk #back-near-leg {
+      animation: legSwingB 0.75s ease-in-out infinite;
+    }
+
+    /* Легке погойдування тулуба, голови та хвоста в такт крокам */
+    .state-walk #body-group {
+      animation: bodyWalkBounce 0.375s ease-in-out infinite alternate;
+    }
+    .state-walk #head {
+      animation: headWalkBob 0.375s ease-in-out infinite alternate;
+    }
+    .state-walk #tail {
+      animation: tailWalkWag 0.75s ease-in-out infinite alternate;
+    }
+
+    @keyframes legSwingA {
+      0%, 100% { transform: rotate(-22deg) translateY(-1px); }
+      50%      { transform: rotate(22deg) translateY(-1px); }
+    }
+    @keyframes legSwingB {
+      0%, 100% { transform: rotate(22deg) translateY(-1px); }
+      50%      { transform: rotate(-22deg) translateY(-1px); }
+    }
+    @keyframes bodyWalkBounce {
+      0%   { transform: translateY(0px); }
+      100% { transform: translateY(-2px); }
+    }
+    @keyframes headWalkBob {
+      0%   { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-2.5px) rotate(2deg); }
+    }
+    @keyframes tailWalkWag {
+      0%   { transform: rotate(-6deg); }
+      100% { transform: rotate(8deg); }
+    }
+
+    /* ==========================================================================
+       2. АНІМАЦІЯ ПОЇДАННЯ РИБИ (активується додаванням класу .state-eat до <svg>)
+       Цикл триває 3.2 секунди: нахил -> укус -> підйом і жування -> повернення
+       ========================================================================== */
+    .state-eat #fish-group {
+      opacity: 1;
+    }
+    /* Відкушений шматочок зникає в момент укусу (близько 35% циклу) */
+    .state-eat #fish-bite-chunk {
+      animation: fishChunkEaten 3.2s linear infinite;
+    }
+    /* Нахил голови вниз до риби та рухи під час жування */
+    .state-eat #head {
+      animation: headEatCycle 3.2s ease-in-out infinite;
+    }
+    /* Перемикання звичайного ротика на відкритий рот під час укусу */
+    .state-eat #mouth-normal {
+      animation: mouthNormalHide 3.2s steps(1) infinite;
+    }
+    .state-eat #mouth-open {
+      animation: mouthOpenShow 3.2s steps(1) infinite;
+    }
+    /* Щасливі примружені очі під час жування */
+    .state-eat #eyes-normal {
+      animation: eyesNormalHide 3.2s steps(1) infinite;
+    }
+    .state-eat #eyes-happy {
+      animation: eyesHappyShow 3.2s steps(1) infinite;
+    }
+    /* Задоволене похитування хвостом */
+    .state-eat #tail {
+      animation: tailEatWag 0.6s ease-in-out infinite alternate;
+    }
+
+    @keyframes headEatCycle {
+      0%, 10%   { transform: translate(0px, 0px) rotate(0deg); }
+      28%, 42%  { transform: translate(11px, 34px) rotate(36deg); } /* Нахил до риби */
+      48%, 56%  { transform: translate(3px, 6px) rotate(6deg); }    /* Жування 1 */
+      62%, 70%  { transform: translate(3px, 3px) rotate(2deg); }    /* Жування 2 */
+      76%, 84%  { transform: translate(3px, 6px) rotate(6deg); }    /* Жування 3 */
+      95%, 100% { transform: translate(0px, 0px) rotate(0deg); }
+    }
+
+    @keyframes fishChunkEaten {
+      0%, 34%  { opacity: 1; transform: scale(1); }
+      36%, 92% { opacity: 0; transform: scale(0); } /* Шматок відкушено */
+      98%, 100%{ opacity: 1; transform: scale(1); } /* Поява нової цілої риби для повтору */
+    }
+
+    @keyframes mouthNormalHide {
+      0%, 24%  { opacity: 1; }
+      25%, 44% { opacity: 0; }
+      45%, 100%{ opacity: 1; }
+    }
+    @keyframes mouthOpenShow {
+      0%, 24%  { opacity: 0; }
+      25%, 44% { opacity: 1; } /* Рот широко відкритий перед укусом */
+      45%, 100%{ opacity: 0; }
+    }
+
+    @keyframes eyesNormalHide {
+      0%, 46%  { opacity: 1; }
+      47%, 88% { opacity: 0; }
+      89%, 100%{ opacity: 1; }
+    }
+    @keyframes eyesHappyShow {
+      0%, 46%  { opacity: 0; }
+      47%, 88% { opacity: 1; } /* Кішка мружиться від задоволення, коли жує */
+      89%, 100%{ opacity: 0; }
+    }
+
+    @keyframes tailEatWag {
+      0%   { transform: rotate(-4deg); }
+      100% { transform: rotate(10deg); }
+    }
+  </svg></svg></style>
+
+  <!-- РИБИНА (відображається лише при активній анімації .state-eat) -->
+  <g id="fish-group" transform="translate(103, 108)">
+    <!-- Основна частина риби (тулуб і хвіст) -->
+    <path d="M 11 4 C 17 1, 25 2, 30 6 L 37 1 L 35 7 L 37 13 L 30 8 C 25 12, 17 13, 11 10 Z" fill="url(#fishGrad)" stroke="#01579B" stroke-width="1.5" stroke-linejoin="round" />
+    <!-- Плавник та зябра -->
+    <path d="M 20 3 L 23 0 L 25 3" fill="#29B6F6" stroke="#01579B" stroke-width="1.2" stroke-linejoin="round" />
+    <path d="M 15 4 C 17 6, 17 8, 15 10" fill="none" stroke="#01579B" stroke-width="1.2" stroke-linecap="round" />
+    
+    <!-- Голова риби (шматочок, який кішка відкушує) -->
+    <g id="fish-bite-chunk">
+      <path d="M 11 4 C 5 4, 1 6, 1 7 C 1 8, 5 10, 11 10 Z" fill="url(#fishGrad)" stroke="#01579B" stroke-width="1.5" stroke-linejoin="round" />
+      <circle cx="5.5" cy="6.5" r="1.2" fill="#FFFFFF" />
+      <circle cx="5.2" cy="6.5" r="0.6" fill="#000000" />
+    </g>
+  </g>
+
+  <!-- ХВІСТ -->
+  <g id="tail">
+    <path d="M 32 72 C 14 68, 10 48, 18 36 C 24 27, 16 20, 11 23 C 5 26, 2 38, 6 52 C 11 69, 24 81, 36 83 Z" fill="url(#furMain)" stroke="#D86800" stroke-width="2" stroke-linejoin="round" />
+    <!-- Смужки на хвості -->
+    <path d="M 11 33 C 14 34, 17 36, 18 38 C 15 40, 12 39, 9 37 Z" fill="url(#stripeGrad)" opacity="0.8" />
+    <path d="M 7 47 C 11 47, 15 48, 17 50 C 14 52, 10 52, 7 51 Z" fill="url(#stripeGrad)" opacity="0.8" />
+    <path d="M 12 62 C 16 61, 20 62, 22 64 C 19 66, 15 66, 13 65 Z" fill="url(#stripeGrad)" opacity="0.8" />
+  </g>
+
+  <!-- ДАЛЬНЯ ПЕРЕДНЯ ЛАПА -->
+  <g id="front-far-leg">
+    <path d="M 88 78 L 88 112 C 88 117, 99 117, 99 112 L 99 78 Z" fill="url(#furShadow)" stroke="#D86800" stroke-width="2" stroke-linejoin="round" />
+    <path d="M 92 115 L 92 111 M 96 115 L 96 111" stroke="#BF360C" stroke-width="1.5" stroke-linecap="round" />
+  </g>
+
+  <!-- ДАЛЬНЯ ЗАДНЯ ЛАПА -->
+  <g id="back-far-leg">
+    <path d="M 45 78 C 43 90, 48 98, 49 112 C 49 117, 60 117, 60 112 C 60 100, 56 91, 58 78 Z" fill="url(#furShadow)" stroke="#D86800" stroke-width="2" stroke-linejoin="round" />
+    <path d="M 53 115 L 53 111 M 57 115 L 57 111" stroke="#BF360C" stroke-width="1.5" stroke-linecap="round" />
+  </g>
+
+  <!-- ТУЛУБ (виокремлений від ближніх лап для незалежної анімації ходьби) -->
+  <g id="body-group">
+    <path d="M 33 68
+             C 30 78, 30 90, 38 92
+             C 50 93, 66 91, 82 90
+             C 94 89, 104 80, 104 67
+             C 104 56, 96 50, 84 52
+             C 72 54, 58 55, 46 54
+             C 37 53, 35 60, 33 68 Z" fill="url(#furMain)" stroke="#D86800" stroke-width="2" stroke-linejoin="round" />
+
+    <!-- Світла грудка -->
+    <path d="M 93 62 C 101 64, 103 74, 98 83 C 94 86, 89 87, 88 85 C 91 77, 91 69, 93 62 Z" fill="url(#furLight)" opacity="0.7" />
+
+    <!-- Смужки на спині -->
+    <path d="M 48 54 C 46 61, 47 68, 50 72 C 52 67, 52 60, 52 54 Z" fill="url(#stripeGrad)" opacity="0.75" />
+    <path d="M 60 54 C 58 62, 59 70, 62 75 C 64 69, 64 61, 64 54 Z" fill="url(#stripeGrad)" opacity="0.75" />
+    <path d="M 72 53 C 70 60, 71 67, 74 71 C 76 66, 76 59, 76 53 Z" fill="url(#stripeGrad)" opacity="0.75" />
+  </g>
+
+  <!-- БЛИЖНЯ ЗАДНЯ ЛАПА (окрема група для руху) -->
+  <g id="back-near-leg">
+    <path d="M 35 76
+             C 32 84, 32 92, 35 98
+             C 37 102, 36 108, 36 114
+             C 36 119, 48 119, 48 114
+             C 48 106, 47 101, 51 96
+             C 53 92, 52 82, 48 76 Z" fill="url(#furMain)" stroke="#D86800" stroke-width="2" stroke-linejoin="round" />
+    <!-- Смужки на стегні -->
+    <path d="M 33 78 C 38 79, 43 81, 46 83 C 42 84, 37 83, 33 82 Z" fill="url(#stripeGrad)" opacity="0.7" />
+    <path d="M 33 86 C 38 87, 42 89, 44 91 C 40 92, 36 91, 34 90 Z" fill="url(#stripeGrad)" opacity="0.7" />
+    <!-- Пальчики -->
+    <path d="M 40 117.5 L 40 113 M 44 117.5 L 44 113" stroke="#BF360C" stroke-width="1.6" stroke-linecap="round" />
+  </g>
+
+  <!-- БЛИЖНЯ ПЕРЕДНЯ ЛАПА (окрема група для руху) -->
+  <g id="front-near-leg">
+    <path d="M 76 80
+             L 76 114
+             C 76 119, 88 119, 88 114
+             L 88 80 Z" fill="url(#furMain)" stroke="#D86800" stroke-width="2" stroke-linejoin="round" />
+    <!-- Смужки на передній лапі -->
+    <path d="M 76 95 C 80 95, 84 95, 87 94 C 85 97, 80 98, 76 98 Z" fill="url(#stripeGrad)" opacity="0.7" />
+    <path d="M 76 103 C 80 103, 84 103, 87 102 C 85 105, 80 106, 76 106 Z" fill="url(#stripeGrad)" opacity="0.7" />
+    <!-- Пальчики -->
+    <path d="M 80 117.5 L 80 113 M 84 117.5 L 84 113" stroke="#BF360C" stroke-width="1.6" stroke-linecap="round" />
+  </g>
+
+  <!-- ГОЛОВА -->
+  <g id="head">
+    <!-- Ліве вухо -->
+    <path d="M 73 34 C 69 22, 71 10, 76 8 C 81 6, 89 14, 93 21 Z" fill="url(#furMain)" stroke="#D86800" stroke-width="2" stroke-linejoin="round" />
+    <path d="M 75 30 C 73 22, 74 14, 77 13 C 80 12, 86 17, 89 22 Z" fill="url(#earPink)" />
+
+    <!-- Праве вухо -->
+    <path d="M 119 34 C 123 22, 121 10, 116 8 C 111 6, 103 14, 99 21 Z" fill="url(#furMain)" stroke="#D86800" stroke-width="2" stroke-linejoin="round" />
+    <path d="M 117 30 C 119 22, 118 14, 115 13 C 112 12, 106 17, 103 22 Z" fill="url(#earPink)" />
+
+    <!-- Контур голови -->
+    <path d="M 96 19 C 114 19, 124 31, 123 46 C 122 59, 110 66, 96 66 C 82 66, 70 59, 69 46 C 68 31, 78 19, 96 19 Z" fill="url(#furMain)" stroke="#D86800" stroke-width="2" />
+
+    <!-- Смужки на лобі -->
+    <path d="M 96 20 C 94.5 24, 94.5 28, 96 31 C 97.5 28, 97.5 24, 96 20 Z" fill="url(#stripeGrad)" opacity="0.85" />
+    <path d="M 89 21 C 88 25, 88.5 28, 90 30 C 91 27.5, 91 24, 89 21 Z" fill="url(#stripeGrad)" opacity="0.8" />
+    <path d="M 103 21 C 104 25, 103.5 28, 102 30 C 101 27.5, 101 24, 103 21 Z" fill="url(#stripeGrad)" opacity="0.8" />
+
+    <!-- Бічні смужки на щоках -->
+    <path d="M 70 41 C 74 41, 77 42, 79 43 C 76 44.5, 73 44.5, 70 44 Z" fill="url(#stripeGrad)" opacity="0.75" />
+    <path d="M 122 41 C 118 41, 115 42, 113 43 C 116 44.5, 119 44.5, 122 44 Z" fill="url(#stripeGrad)" opacity="0.75" />
+
+    <!-- Рум'янець -->
+    <ellipse cx="81" cy="49" rx="5" ry="3" fill="#FF7043" opacity="0.4" />
+    <ellipse cx="111" cy="49" rx="5" ry="3" fill="#FF7043" opacity="0.4" />
+
+    <!-- Звичайні очі -->
+    <g id="eyes-normal">
+      <ellipse cx="85" cy="40" rx="4.5" ry="5.5" fill="#3E2723" />
+      <circle cx="83.5" cy="38" r="1.8" fill="#FFFFFF" />
+      <circle cx="86.5" cy="42" r="0.8" fill="#FFFFFF" opacity="0.85" />
+
+      <ellipse cx="107" cy="40" rx="4.5" ry="5.5" fill="#3E2723" />
+      <circle cx="105.5" cy="38" r="1.8" fill="#FFFFFF" />
+      <circle cx="108.5" cy="42" r="0.8" fill="#FFFFFF" opacity="0.85" />
+    </g>
+
+    <!-- Примружені очі (для анімації задоволеного жування риби) -->
+    <g id="eyes-happy">
+      <path d="M 80 41 Q 85 35 90 41" fill="none" stroke="#3E2723" stroke-width="2.4" stroke-linecap="round" />
+      <path d="M 102 41 Q 107 35 112 41" fill="none" stroke="#3E2723" stroke-width="2.4" stroke-linecap="round" />
+    </g>
+
+    <!-- Носик -->
+    <path d="M 92.5 47.5 C 92.5 46, 99.5 46, 99.5 47.5 C 99.5 49.2, 97.2 51.2, 96 51.2 C 94.8 51.2, 92.5 49.2, 92.5 47.5 Z" fill="#EC407A" />
+    <ellipse cx="95" cy="47.2" rx="1.4" ry="0.6" fill="#FFCDD2" opacity="0.85" />
+
+    <!-- Звичайний ротик -->
+    <path id="mouth-normal" d="M 96 51.2 L 96 53.8 C 96 56.2, 92 57.5, 89.2 55.5 M 96 53.8 C 96 56.2, 100 57.5, 102.8 55.5" fill="none" stroke="#4E342E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Відкритий рот (для моменту укусу риби) -->
+    <g id="mouth-open">
+      <ellipse cx="96" cy="56.5" rx="5.5" ry="4.8" fill="#880E4F" stroke="#4E342E" stroke-width="1.5" />
+      <path d="M 92.5 58.5 Q 96 56 99.5 58.5 Q 96 61.5 92.5 58.5 Z" fill="#FF8A80" />
+    </g>
+
+    <!-- Вуса -->
+    <path d="M 78 50 C 72 49, 67 49, 63 50.5" fill="none" stroke="#5D4037" stroke-width="1.4" stroke-linecap="round" />
+    <path d="M 78.5 53.5 C 72.5 53.5, 68 55, 64.5 57" fill="none" stroke="#5D4037" stroke-width="1.4" stroke-linecap="round" />
+
+    <path d="M 114 50 C 120 49, 125 49, 127.5 50.5" fill="none" stroke="#5D4037" stroke-width="1.4" stroke-linecap="round" />
+    <path d="M 113.5 53.5 C 119.5 53.5, 124 55, 127 57" fill="none" stroke="#5D4037" stroke-width="1.4" stroke-linecap="round" />
+  </g>
+</svg>
