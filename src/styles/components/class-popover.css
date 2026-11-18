@@ -1,15 +1,26 @@
-.pop { position: fixed; z-index: 20; width: min(340px, calc(100vw - 16px)); max-height: 70vh; overflow: auto; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.14); padding: 12px 14px; animation: pop-in 150ms ease-out; }
-.pop.pinned { border-color: var(--feld); }
+.pop { position: fixed; z-index: 20; width: min(340px, calc(100vw - 16px)); max-height: 70vh; overflow: auto; background: var(--bg); border: 1px solid var(--line); border-top: 4px solid var(--abstrakt); border-radius: 12px; box-shadow: var(--shadow-3); padding: 12px 14px 14px; animation: pop-in 150ms ease-out; overscroll-behavior: contain; }
 @keyframes pop-in { from { opacity: 0; } }
-.pop h3 { margin: 0 0 6px; font-size: 14px; font-family: var(--mono); }
+.pop h3 { margin: 0 0 8px; padding-bottom: 8px; border-bottom: 1px solid var(--line-soft); font-size: 14px; font-family: var(--mono); }
 .pop h3 small { color: var(--muted); font-weight: 400; }
-.pop h4 { margin: 10px 0 4px; font-size: 12px; color: var(--muted); font-weight: 600; }
+.pop h4 { margin: 12px 0 4px; font-size: 12px; color: var(--muted); font-weight: 700; }
 .rows { list-style: none; margin: 0; padding: 0; }
-.rows li { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 4px; padding: 2px 0; font-family: var(--mono); font-size: 13px; }
-.feld { color: var(--feld); } .methode { color: var(--methode); } .abstrakt { color: var(--abstrakt); } .privat { color: var(--muted); } .typ { color: var(--muted); }
-.tag { margin-left: auto; font: 11px var(--sans); padding: 0 8px; border-radius: 99px; background: var(--btn); color: var(--muted); }
-.tag.eigen { background: #dbeafe; color: #1d4ed8; } .tag.ueber { background: #fef3c7; color: #92400e; }
-.tag.abstract { background: #f3e8ff; color: var(--abstrakt); } .tag.impl { background: #dcfce7; color: var(--methode); }
-.erben { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.rows li { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 4px; padding: 3px 0; border-bottom: 1px dashed var(--line-soft); font-family: var(--mono); font-size: 13px; }
+.rows li:last-child { border-bottom: 0; }
+.feld { color: var(--feld); font-weight: 600; } .methode { color: var(--methode); font-weight: 600; } .abstrakt { color: var(--abstrakt); font-weight: 600; } .privat { color: var(--muted); } .typ { color: var(--muted); }
+.tag { margin-left: auto; font: 600 11px var(--sans); padding: 1px 8px; border-radius: 99px; background: var(--btn); color: var(--muted); border: 1px solid var(--line-soft); }
+.tag.eigen { background: #dbeafe; color: #1e40af; border-color: #93c5fd; } .tag.ueber { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+.tag.abstract { background: #f3e8ff; color: #7e22ce; border-color: #d8b4fe; } .tag.impl { background: #dcfce7; color: #166534; border-color: #86efac; }
+.erben { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
 .erbe { display: grid; justify-items: center; gap: 2px; padding: 6px 10px; }
 .versuch { font-family: var(--mono); font-size: 12px; }
+
+/* Scrollbar der Karten: kein Hintergrund, nur ein dünner, runder Slider.
+   Track-Margin hält den Slider von den abgerundeten Ecken fern. */
+.pop::-webkit-scrollbar { width: 8px; height: 8px; background: transparent; }
+.pop::-webkit-scrollbar-track { background: transparent; margin: 10px 0; }
+.pop::-webkit-scrollbar-corner { background: transparent; }
+.pop::-webkit-scrollbar-thumb { background: #94a3b8; border: 2px solid transparent; background-clip: padding-box; border-radius: 99px; }
+.pop::-webkit-scrollbar-thumb:hover { background: #64748b; background-clip: padding-box; }
+@supports not selector(::-webkit-scrollbar) {
+  .pop { scrollbar-width: thin; scrollbar-color: #94a3b8 transparent; }
+}

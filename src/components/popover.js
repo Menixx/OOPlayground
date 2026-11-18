@@ -1,12 +1,34 @@
 import { el } from '../utils/dom.js';
-const offene = new Set();
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') [...offene].forEach((f) => f()); });
+// close-Funktion -> { trigger, pop() }, damit Klicks außerhalb erkannt werden können
+const offene = new Map();
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') [...offene.keys()].forEach((f) => f()); });
 
-/** Hover/Fokus öffnet, Klick fixiert (nochmal Klick schließt), Escape schließt alles.
+// Klick irgendwo außerhalb einer offenen Karte (und außerhalb ihres Triggers) schließt sie.
+// Capture-Phase: funktioniert auch, wenn ein Handler stopPropagation() aufruft.
+document.addEventListener('click', (e) => {
+  [...offene].forEach(([close, { trigger, pop }]) => {
+    const p = pop();
+    if (trigger.contains(e.target) || p?.contains(e.target)) return;
+    close();
+  });
+}, true);
+
+// Scrollen innerhalb einer Karte darf nie die Seite scrollen (auch wenn die Karte selbst keinen Scrollbar hat).
+function sperreSeitenScroll(pop) {
+  pop.addEventListener('wheel', (e) => {
+    e.stopPropagation(); // nur die innerste Karte entscheidet (verschachtelte Karten)
+    const max = pop.scrollHeight - pop.clientHeight;
+    const amEnde = e.deltaY < 0 ? pop.scrollTop <= 0 : pop.scrollTop >= max - 1;
+    if (max <= 0 || amEnde) e.preventDefault();
+  }, { passive: false });
+}
+
+/** Hover/Fokus öffnet, Verlassen schließt (nach kurzer Verzögerung), Escape oder Klick daneben schließt alles.
  *  Verschachtelte Karten (parent) liegen im DOM-Teilbaum der Elternkarte,
- *  daher löst der Wechsel zwischen ihnen kein mouseleave aus. */
+ *  daher löst der Wechsel zwischen ihnen kein mouseleave der Elternkarte aus.
+ *  Touch: Tippen öffnet, erneutes Tippen auf den Trigger oder Tippen daneben schließt. */
 export function attach(trigger, { build, parent = null }) {
-  let pop = null, body = null, pinned = false, timer = null;
+  let pop = null, body = null, timer = null, touch = false, warOffen = false;
   const kids = new Set();
   const api = {
     get root() { return pop; },
@@ -46,27 +68,27 @@ export function attach(trigger, { build, parent = null }) {
     pop.addEventListener('mouseleave', schedule);
     pop.addEventListener('focusin', () => clearTimeout(timer));
     pop.addEventListener('focusout', schedule);
+    sperreSeitenScroll(pop);
     render(); place();
     trigger.setAttribute('aria-expanded', 'true');
-    offene.add(close);
+    offene.set(close, { trigger, pop: () => pop });
   }
   function close() {
     clearTimeout(timer);
     kids.forEach((f) => f());
-    pop?.remove(); pop = body = null; pinned = false;
+    pop?.remove(); pop = body = null;
     trigger.setAttribute('aria-expanded', 'false');
     offene.delete(close);
   }
-  function schedule() { clearTimeout(timer); timer = setTimeout(() => { if (!pinned) close(); }, 250); }
+  function schedule() { clearTimeout(timer); timer = setTimeout(close, 250); }
 
   trigger.addEventListener('mouseenter', open);
   trigger.addEventListener('mouseleave', schedule);
   trigger.addEventListener('focus', open);
   trigger.addEventListener('blur', schedule);
-  trigger.addEventListener('click', () => {
-    if (pinned) return close();
-    open(); pinned = true; pop.classList.add('pinned');
-  });
+  // Touch-Geräte: der emulierte mouseenter öffnet die Karte; ein Tippen auf den Trigger bei offener Karte schließt sie.
+  trigger.addEventListener('pointerdown', (e) => { touch = e.pointerType !== 'mouse'; warOffen = !!pop; });
+  trigger.addEventListener('click', () => { if (touch && warOffen) close(); else open(); });
   addEventListener('resize', () => pop && place());
   return api;
 }

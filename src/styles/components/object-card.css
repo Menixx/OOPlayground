@@ -1,3 +1,4 @@
-.run, .mini { margin-left: 4px; padding: 1px 8px; font: 12px var(--sans); background: var(--btn); }
-.run { color: var(--methode); }
-.link { padding: 0 6px; font: 13px var(--mono); color: var(--feld); background: transparent; border-bottom: 1px dashed var(--feld); border-radius: 0; }
+.run, .mini { margin-left: 4px; padding: 1px 9px; font: 600 12px var(--sans); border-bottom-width: 2px; }
+.run { color: var(--methode); border-color: #86efac; background: linear-gradient(#fff, #e4f7ea); }
+.link { padding: 0 6px; font: 13px var(--mono); color: var(--feld); background: transparent; border: 0; border-bottom: 1px dashed var(--feld); border-radius: 0; box-shadow: none; }
+.link:hover:not(:disabled) { background: #dbeafe; transform: none; box-shadow: none; }

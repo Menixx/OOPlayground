@@ -1,2 +1,2 @@
-.impl { margin: 8px 0 0; padding-left: 20px; font-size: 12px; }
+.impl { margin: 8px 0 0; padding: 8px 8px 8px 28px; font-size: 12px; background: var(--panel); border: 1px solid var(--line-soft); border-radius: 8px; box-shadow: inset 0 1px 3px rgba(15,23,42,.10); }
 .impl li { margin: 2px 0; }
