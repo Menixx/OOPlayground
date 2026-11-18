@@ -1,4 +1,4 @@
-import { el, deklaration, javaWert, einheit, signatur } from '../../utils/dom.js';
+import { el, L, deklaration, javaLiteral, einheit, signatur } from '../../utils/dom.js';
 import { manager, klassenName } from '../../services/ObjectManager.js';
 import { attach } from '../popover.js';
 import { buildEngine } from '../EnginePopover/EnginePopover.js';
@@ -13,17 +13,17 @@ export function buildObjectCard(id, obj, api) {
       attach(b, { parent: api, build: (eapi) => buildEngine(v, eapi) });
       return b;
     }
-    return el('code', {}, javaWert(v, t));
+    return javaLiteral(v, t);
   };
-  const methoden = parent.methoden.map(([n]) => [n, Object.hasOwn(cls.prototype, n) ? ['überschrieben', 'ueber'] : ['geerbt', 'geerbt']]);
+  const methoden = parent.methoden.map(([n]) => [n, Object.hasOwn(cls.prototype, n) ? 'ueber' : 'geerbt']);
   return el('div', {},
     el('h3', {}, `class ${klassenName(cls)}`, el('small', {}, ` ${id}`)),
-    el('h4', {}, 'Felder'),
+    el('h4', { i18n: 'card.fields' }),
     el('ul', { class: 'rows' }, felder.map(([n, t, art]) =>
-      el('li', {}, deklaration(t, n, wert(n, t), einheit(n)), el('span', { class: `tag ${art}` }, art)))),
-    el('h4', {}, 'Methoden'),
-    el('ul', { class: 'rows' }, methoden.map(([n, [label, k]]) =>
-      el('li', {}, signatur(['public'], 'void', n), el('span', { class: `tag ${k}` }, label),
-        el('button', { type: 'button', class: 'run', 'data-tip': 'Ausführen', onclick: () => manager.aufrufen(id, n) }, 'Ausführen')))),
+      el('li', {}, deklaration(t, n, wert(n, t), einheit(n)), el('span', { class: `tag ${art}`, i18n: `tag.${art}` })))),
+    el('h4', { i18n: 'card.methods' }),
+    el('ul', { class: 'rows' }, methoden.map(([n, k]) =>
+      el('li', {}, signatur(['public'], 'void', n), el('span', { class: `tag ${k}`, i18n: `tag.${k}` }),
+        el('button', { type: 'button', class: 'run', 'data-tip': L('tip.run'), onclick: () => manager.aufrufen(id, n), i18n: 'card.run' })))),
     el('button', { type: 'button', class: 'loeschen', onclick: () => manager.loeschen(id) }, `${id} = null`));
 }

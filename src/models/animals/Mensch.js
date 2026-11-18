@@ -1,3 +1,4 @@
+import { t } from '../../i18n/i18n.js';
 import { Tier } from '../abstract/Tier.js';
 export class Mensch extends Tier {
   static eigeneFelder = [['beruf', 'String']];
@@ -10,6 +11,6 @@ export class Mensch extends Tier {
     this.kannGestreicheltWerden = true;
     this.beruf = 'Student';
   }
-  essen() { return 'Der Mensch isst eine Pizza.'; }
-  bewegen() { return 'Geht auf zwei Beinen'; }
+  essen() { return t('mensch.essen'); }
+  bewegen() { return t('mensch.bewegen'); }
 }

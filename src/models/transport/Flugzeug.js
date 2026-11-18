@@ -1,3 +1,4 @@
+import { t } from '../../i18n/i18n.js';
 import { Turbofan } from '../engines/Turbofan.js';
 import { Transport } from '../abstract/Transport.js';
 export class Flugzeug extends Transport {
@@ -12,8 +13,8 @@ export class Flugzeug extends Transport {
     this.spannweite = 35.8;
   }
   motorStarten() {
-    if (this.motor.laeuft) return 'Der Motor läuft bereits.';
-    return `${this.motor.starten()}\nMotor erfolgreich gestartet.`;
+    if (this.motor.laeuft) return t('transport.motorLaeuft');
+    return `${this.motor.starten()}\n${t('transport.motorErfolg')}`;
   }
-  bewegen() { return 'Fliegt durch die Luft'; }
+  bewegen() { return t('flugzeug.bewegen'); }
 }

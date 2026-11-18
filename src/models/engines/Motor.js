@@ -1,17 +1,18 @@
+import { t } from '../../i18n/i18n.js';
 export class Motor {
   static felder = [['typ', 'String'], ['leistung', 'int'], ['laeuft', 'boolean']];
   static bezeichnung = 'Motor';
   static einheit = '';
   static privateMethoden = [];
   constructor(typ, leistung) {
-    if (new.target === Motor) throw new Error('Abstrakte Klassen können nicht instanziiert werden.');
+    if (new.target === Motor) throw new Error(t('error.abstract'));
     this.typ = typ;
     this.leistung = leistung;
     this.laeuft = false;
   }
-  starten() { throw new Error('Die Methode starten() muss implementiert werden.'); }
+  starten() { throw new Error(t('error.notImplemented', { methode: 'starten' })); }
   stoppen() {
     this.laeuft = false;
-    return 'Motor gestoppt!';
+    return t('motor.gestoppt');
   }
 }

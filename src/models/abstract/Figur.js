@@ -1,3 +1,4 @@
+import { t, tWert } from '../../i18n/i18n.js';
 export class Figur {
   static felder = [
     ['name', 'String', '"Unbenannt"'],
@@ -6,13 +7,13 @@ export class Figur {
   static methoden = [['drehen90', false]];
   #winkel = 0; // gekapselt: nur über drehen90() änderbar
   constructor() {
-    if (new.target === Figur) throw new Error('Abstrakte Klassen können nicht instanziiert werden.');
+    if (new.target === Figur) throw new Error(t('error.abstract'));
     this.name = "Unbenannt";
     this.anzahlEcken = undefined;
   }
   get winkel() { return this.#winkel; }
   drehen90() {
     this.#winkel += 90;
-    return `${this.name} wurde um 90° gedreht (jetzt ${this.#winkel % 360}°).`;
+    return t('figur.drehen', { name: tWert(this.name), winkel: this.#winkel % 360 });
   }
 }

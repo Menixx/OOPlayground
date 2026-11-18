@@ -1,3 +1,4 @@
+import { t } from '../../i18n/i18n.js';
 import { Elektromotor } from '../engines/Elektromotor.js';
 import { Transport } from '../abstract/Transport.js';
 export class Zug extends Transport {
@@ -12,8 +13,8 @@ export class Zug extends Transport {
     this.anzahlWaggons = 8;
   }
   motorStarten() {
-    if (this.motor.laeuft) return 'Der Motor läuft bereits.';
-    return `${this.motor.starten()}\nMotor erfolgreich gestartet.`;
+    if (this.motor.laeuft) return t('transport.motorLaeuft');
+    return `${this.motor.starten()}\n${t('transport.motorErfolg')}`;
   }
-  bewegen() { return 'Fährt auf Schienen'; }
+  bewegen() { return t('zug.bewegen'); }
 }

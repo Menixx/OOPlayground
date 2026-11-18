@@ -1,3 +1,4 @@
+import { t, tWert } from '../../i18n/i18n.js';
 export class Transport {
   static felder = [
     ['name', 'String', '"Unbenannt"'],
@@ -8,20 +9,20 @@ export class Transport {
   ];
 static methoden = [['motorStarten', true], ['bewegen', true], ['halten', false]];
   constructor() {
-    if (new.target === Transport) throw new Error('Abstrakte Klassen können nicht instanziiert werden.');
+    if (new.target === Transport) throw new Error(t('error.abstract'));
     this.name = "Unbenannt";
     this.kannFliegen = undefined;
     this.hoechstgeschwindigkeit = undefined;
     this.anzahlRaeder = undefined;
     this.motor = undefined;
   }
-  motorStarten() { throw new Error('Die Methode motorStarten() muss implementiert werden.'); }
-  bewegen() { throw new Error('Die Methode bewegen() muss implementiert werden.'); }
+  motorStarten() { throw new Error(t('error.notImplemented', { methode: 'motorStarten' })); }
+  bewegen() { throw new Error(t('error.notImplemented', { methode: 'bewegen' })); }
   halten() {
     if (this.motor?.laeuft) {
       this.motor.stoppen();               // Delegation an das Motor-Objekt
-      return `${this.name} hält an.\nMotor gestoppt.`;
+      return `${t('transport.halten', { name: tWert(this.name) })}\n${t('transport.motorGestoppt')}`;
     }
-    return `${this.name} hält an.`;
+    return t('transport.halten', { name: tWert(this.name) });
   }
 }

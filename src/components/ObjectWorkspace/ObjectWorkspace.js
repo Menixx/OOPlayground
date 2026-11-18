@@ -9,9 +9,9 @@ import { figurSvg } from '../figurSvg.js';
 import { createAnimation } from '../animations.js';
 
 export function mountWorkspace(root) {
-  const alle = el('button', { type: 'button', class: 'primary', disabled: true, onclick: () => manager.alleBewegen() }, 'Alle bewegen');
-  const alleLoeschen = el('button', { type: 'button', class: 'loeschen', disabled: true, onclick: () => manager.alleLoeschen() }, 'Alle löschen');
-  const leer = el('p', { class: 'hint' }, 'Noch keine Objekte. Fahre über eine abstrakte Klasse und instanziiere einen Erben.');
+  const alle = el('button', { type: 'button', class: 'primary', disabled: true, onclick: () => manager.alleBewegen(), i18n: 'workspace.moveAll' });
+  const alleLoeschen = el('button', { type: 'button', class: 'loeschen', disabled: true, onclick: () => manager.alleLoeschen(), i18n: 'workspace.deleteAll' });
+  const leer = el('p', { class: 'hint', i18n: 'workspace.empty' });
   const grid = el('div', { class: 'grid' });
   root.append(el('div', { class: 'bar' }, alle, alleLoeschen), leer, grid);
   const items = new Map();

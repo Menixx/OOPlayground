@@ -1,3 +1,4 @@
+import { t } from '../../i18n/i18n.js';
 import { Benzinmotor } from '../engines/Benzinmotor.js';
 import { Transport } from '../abstract/Transport.js';
 export class Auto extends Transport {
@@ -12,8 +13,8 @@ export class Auto extends Transport {
     this.anzahlTueren = 4;
   }
   motorStarten() {
-    if (this.motor.laeuft) return 'Der Motor läuft bereits.';
-    return `${this.motor.starten()}\nMotor erfolgreich gestartet.`;
+    if (this.motor.laeuft) return t('transport.motorLaeuft');
+    return `${this.motor.starten()}\n${t('transport.motorErfolg')}`;
   }
-  bewegen() { return 'Fährt auf der Straße'; }
+  bewegen() { return t('auto.bewegen'); }
 }

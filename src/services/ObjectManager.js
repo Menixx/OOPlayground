@@ -1,4 +1,5 @@
 import { bus } from './EventBus.js';
+import { t } from '../i18n/i18n.js';
 import { Tier } from '../models/abstract/Tier.js';
 import { Transport } from '../models/abstract/Transport.js';
 import { Figur } from '../models/abstract/Figur.js';
@@ -36,7 +37,7 @@ export class ObjectManager {
       this.#zaehler[key] = (this.#zaehler[key] ?? 0) + 1;
       const id = key + this.#zaehler[key];
       this.#objekte.set(id, obj);
-      log('info', `Objekt ${id} wurde erstellt.`);
+      log('info', t('log.created', { id }));
       bus.emit('created', { id, obj });
       return id;
     } catch (e) { log('fehler', e.message); }
@@ -60,7 +61,7 @@ export class ObjectManager {
 
   // Polymorphie: ein Aufruf, viele Implementierungen – keine Prüfung auf konkrete Klassen
   alleBewegen() {
-    log('befehl', 'Alle bewegen');
+    log('befehl', t('workspace.moveAll'));
     this.alle
       .filter(({ obj }) => obj instanceof Tier || obj instanceof Transport)
       .forEach(({ id, obj }) => {
@@ -79,7 +80,7 @@ export class ObjectManager {
     const uebrig = [...this.#objekte.values()].some((o) => klassenName(o.constructor).toLowerCase() === key);
     if (!uebrig) delete this.#zaehler[key];
     log('befehl', `${id} = null`);
-    log('ergebnis', `Objekt ${id} wurde gelöscht.`);
+    log('ergebnis', t('log.deleted', { id }));
     bus.emit('deleted', { ids: [id] });
   }
 
@@ -88,8 +89,8 @@ export class ObjectManager {
     const ids = [...this.#objekte.keys()];
     this.#objekte.clear();
     this.#zaehler = {};                      // alle Nummern beginnen wieder bei 1
-    log('befehl', 'Alle löschen');
-    log('ergebnis', `${ids.length} Objekt(e) wurden gelöscht.`);
+    log('befehl', t('workspace.deleteAll'));
+    log('ergebnis', t('log.deletedAll', { n: ids.length }));
     bus.emit('deleted', { ids });
   }
 }

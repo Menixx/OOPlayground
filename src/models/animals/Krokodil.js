@@ -1,3 +1,4 @@
+import { t } from '../../i18n/i18n.js';
 import { Tier } from '../abstract/Tier.js';
 export class Krokodil extends Tier {
   static eigeneFelder = [['anzahlZaehne', 'int']];
@@ -10,6 +11,6 @@ export class Krokodil extends Tier {
     this.kannGestreicheltWerden = false;
     this.anzahlZaehne = 66;
   }
-  essen() { return 'Das Krokodil frisst Fleisch.'; }
-  bewegen() { return 'Kriecht'; }
+  essen() { return t('krokodil.essen'); }
+  bewegen() { return t('krokodil.bewegen'); }
 }

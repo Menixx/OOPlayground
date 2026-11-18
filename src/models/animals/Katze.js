@@ -1,3 +1,4 @@
+import { t } from '../../i18n/i18n.js';
 import { Tier } from '../abstract/Tier.js';
 export class Katze extends Tier {
   static eigeneFelder = [['schnurrt', 'boolean']];
@@ -10,6 +11,6 @@ export class Katze extends Tier {
     this.kannGestreicheltWerden = true;
     this.schnurrt = true;
   }
-  essen() { return 'Die Katze frisst Fisch.'; }
-  bewegen() { return 'Läuft auf vier Pfoten'; }
+  essen() { return t('katze.essen'); }
+  bewegen() { return t('katze.bewegen'); }
 }
