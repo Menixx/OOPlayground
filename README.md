@@ -11,6 +11,12 @@ Vanilla JS (ES Modules) + Vite, ohne Backend.
 `vite.config.js` nutzt `base: './'` (läuft unter jedem Repo-Pfad). Optional: `VITE_BASE=/repo-name/ npm run build`.
 Automatisches Deployment: `.github/workflows/deploy.yml` (Settings → Pages → Source: GitHub Actions).
 
+## Erklärungsseite (docs.html)
+Zweite Einstiegsseite (Vite multi-page), erreichbar über den Link „Erklärung“ (Buch-Symbol) in der Kopfzeile (neuer Tab).
+- Texte: `src/docs/content/de.js` und `en.js` (Auszeichnung siehe Dateikopf). Ändert sich ein Knopf oder eine Ausgabe im OOPlayground, hier mit anpassen.
+- `src/docs/render.js` (Daten → HTML), `src/docs/nav.js` (Menü, Scrollspy, Suche, Schublade), `src/styles/docs.css`.
+- Die Sprache wird zwischen beiden Tabs synchronisiert (`localStorage`-Schlüssel `ooplayground.sprache`).
+
 ## Icons
 SVG-Dateien nach `public/icons/` legen. Dateinamen: siehe `public/icons/README.md` und `src/icons.js`.
 Fehlende Icons werden durch einen Platzhalter ersetzt.

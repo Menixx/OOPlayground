@@ -13,9 +13,6 @@
 .kommentar { color: var(--muted); font-style: italic; }
 .mod { color: #be185d; font-weight: 600; } /* Modifikatoren: public, private, abstract */
 .rows li > .dekl + button { margin-left: auto; } /* „testen“ rechts, wenn kein Tag davor steht */
-.tag { margin-left: auto; font: 600 11px var(--sans); padding: 1px 8px; border-radius: 99px; background: var(--btn); color: var(--muted); border: 1px solid var(--line-soft); }
-.tag.eigen { background: #dbeafe; color: #1e40af; border-color: #93c5fd; } .tag.ueber { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
-.tag.abstract { background: #f3e8ff; color: #7e22ce; border-color: #d8b4fe; } .tag.impl { background: #dcfce7; color: #166534; border-color: #86efac; }
 .erben { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
 .erbe { display: grid; justify-items: center; gap: 2px; padding: 6px 10px; }
 .versuch { font-family: var(--mono); font-size: 12px; }

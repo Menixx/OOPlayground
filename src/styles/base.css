@@ -17,3 +17,6 @@ button:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
 [data-tip] { position: relative; }
 [data-tip]:hover::after, [data-tip]:focus-visible::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: var(--text); color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 5px; box-shadow: var(--shadow-2); white-space: nowrap; z-index: 50; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+/* Hauptschaltfläche (z. B. „Alle bewegen“, „▶ So zeigst du es“) */
+.primary { background: linear-gradient(#3b82f6, #1d4ed8); color: #fff; border-color: #1e40af; font-weight: 600; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), var(--shadow-2); }
+.primary:hover:not(:disabled) { background: linear-gradient(#4b8ff8, #1e40af); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), var(--shadow-3); }

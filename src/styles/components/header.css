@@ -2,13 +2,5 @@
 #header h1 { font-size: 24px; margin: 0; color: #fff; letter-spacing: -.01em; }
 #header p { flex-basis: 100%; margin: 0; color: #cbd5e1; font-size: 14px; }
 
-/* Sprachumschalter: zwei Hälften, ein gleitender Schieber markiert die aktive Sprache */
-.lang-toggle { --pad: 3px; position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; margin-left: auto; padding: var(--pad); border: 1px solid rgba(255,255,255,.18); border-radius: 99px; background: rgba(255,255,255,.07); box-shadow: inset 0 2px 4px rgba(0,0,0,.45); color: #94a3b8; font: 700 12px var(--sans); letter-spacing: .04em; }
-.lang-toggle:hover:not(:disabled) { background: rgba(255,255,255,.12); transform: none; box-shadow: inset 0 2px 4px rgba(0,0,0,.45); }
-.lang-toggle:active:not(:disabled) { transform: none; box-shadow: inset 0 2px 4px rgba(0,0,0,.45); }
-.lang-thumb { position: absolute; top: var(--pad); bottom: var(--pad); left: var(--pad); width: calc(50% - var(--pad)); border-radius: 99px; background: linear-gradient(#3b82f6, #1d4ed8); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 2px 6px rgba(37,99,235,.55); transition: transform 340ms cubic-bezier(.34, 1.45, .64, 1); }
-.lang-toggle[data-lang="de"] .lang-thumb { transform: translateX(100%); }
-.lang-opt { position: relative; z-index: 1; min-width: 34px; padding: 3px 10px; text-align: center; transition: color 220ms ease; }
-.lang-toggle[data-lang="en"] .lang-opt[data-l="en"],
-.lang-toggle[data-lang="de"] .lang-opt[data-l="de"] { color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,.3); }
-.lang-opt:hover { color: #e2e8f0; }
+#header .docs-link { margin-left: auto; }
+#header .lang-toggle { margin-left: 8px; }

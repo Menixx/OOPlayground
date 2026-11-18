@@ -1,8 +1,10 @@
 @import './variables.css';
 @import './base.css';
 @import './components/header.css';
+@import './components/header-controls.css';
 @import './components/class-panel.css';
 @import './components/class-popover.css';
+@import './components/tag.css';
 @import './components/object-workspace.css';
 @import './components/object-card.css';
 @import './components/engine-popover.css';

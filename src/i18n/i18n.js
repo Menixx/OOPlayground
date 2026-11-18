@@ -67,3 +67,18 @@ export function setSprache(neu) {
   uebersetzeDom();
   bus.emit('sprache', neu);
 }
+
+/** Sprache übernehmen, die ein anderer Tab gewählt hat – ohne erneut in den Speicher zu schreiben. */
+export function syncSprache(neu) {
+  if (!SPRACHEN.includes(neu) || neu === sprache) return;
+  sprache = neu;
+  uebersetzeDom();
+  bus.emit('sprache', neu);
+}
+
+/** Sprachwechsel in anderen Tabs (OOPlayground ↔ Erklärung) sofort übernehmen. */
+export function folgeAnderenTabs() {
+  window.addEventListener('storage', (e) => {
+    if (e.key === SPEICHER_KEY && e.newValue) syncSprache(e.newValue);
+  });
+}
