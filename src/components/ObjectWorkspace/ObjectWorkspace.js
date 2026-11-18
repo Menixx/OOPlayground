@@ -10,9 +10,10 @@ import { createAnimation } from '../animations.js';
 
 export function mountWorkspace(root) {
   const alle = el('button', { type: 'button', class: 'primary', disabled: true, onclick: () => manager.alleBewegen() }, 'Alle bewegen');
+  const alleLoeschen = el('button', { type: 'button', class: 'loeschen', disabled: true, onclick: () => manager.alleLoeschen() }, 'Alle löschen');
   const leer = el('p', { class: 'hint' }, 'Noch keine Objekte. Fahre über eine abstrakte Klasse und instanziiere einen Erben.');
   const grid = el('div', { class: 'grid' });
-  root.append(el('div', { class: 'bar' }, alle), leer, grid);
+  root.append(el('div', { class: 'bar' }, alle, alleLoeschen), leer, grid);
   const items = new Map();
 
   bus.on('created', ({ id, obj }) => {
@@ -22,7 +23,7 @@ export function mountWorkspace(root) {
   else { anim = createAnimation(name); vis = anim?.el ?? icon(name, 'icon big'); }
   const t = el('button', { type: 'button', class: 'obj', 'aria-label': `${id} (${name})` }, vis, el('span', {}, id));
   const pop = attach(t, { build: (api) => buildObjectCard(id, obj, api) });
-  items.set(id, { pop, fig, obj, anim });
+  items.set(id, { pop, fig, obj, anim, tile: t });
   grid.append(t);
   leer.hidden = true;
 });
@@ -33,9 +34,23 @@ bus.on('called', ({ id, methode }) => {
   if (methode === 'halten') a.halt(); else a.play(methode);
 });
 
+bus.on('deleted', ({ ids }) => {
+  ids.forEach((id) => {
+    const i = items.get(id);
+    if (!i) return;
+    i.pop.close();      // Karte schließen
+    i.tile.remove();    // Kachel entfernen
+    items.delete(id);
+  });
+  leer.hidden = items.size > 0;
+  alle.disabled = !manager.kannBewegen;
+  alleLoeschen.disabled = manager.alle.length === 0;
+});
+
 bus.on('changed', ({ id }) => {
     const i = items.get(id);
     if (i) { i.pop.refresh(); if (i.fig) i.fig.style.transform = `rotate(${i.obj.winkel}deg)`; }
     alle.disabled = !manager.kannBewegen;
+    alleLoeschen.disabled = manager.alle.length === 0;
   });
 }

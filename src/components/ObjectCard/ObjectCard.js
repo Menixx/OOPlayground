@@ -24,5 +24,6 @@ export function buildObjectCard(id, obj, api) {
     el('h4', {}, 'Methoden'),
     el('ul', { class: 'rows' }, methoden.map(([n, [label, k]]) =>
       el('li', {}, el('span', { class: 'methode' }, `${n}()`), el('span', { class: `tag ${k}` }, label),
-        el('button', { type: 'button', class: 'run', 'data-tip': 'Ausführen', onclick: () => manager.aufrufen(id, n) }, 'Ausführen')))));
+        el('button', { type: 'button', class: 'run', 'data-tip': 'Ausführen', onclick: () => manager.aufrufen(id, n) }, 'Ausführen')))),
+    el('button', { type: 'button', class: 'loeschen', onclick: () => manager.loeschen(id) }, `${id} = null`));
 }

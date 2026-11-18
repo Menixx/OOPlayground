@@ -68,6 +68,30 @@ export class ObjectManager {
         bus.emit('called', { id, methode: 'bewegen' });  
       });
   }
+
+    // Objekt freigeben: Referenz entfernen (= null)
+  loeschen(id) {
+    const obj = this.#objekte.get(id);
+    if (!obj) return;
+    this.#objekte.delete(id);
+    // Gibt es keine Instanz dieser Klasse mehr, beginnt die Nummerierung wieder bei 1
+    const key = klassenName(obj.constructor).toLowerCase();
+    const uebrig = [...this.#objekte.values()].some((o) => klassenName(o.constructor).toLowerCase() === key);
+    if (!uebrig) delete this.#zaehler[key];
+    log('befehl', `${id} = null`);
+    log('ergebnis', `Objekt ${id} wurde gelöscht.`);
+    bus.emit('deleted', { ids: [id] });
+  }
+
+  alleLoeschen() {
+    if (!this.#objekte.size) return;
+    const ids = [...this.#objekte.keys()];
+    this.#objekte.clear();
+    this.#zaehler = {};                      // alle Nummern beginnen wieder bei 1
+    log('befehl', 'Alle löschen');
+    log('ergebnis', `${ids.length} Objekt(e) wurden gelöscht.`);
+    bus.emit('deleted', { ids });
+  }
 }
 export const manager = new ObjectManager();
 bus.on('created', () => bus.emit('changed', {}));
