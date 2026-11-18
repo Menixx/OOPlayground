@@ -1,7 +1,7 @@
 * { box-sizing: border-box; }
 body { margin: 0; font: 15px/1.5 var(--sans); background: var(--page); color: var(--text); min-height: 100vh; }
-main { max-width: 1000px; margin: 0 auto; padding: 24px 16px 40px; display: grid; gap: 22px; }
-section { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px 18px; box-shadow: var(--shine), var(--shadow-2); }
+main { max-width: 1000px; width: 100%; min-width: 0; margin: 0 auto; padding: 24px 16px 40px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; }
+section { min-width: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px 18px; box-shadow: var(--shine), var(--shadow-2); }
 h2 { display: flex; align-items: center; gap: 8px; font-size: 15px; margin: 0 0 12px; }
 h2::before { content: ''; width: 4px; height: 16px; border-radius: 2px; background: var(--feld); }
 code, .out { font-family: var(--mono); font-size: 13px; }

@@ -1,8 +1,17 @@
 .bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }.primary { background: linear-gradient(#3b82f6, #1d4ed8); color: #fff; border-color: #1e40af; font-weight: 600; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), var(--shadow-2); }
 .primary:hover:not(:disabled) { background: linear-gradient(#4b8ff8, #1e40af); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), var(--shadow-3); }
-.grid { display: flex; flex-wrap: wrap; gap: 14px; }
-.obj { display: grid; justify-items: center; gap: 2px; min-width: 92px; padding: 10px; background: linear-gradient(#fff, #f4f7fc); border: 1px solid var(--line); border-bottom: 4px solid var(--feld); border-radius: 12px; box-shadow: var(--shine), var(--shadow-2); font-size: 12px; font-weight: 600; font-family: var(--mono); }
-.obj:hover:not(:disabled) { background: linear-gradient(#fff, #eef4ff); transform: translateY(-3px); box-shadow: var(--shine), var(--shadow-3); }
+.grid { display: flex; flex-wrap: nowrap; align-items: flex-start; gap: 14px; width: 100%; min-width: 0; height: 176px; min-height: 176px; box-sizing: border-box; overflow-x: auto; overflow-y: hidden; padding: 6px 0 20px; } /* 20px below the cards so their shadow fades out before the scrollbar */
+/* Scrollbar: only the thumb, no track background, no arrow buttons */
+.grid::-webkit-scrollbar { height: 6px; background: transparent; }
+.grid::-webkit-scrollbar-track, .grid::-webkit-scrollbar-corner { background: transparent; }
+.grid::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+.grid::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
+.grid::-webkit-scrollbar-thumb:hover { background: #64748b; }
+/* Standard properties only where ::-webkit-scrollbar is unsupported (Firefox) — in Chromium they would override the rules above and bring back the arrows */
+@supports not selector(::-webkit-scrollbar) { .grid { scrollbar-width: thin; scrollbar-color: #94a3b8 transparent; } }
+.obj { display: grid; justify-items: center; align-content: center; gap: 2px; width: 132px; min-width: 132px; max-width: 132px; height: 144px; min-height: 144px; max-height: 144px; flex: 0 0 132px; box-sizing: border-box; padding: 10px; background: linear-gradient(#fff, #f4f7fc); border: 1px solid var(--line); border-bottom: 4px solid var(--feld); border-radius: 12px; box-shadow: var(--shine), var(--obj-shadow); font-size: 12px; font-weight: 600; font-family: var(--mono); }.obj:hover:not(:disabled) { background: linear-gradient(#fff, #eef4ff); transform: translateY(-3px); box-shadow: var(--shine), var(--obj-shadow-hover); }
+/* Half-length versions of --shadow-2 / --shadow-3, so the shadow is not clipped by the scroll container */
+.obj { --obj-shadow: 0 .5px 1px rgba(15,23,42,.14), 0 2px 5px rgba(15,23,42,.12), 0 5px 12px rgba(15,23,42,.08); --obj-shadow-hover: 0 1px 1.5px rgba(15,23,42,.16), 0 5px 10px rgba(15,23,42,.18), 0 11px 22px rgba(15,23,42,.16); }
 .fig-wrap { display: block; width: 48px; height: 48px; transition: transform 300ms ease; }
 .fig { --c: var(--feld); --c-fill: var(--feld); width: 100%; height: 100%; fill: var(--c-fill); fill-opacity: .55; stroke: var(--c); stroke-width: 4; stroke-linejoin: round; filter: drop-shadow(0 2px 2px rgba(15,23,42,.25)); }
 .fig .marke { fill: var(--c); stroke: var(--c); stroke-width: 3; fill-opacity: 1; }
@@ -11,3 +20,8 @@
 .fig-stern { --c: #d99a06; --c-fill: #fcd34d; }   /* gold */
 .anim { display: grid; place-items: center; width: 104px; height: 92px; }
 .anim svg { width: 100%; height: 100%; display: block; }
+#workspace { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 176px; min-width: 0; max-width: 100%; margin-bottom: -14px; } /* pull the scrollbar down into the section's bottom padding */
+#workspace > .bar { grid-column: 1; grid-row: 1; }
+#workspace > .hint, #workspace > .grid { grid-column: 1; grid-row: 2; }
+#workspace > .hint { align-self: center; z-index: 1; margin: 0; pointer-events: none; }
+

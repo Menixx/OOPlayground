@@ -57,22 +57,22 @@
     }
 
     /* ==========================================================================
-       1. АНІМАЦІЯ ПОЛЬОТУ ЛІТАКА (РЕАКТИВНІ ЯЗИКИ ПОЛУМ'Я)
+       1. АНІМАЦІЯ ЗАПУСКУ ДВИГУНІВ (РЕАКТИВНІ ЯЗИКИ ПОЛУМ'Я)
        Класи, що змінюють стани анімації:
-       - .state-fly — вмикає пульсацію язиків полум'я
+       - .state-start — вмикає пульсацію язиків полум'я
          (.jet-flame, .flame-inner-left, .flame-inner-right, .flame-outer-left,
          .flame-outer-right) у задній частині крила строго на рівні кожної з 4-х
          турбін, а також плавне ширяння корпусу літака (#plane-aircraft).
        ========================================================================== */
-    .state-fly #plane-aircraft {
+    .state-start #plane-aircraft {
       animation: planeHoverFloat 1.6s ease-in-out infinite alternate;
     }
-    .state-fly .flame-inner-left,
-    .state-fly .flame-inner-right {
+    .state-start .flame-inner-left,
+    .state-start .flame-inner-right {
       animation: flameFlickerInner 0.16s ease-in-out infinite alternate;
     }
-    .state-fly .flame-outer-left,
-    .state-fly .flame-outer-right {
+    .state-start .flame-outer-left,
+    .state-start .flame-outer-right {
       animation: flameFlickerOuter 0.19s ease-in-out infinite alternate;
     }
 
@@ -92,28 +92,28 @@
     }
 
     /* ==========================================================================
-       2. АНІМАЦІЯ ЗАПУСКУ ДВИГУНІВ (ПОТОКИ ПОВІТРЯ ВПЕРЕД І НАЗАД ВІД ТУРБІН)
+       2. АНІМАЦІЯ ПОЛЬОТУ ЛІТАКА (ПОТОКИ ПОВІТРЯ ВПЕРЕД І НАЗАД ВІД ТУРБІН)
        Класи, що змінюють стани анімації:
-       - .state-start — запускає рух тонких ліній
+       - .state-fly — запускає рух тонких ліній
          всмоктування повітря спереду турбін (.air-intake-line, .intake-1, .intake-2)
          та виштовхування повітряного потоку позаду крила (.air-exhaust-line,
          .exhaust-1, .exhaust-2), а також легку вібрацію корпусу (#plane-aircraft).
        ========================================================================== */
-    .state-start #plane-aircraft {
+    .state-fly #plane-aircraft {
       animation: engineSpoolVibrate 0.11s ease-in-out infinite alternate;
     }
     /* Лінії всмоктування повітря перед турбінами */
-    .state-start .intake-1 {
+    .state-fly .intake-1 {
       animation: airIntakeFlow 0.85s ease-in infinite 0s;
     }
-    .state-start .intake-2 {
+    .state-fly .intake-2 {
       animation: airIntakeFlow 0.85s ease-in infinite 0.42s;
     }
     /* Лінії виштовхування повітря позаду крила */
-    .state-start .exhaust-1 {
+    .state-fly .exhaust-1 {
       animation: airExhaustFlow 0.85s ease-out infinite 0s;
     }
-    .state-start .exhaust-2 {
+    .state-fly .exhaust-2 {
       animation: airExhaustFlow 0.85s ease-out infinite 0.42s;
     }
 
@@ -158,7 +158,7 @@
   <!-- ОСНОВНА ГРУПА ЛІТАКА -->
   <g id="plane-aircraft">
 
-    <!-- 1. ЯЗИКИ ПОЛУМ'Я (відображаються позаду крила при класі .state-fly) -->
+    <!-- 1. ЯЗИКИ ПОЛУМ'Я (відображаються позаду крила при класі .state-start) -->
     <g id="jet-flames-group" filter="url(#flameGlow)">
       <!-- Полум'я зовнішньої лівої турбіни (x = 23.5) -->
       <g class="jet-flame flame-outer-left">
@@ -182,7 +182,7 @@
       </g>
     </g>
 
-    <!-- 2. ПОТОКИ ПОВІТРЯ ПРИ ЗАПУСКУ ДВИГУНІВ (відображаються при класі .state-start) -->
+    <!-- 2. ПОТОКИ ПОВІТРЯ ПІД ЧАС ПОЛЬОТУ (відображаються при класі .state-fly) -->
     <g id="airflow-lines-group" fill="none" stroke="#81D4FA" stroke-width="1.2" stroke-linecap="round">
       <!-- Тонкі лінії всмоктування повітря передньою частиною турбін -->
       <g class="air-intake-line intake-1" stroke-dasharray="10 6">
