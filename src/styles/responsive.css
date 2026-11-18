@@ -1,0 +1,55 @@
+/* ==========================================================================
+   Adaptive Layout — drei Breakpoints
+   - Desktop: ab 1025px  -> Basisstile (keine Media Query)
+   - Tablet:  601–1024px -> @media (max-width: 1024px)
+   - Mobil:   bis 600px  -> @media (max-width: 600px), baut auf den Tablet-Regeln auf
+   Diese Datei wird zuletzt importiert, damit sie die Komponentenstile überschreibt.
+   ========================================================================== */
+
+/* ---------- Tablet ---------- */
+@media (max-width: 1024px) {
+  #header { padding: 18px 20px; }
+  #header h1 { font-size: 22px; }
+
+  main { padding: 20px 20px 32px; gap: 18px; }
+  section { padding: 14px 16px 16px; }
+  /* Scrollbar der Objektleiste bleibt am unteren Rand: 16px Innenabstand - 4px */
+  #workspace { margin-bottom: -12px; }
+
+  .class-btn { min-width: 112px; }
+  .out { height: 180px; }
+}
+
+/* ---------- Mobil ---------- */
+@media (max-width: 600px) {
+  body { font-size: 14px; }
+
+  #header { padding: 14px 12px; gap: 2px 10px; }
+  #header h1 { font-size: 20px; }
+  #header p { font-size: 13px; }
+
+  main { padding: 12px 10px 24px; gap: 12px; }
+  section { padding: 12px 12px 14px; border-radius: 12px; }
+  h2 { font-size: 14px; margin-bottom: 10px; }
+  #workspace { margin-bottom: -10px; } /* 14px Innenabstand - 4px */
+
+  /* Abstrakte Klassen: immer eine Reihe aus gleich breiten Kacheln statt Umbruch */
+  #class-panel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .class-btn { min-width: 0; padding: 10px 6px 8px; }
+
+  /* Aktionsleiste: Schaltflächen teilen sich die Breite */
+  .bar { gap: 6px; }
+  .bar > button { flex: 1 1 0; min-width: 0; padding-inline: 8px; }
+
+  /* Objekte: etwas schmalere Karten, damit mehr davon sichtbar sind */
+  .grid { gap: 10px; }
+  .obj { width: 120px; min-width: 120px; max-width: 120px; flex-basis: 120px; padding: 8px; }
+  .anim { width: 100px; height: 88px; }
+
+  .out { height: 160px; padding: 8px 10px; font-size: 12px; }
+  #console > .mini { top: -34px; }
+
+  /* Karten: fast volle Bildschirmbreite */
+  .pop { width: calc(100vw - 16px); padding: 10px 12px 12px; }
+  .rows li { font-size: 12px; }
+}
