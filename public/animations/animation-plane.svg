@@ -62,11 +62,8 @@
        - .state-start — вмикає пульсацію язиків полум'я
          (.jet-flame, .flame-inner-left, .flame-inner-right, .flame-outer-left,
          .flame-outer-right) у задній частині крила строго на рівні кожної з 4-х
-         турбін, а також плавне ширяння корпусу літака (#plane-aircraft).
+         турбін. Корпус літака (#plane-aircraft) при цьому залишається нерухомим.
        ========================================================================== */
-    .state-start #plane-aircraft {
-      animation: planeHoverFloat 1.6s ease-in-out infinite alternate;
-    }
     .state-start .flame-inner-left,
     .state-start .flame-inner-right {
       animation: flameFlickerInner 0.16s ease-in-out infinite alternate;
@@ -84,11 +81,6 @@
     @keyframes flameFlickerOuter {
       0%   { opacity: 0.85; transform: scaleX(0.88) scaleY(0.82); }
       100% { opacity: 1;    transform: scaleX(1.08) scaleY(1.15); }
-    }
-
-    @keyframes planeHoverFloat {
-      0%   { transform: translateY(0px); }
-      100% { transform: translateY(-2.5px); }
     }
 
     /* ==========================================================================
