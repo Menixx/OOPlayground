@@ -10,4 +10,8 @@ export class Motor {
     this.laeuft = false;
   }
   starten() { throw new Error('Die Methode starten() muss implementiert werden.'); }
+  stoppen() {
+    this.laeuft = false;
+    return 'Motor gestoppt!';
+  }
 }

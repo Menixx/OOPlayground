@@ -10,3 +10,5 @@
 .fig-dreieck { --c: #22c55e; --c-fill: #86efac; } /* hellgrün */
 .fig-kreis { --c: #0ea5e9; --c-fill: #7dd3fc; }   /* hellblau */
 .fig-stern { --c: #d99a06; --c-fill: #fcd34d; }   /* gold */
+.anim { display: grid; place-items: center; width: 104px; height: 92px; }
+.anim svg { width: 100%; height: 100%; display: block; }

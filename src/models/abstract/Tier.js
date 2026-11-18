@@ -6,7 +6,7 @@ export class Tier {
     ['hatSchwanz', 'boolean', 'undefined'],
     ['kannGestreicheltWerden', 'boolean', 'undefined']
   ];
-  static methoden = [['essen', true], ['bewegen', true]];
+static methoden = [['essen', true], ['bewegen', true], ['halten', false]];
   constructor() {
     if (new.target === Tier) throw new Error('Abstrakte Klassen können nicht instanziiert werden.');
     this.name = "Unbenannt";
@@ -17,4 +17,5 @@ export class Tier {
   }
   essen() { throw new Error('Die Methode essen() muss implementiert werden.'); }
   bewegen() { throw new Error('Die Methode bewegen() muss implementiert werden.'); }
+  halten() { return `${this.name} bleibt stehen.`; }
 }

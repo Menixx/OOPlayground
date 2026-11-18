@@ -48,10 +48,13 @@ export class ObjectManager {
     try { new cls(); } catch (e) { log('fehler', e.message); }
   }
 
-  aufrufen(id, methode) {
+    aufrufen(id, methode) {
     const obj = this.#objekte.get(id);
     log('befehl', `${id}.${methode}()`);
-    try { log('ergebnis', obj[methode]()); } catch (e) { log('fehler', e.message); }
+    try {
+      log('ergebnis', obj[methode]());
+      bus.emit('called', { id, methode });   // Animation anstoßen
+    } catch (e) { log('fehler', e.message); }
     bus.emit('changed', { id });
   }
 
@@ -60,7 +63,10 @@ export class ObjectManager {
     log('befehl', 'Alle bewegen');
     this.alle
       .filter(({ obj }) => obj instanceof Tier || obj instanceof Transport)
-      .forEach(({ id, obj }) => log('ergebnis', `${id}: ${obj.bewegen()}.`));
+      .forEach(({ id, obj }) => {
+        log('ergebnis', `${id}: ${obj.bewegen()}.`);
+        bus.emit('called', { id, methode: 'bewegen' });  
+      });
   }
 }
 export const manager = new ObjectManager();

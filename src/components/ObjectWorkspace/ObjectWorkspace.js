@@ -6,6 +6,7 @@ import { Figur } from '../../models/abstract/Figur.js';
 import { attach } from '../popover.js';
 import { buildObjectCard } from '../ObjectCard/ObjectCard.js';
 import { figurSvg } from '../figurSvg.js';
+import { createAnimation } from '../animations.js';
 
 export function mountWorkspace(root) {
   const alle = el('button', { type: 'button', class: 'primary', disabled: true, onclick: () => manager.alleBewegen() }, 'Alle bewegen');
@@ -15,17 +16,24 @@ export function mountWorkspace(root) {
   const items = new Map();
 
   bus.on('created', ({ id, obj }) => {
-    const name = klassenName(obj.constructor);
-    let fig = null, vis;
-    if (obj instanceof Figur) { fig = el('span', { class: 'fig-wrap' }); fig.innerHTML = figurSvg(name); vis = fig; }
-    else vis = icon(name, 'icon big');
-    const t = el('button', { type: 'button', class: 'obj', 'aria-label': `${id} (${name})` }, vis, el('span', {}, id));
-    const pop = attach(t, { build: (api) => buildObjectCard(id, obj, api) });
-    items.set(id, { pop, fig, obj });
-    grid.append(t);
-    leer.hidden = true;
-  });
-  bus.on('changed', ({ id }) => {
+  const name = klassenName(obj.constructor);
+  let fig = null, anim = null, vis;
+  if (obj instanceof Figur) { fig = el('span', { class: 'fig-wrap' }); fig.innerHTML = figurSvg(name); vis = fig; }
+  else { anim = createAnimation(name); vis = anim?.el ?? icon(name, 'icon big'); }
+  const t = el('button', { type: 'button', class: 'obj', 'aria-label': `${id} (${name})` }, vis, el('span', {}, id));
+  const pop = attach(t, { build: (api) => buildObjectCard(id, obj, api) });
+  items.set(id, { pop, fig, obj, anim });
+  grid.append(t);
+  leer.hidden = true;
+});
+
+bus.on('called', ({ id, methode }) => {
+  const a = items.get(id)?.anim;
+  if (!a) return;
+  if (methode === 'halten') a.halt(); else a.play(methode);
+});
+
+bus.on('changed', ({ id }) => {
     const i = items.get(id);
     if (i) { i.pop.refresh(); if (i.fig) i.fig.style.transform = `rotate(${i.obj.winkel}deg)`; }
     alle.disabled = !manager.kannBewegen;
