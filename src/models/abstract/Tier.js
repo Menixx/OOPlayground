@@ -1,10 +1,10 @@
 export class Tier {
   static felder = [
     ['name', 'String', '"Unbenannt"'],
-    ['kannFliegen', 'boolean', 'undefined'],
-    ['anzahlBeine', 'number', 'undefined'],
-    ['hatSchwanz', 'boolean', 'undefined'],
-    ['kannGestreicheltWerden', 'boolean', 'undefined']
+    ['kannFliegen', 'boolean'],
+    ['anzahlBeine', 'int'],
+    ['hatSchwanz', 'boolean'],
+    ['kannGestreicheltWerden', 'boolean']
   ];
 static methoden = [['essen', true], ['bewegen', true], ['halten', false]];
   constructor() {

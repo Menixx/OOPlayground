@@ -1,5 +1,5 @@
 export class Motor {
-  static felder = [['typ', 'String'], ['leistung', 'number'], ['laeuft', 'boolean']];
+  static felder = [['typ', 'String'], ['leistung', 'int'], ['laeuft', 'boolean']];
   static bezeichnung = 'Motor';
   static einheit = '';
   static privateMethoden = [];

@@ -1,6 +1,6 @@
 import { Figur } from '../abstract/Figur.js';
 export class Kreis extends Figur {
-  static eigeneFelder = ['radius'];
+  static eigeneFelder = [['radius', 'int']];
   constructor() {
     super();
     this.name = 'Kreis';

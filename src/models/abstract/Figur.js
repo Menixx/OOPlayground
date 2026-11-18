@@ -1,7 +1,7 @@
 export class Figur {
   static felder = [
     ['name', 'String', '"Unbenannt"'],
-    ['anzahlEcken', 'number', 'undefined']
+    ['anzahlEcken', 'int']
   ];
   static methoden = [['drehen90', false]];
   #winkel = 0; // gekapselt: nur über drehen90() änderbar

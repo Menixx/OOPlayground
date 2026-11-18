@@ -1,6 +1,6 @@
 import { Tier } from '../abstract/Tier.js';
 export class Krokodil extends Tier {
-  static eigeneFelder = ['anzahlZaehne'];
+  static eigeneFelder = [['anzahlZaehne', 'int']];
   constructor() {
     super();
     this.name = 'Krokodil';

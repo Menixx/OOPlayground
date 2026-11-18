@@ -1,7 +1,7 @@
 import { Turbofan } from '../engines/Turbofan.js';
 import { Transport } from '../abstract/Transport.js';
 export class Flugzeug extends Transport {
-  static eigeneFelder = ['spannweite'];
+  static eigeneFelder = [['spannweite', 'double']];
   constructor() {
     super();
     this.name = 'Flugzeug';

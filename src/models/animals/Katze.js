@@ -1,6 +1,6 @@
 import { Tier } from '../abstract/Tier.js';
 export class Katze extends Tier {
-  static eigeneFelder = ['schnurrt'];
+  static eigeneFelder = [['schnurrt', 'boolean']];
   constructor() {
     super();
     this.name = 'Katze';

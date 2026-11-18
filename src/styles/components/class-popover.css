@@ -1,4 +1,4 @@
-.pop { position: fixed; z-index: 20; width: min(340px, calc(100vw - 16px)); max-height: 70vh; overflow: auto; background: var(--bg); border: 1px solid var(--line); border-top: 4px solid var(--abstrakt); border-radius: 12px; box-shadow: var(--shadow-3); padding: 12px 14px 14px; animation: pop-in 150ms ease-out; overscroll-behavior: contain; }
+.pop { position: fixed; z-index: 20; width: min(420px, calc(100vw - 16px)); /* breit genug für Java-Signaturen + Tag + Schaltfläche in einer Zeile */ max-height: 70vh; overflow: auto; background: var(--bg); border: 1px solid var(--line); border-top: 4px solid var(--abstrakt); border-radius: 12px; box-shadow: var(--shadow-3); padding: 12px 14px 14px; animation: pop-in 150ms ease-out; overscroll-behavior: contain; }
 @keyframes pop-in { from { opacity: 0; } }
 .pop h3 { margin: 0 0 8px; padding-bottom: 8px; border-bottom: 1px solid var(--line-soft); font-size: 14px; font-family: var(--mono); }
 .pop h3 small { color: var(--muted); font-weight: 400; }
@@ -6,7 +6,13 @@
 .rows { list-style: none; margin: 0; padding: 0; }
 .rows li { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 4px; padding: 3px 0; border-bottom: 1px dashed var(--line-soft); font-family: var(--mono); font-size: 13px; }
 .rows li:last-child { border-bottom: 0; }
-.feld { color: var(--feld); font-weight: 600; } .methode { color: var(--methode); font-weight: 600; } .abstrakt { color: var(--abstrakt); font-weight: 600; } .privat { color: var(--muted); } .typ { color: var(--muted); }
+.feld { color: var(--feld); font-weight: 600; } .methode { color: var(--methode); font-weight: 600; } .abstrakt { color: var(--abstrakt); font-weight: 600; } .privat { color: var(--muted); }
+/* Java-Felddeklaration: Typ vor dem Namen, Kommentar für Einheiten */
+.dekl { min-width: 0; }
+.typ { color: #b45309; font-weight: 600; }
+.kommentar { color: var(--muted); font-style: italic; }
+.mod { color: #be185d; font-weight: 600; } /* Modifikatoren: public, private, abstract */
+.rows li > .dekl + button { margin-left: auto; } /* „testen“ rechts, wenn kein Tag davor steht */
 .tag { margin-left: auto; font: 600 11px var(--sans); padding: 1px 8px; border-radius: 99px; background: var(--btn); color: var(--muted); border: 1px solid var(--line-soft); }
 .tag.eigen { background: #dbeafe; color: #1e40af; border-color: #93c5fd; } .tag.ueber { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
 .tag.abstract { background: #f3e8ff; color: #7e22ce; border-color: #d8b4fe; } .tag.impl { background: #dcfce7; color: #166534; border-color: #86efac; }

@@ -1,10 +1,10 @@
 export class Transport {
   static felder = [
     ['name', 'String', '"Unbenannt"'],
-    ['kannFliegen', 'boolean', 'undefined'],
-    ['hoechstgeschwindigkeit', 'number', 'undefined'],
-    ['anzahlRaeder', 'number', 'undefined'],
-    ['motor', 'Motor', 'undefined']
+    ['kannFliegen', 'boolean'],
+    ['hoechstgeschwindigkeit', 'int'],
+    ['anzahlRaeder', 'int'],
+    ['motor', 'Motor']
   ];
 static methoden = [['motorStarten', true], ['bewegen', true], ['halten', false]];
   constructor() {

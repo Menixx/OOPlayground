@@ -1,7 +1,7 @@
 import { Elektromotor } from '../engines/Elektromotor.js';
 import { Transport } from '../abstract/Transport.js';
 export class Zug extends Transport {
-  static eigeneFelder = ['anzahlWaggons'];
+  static eigeneFelder = [['anzahlWaggons', 'int']];
   constructor() {
     super();
     this.name = 'Zug';

@@ -1,7 +1,7 @@
 import { Benzinmotor } from '../engines/Benzinmotor.js';
 import { Transport } from '../abstract/Transport.js';
 export class Auto extends Transport {
-  static eigeneFelder = ['anzahlTueren'];
+  static eigeneFelder = [['anzahlTueren', 'int']];
   constructor() {
     super();
     this.name = 'Auto';

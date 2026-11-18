@@ -1,6 +1,6 @@
 import { Figur } from '../abstract/Figur.js';
 export class Stern extends Figur {
-  static eigeneFelder = ['anzahlSpitzen'];
+  static eigeneFelder = [['anzahlSpitzen', 'int']];
   constructor() {
     super();
     this.name = 'Stern';
