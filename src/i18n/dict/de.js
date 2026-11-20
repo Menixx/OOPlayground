@@ -1,0 +1,125 @@
+/* Wörterbuch der Oberflächentexte.
+   Klassen-, Methoden- und Objektnamen stehen NICHT hier – sie bleiben immer deutsch
+   und werden als Parameter ({name}, {id}, {methode} …) in die Texte eingesetzt.
+   Deutsch (Standardsprache); wird von i18n.js bei Bedarf dynamisch geladen. */
+export default {
+  // Kopfzeile & Abschnitte
+  'header.subtitle': 'Interaktive Einführung in die objektorientierte Programmierung',
+  'lang.toggle': 'Sprache wechseln (Deutsch / Englisch)',
+  'header.docs': 'Erklärung',
+  'header.docsTip': 'Erklärung in neuem Tab öffnen',
+  'section.classes': 'Abstrakte Klassen',
+  'section.objects': 'Erstellte Objekte',
+  'section.output': 'Ausgabe',
+
+  // Erklärungsseite (docs.html)
+  'docs.pageTitle': 'OOPlayground – Erklärung',
+  'docs.brand': 'OOPlayground · Erklärung',
+  'docs.toApp': 'Zum OOPlayground',
+  'docs.skip': 'Zum Inhalt springen',
+  'docs.contents': 'Inhalt',
+  'docs.menuOpen': '☰ Inhalt',
+  'docs.menuClose': 'Menü schließen',
+  'docs.search': 'Im Menü suchen …',
+  'docs.noResults': 'Nichts gefunden.',
+  'docs.toTop': 'Nach oben',
+  'docs.short': 'Kurz gesagt',
+  'docs.life': 'Wie im echten Leben',
+  'docs.inApp': 'Im OOPlayground',
+  'docs.remember': 'Merke',
+  'docs.code': 'Ein bisschen Code (für Neugierige)',
+  'docs.showDemo': '▶ So zeigst du es',
+  'docs.goal': 'Ziel',
+  'docs.steps': 'Schritte',
+  'docs.output': 'Das siehst du in der Ausgabe',
+  'docs.outputLabel': 'Ausgabe',
+  'docs.watch': 'Darauf achten',
+  'docs.back': '← Zurück zu:',
+  'docs.related': 'Passt zu:',
+  'docs.pillar': 'Säule {n} von 4',
+  'docs.part1': 'Teil 1: Die Oberfläche',
+  'docs.part2': 'Teil 2: Die Begriffe',
+  'docs.part3': 'Teil 3: Vorführen – Schritt für Schritt',
+  'docs.zoneHeader': 'Kopfzeile',
+
+  // Arbeitsfläche & Konsole
+  'workspace.moveAll': 'Alle bewegen',
+  'workspace.deleteAll': 'Alle löschen',
+  'workspace.empty': 'Noch keine Objekte. Fahre über eine abstrakte Klasse und instanziiere einen Erben.',
+  'console.clear': 'Leeren',
+
+  // Karten
+  'card.fields': 'Felder',
+  'card.methods': 'Methoden',
+  'card.subclasses': 'Erben',
+  'card.run': 'Ausführen',
+  'tip.run': 'Ausführen',
+  'tip.instantiate': 'Instanziieren',
+  'tip.instantiateDirect': 'Direkt instanziieren (verboten)',
+  'tag.geerbt': 'geerbt',
+  'tag.eigen': 'eigen',
+  'tag.ueber': 'überschrieben',
+  'tag.abstract': 'abstract',
+  'tag.impl': 'implemented',
+
+  // Motor-Karte
+  'engine.showImpl': 'Implementierung anzeigen',
+  'engine.hideImpl': 'Implementierung ausblenden',
+  'engine.test': 'testen',
+  'tip.tryAccess': 'Zugriff von außen versuchen',
+  'engine.hint': 'Aufgerufen wird nur {methode}() am Transportobjekt.',
+  'engine.benzin.einspritzen': 'Kraftstoff wird eingespritzt',
+  'engine.benzin.zuenden': 'Zündfunke zündet das Gemisch',
+  'engine.benzin.kolben': 'Kolben beginnen sich zu bewegen',
+  'engine.elektro.batterie': 'Stromversorgung wird aktiviert',
+  'engine.elektro.spannung': 'Spannung liegt an den Spulen an',
+  'engine.elektro.rotor': 'Rotor beginnt sich zu drehen',
+  'engine.turbofan.ansaugen': 'Luft wird angesaugt',
+  'engine.turbofan.verdichten': 'Luft wird verdichtet',
+  'engine.turbofan.zuenden': 'Brennkammer wird gezündet',
+
+  // Terminal: Protokoll
+  'log.created': 'Objekt {id} wurde erstellt.',
+  'log.deleted': 'Objekt {id} wurde gelöscht.',
+  'log.deletedAll': '{n} Objekt(e) wurden gelöscht.',
+
+  // Terminal: Fehler
+  'error.abstract': 'Abstrakte Klassen können nicht instanziiert werden.',
+  'error.notImplemented': 'Die Methode {methode}() muss implementiert werden.',
+  'error.private': 'Zugriff verweigert – {methode} ist privat. ({fehler})',
+
+  // Terminal: Rückgaben der Methoden
+  'figur.drehen': '{name} wurde um 90° gedreht (jetzt {winkel}°).',
+  'tier.halten': '{name} bleibt stehen.',
+  'transport.halten': '{name} hält an.',
+  'transport.motorGestoppt': 'Motor gestoppt.',
+  'transport.motorLaeuft': 'Der Motor läuft bereits.',
+  'transport.motorErfolg': 'Motor erfolgreich gestartet.',
+  'motor.gestartet': 'Motor gestartet!',
+  'motor.gestoppt': 'Motor gestoppt!',
+  'katze.essen': 'Die Katze frisst Fisch.',
+  'katze.bewegen': 'Läuft auf vier Pfoten',
+  'krokodil.essen': 'Das Krokodil frisst Fleisch.',
+  'krokodil.bewegen': 'Kriecht',
+  'mensch.essen': 'Der Mensch isst eine Pizza.',
+  'mensch.bewegen': 'Geht auf zwei Beinen',
+  'auto.bewegen': 'Fährt auf der Straße',
+  'flugzeug.bewegen': 'Fliegt durch die Luft',
+  'zug.bewegen': 'Fährt auf Schienen',
+
+  // Werte von String-Feldern (Schlüssel = gespeicherter Wert im Objekt)
+  'value.Unbenannt': 'Unbenannt',
+  'value.Katze': 'Katze',
+  'value.Krokodil': 'Krokodil',
+  'value.Mensch': 'Mensch',
+  'value.Student': 'Student',
+  'value.Auto': 'Auto',
+  'value.Flugzeug': 'Flugzeug',
+  'value.Zug': 'Zug',
+  'value.Dreieck': 'Dreieck',
+  'value.Kreis': 'Kreis',
+  'value.Stern': 'Stern',
+  'value.Benzin': 'Benzin',
+  'value.Elektro': 'Elektro',
+  'value.Turbofan': 'Turbofan'
+};

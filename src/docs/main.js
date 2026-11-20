@@ -6,10 +6,14 @@ import { bus } from '../services/EventBus.js';
 import { langToggle } from '../components/LangToggle/LangToggle.js';
 import { renderInhalt } from './render.js';
 import { createNav } from './nav.js';
-import de from './content/de.js';
-import en from './content/en.js';
 
-const INHALT = { de, en };
+/** Bereits geladene Inhalte je Sprache – jede Sprache ist ein eigener Chunk (./content/<lang>.js). */
+const INHALT = {};
+async function ladeInhalt(lang) {
+  if (!INHALT[lang]) INHALT[lang] = (await import(`./content/${lang}.js`)).default;
+  return INHALT[lang];
+}
+
 const WENIG_BEWEGUNG = matchMedia('(prefers-reduced-motion: reduce)');
 
 const main = document.getElementById('inhalt');
@@ -41,8 +45,8 @@ toTop.append(el('span', { 'aria-hidden': 'true' }, '↑'), el('span', { i18n: 'd
 const nav = createNav({ nav: document.getElementById('toc'), backdrop: document.getElementById('toc-backdrop'), menuBtn });
 
 // ---------- Inhalt ----------
-function zeichnen() {
-  const inhalt = INHALT[getSprache()];
+async function zeichnen() {
+  const inhalt = await ladeInhalt(getSprache());
   renderInhalt(main, inhalt);
   nav.render(inhalt);
   nav.observe(main);
@@ -63,18 +67,28 @@ function springe(id, { sofort = false, fokus = true } = {}) {
   return true;
 }
 
-zeichnen();
+await zeichnen();
 uebersetzeDom();
 folgeAnderenTabs();
 
 const start = decodeURIComponent(location.hash.slice(1));
 if (!springe(start, { sofort: true, fokus: false })) nav.setActive('start');
 
-// Sprachwechsel (hier oder in einem anderen Tab): neu zeichnen, Position im aktuellen Abschnitt halten
-bus.on('sprache', () => {
+// Sprachwechsel (hier oder in einem anderen Tab): Inhalt laden, neu zeichnen, Position im aktuellen Abschnitt halten
+let wechselNr = 0; // gegen Wettläufe: nur der zuletzt angeforderte Wechsel wird gezeichnet
+bus.on('sprache', async (lang) => {
+  const nr = ++wechselNr;
+  try {
+    await ladeInhalt(lang);
+  } catch (err) {
+    console.error(`Inhalt „${lang}“ konnte nicht geladen werden:`, err);
+    return;
+  }
+  if (nr !== wechselNr || lang !== getSprache()) return; // inzwischen erneut gewechselt
+  // Erst nach dem Laden messen – sonst wäre die Position bis zum Neuzeichnen veraltet
   const id = nav.activeId();
   const vorher = id && document.getElementById(id)?.getBoundingClientRect().top;
-  zeichnen();
+  await zeichnen(); // Inhalt liegt im Cache – kein weiteres Warten
   const neu = id && document.getElementById(id);
   if (neu) {
     nav.pausieren();

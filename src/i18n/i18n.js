@@ -1,5 +1,4 @@
 import { bus } from '../services/EventBus.js';
-import { WOERTERBUCH } from './dictionary.js';
 
 export const SPRACHEN = ['en', 'de'];
 const STANDARD = 'de';
@@ -12,17 +11,31 @@ function gespeicherteSprache() {
   } catch { return STANDARD; }
 }
 
+/** Bereits geladene Wörterbücher je Sprache. Jede Sprache liegt in einem eigenen Chunk (./dict/<lang>.js)
+ *  und wird erst geladen, wenn sie gebraucht wird. */
+const WOERTERBUCH = {};
+
+async function ladeWoerterbuch(lang) {
+  if (!WOERTERBUCH[lang]) WOERTERBUCH[lang] = (await import(`./dict/${lang}.js`)).default;
+  return WOERTERBUCH[lang];
+}
+
 let sprache = gespeicherteSprache();
 export const getSprache = () => sprache;
 
-/** Übersetzt einen Schlüssel in die aktuelle Sprache; {platzhalter} werden durch params ersetzt. */
+// Top-Level-await: Alle Module, die i18n.js importieren, laufen erst, wenn das Wörterbuch da ist –
+// t() bleibt dadurch synchron.
+await ladeWoerterbuch(sprache);
+
+/** Übersetzt einen Schlüssel in die aktuelle Sprache; {platzhalter} werden durch params ersetzt.
+ *  Rückfall auf die Standardsprache nur, wenn sie schon geladen ist (die Schlüsselmengen sind gleich). */
 export function t(key, params = {}) {
-  const text = WOERTERBUCH[sprache]?.[key] ?? WOERTERBUCH[STANDARD][key] ?? key;
+  const text = WOERTERBUCH[sprache]?.[key] ?? WOERTERBUCH[STANDARD]?.[key] ?? key;
   return text.replace(/\{(\w+)\}/g, (m, k) => (k in params ? String(params[k]) : m));
 }
 
 /** Schlüssel für den Wert eines String-Feldes – oder null, wenn der Wert nicht im Wörterbuch steht. */
-export const wertSchluessel = (v) => (typeof v === 'string' && `value.${v}` in WOERTERBUCH[STANDARD] ? `value.${v}` : null);
+export const wertSchluessel = (v) => (typeof v === 'string' && `value.${v}` in WOERTERBUCH[sprache] ? `value.${v}` : null);
 /** Feldwert in der aktuellen Sprache (unbekannte Werte bleiben unverändert). */
 export const tWert = (v) => { const k = wertSchluessel(v); return k ? t(k) : v; };
 
@@ -60,20 +73,37 @@ export function uebersetzeDom(root = document) {
   });
 }
 
-export function setSprache(neu) {
-  if (!SPRACHEN.includes(neu) || neu === sprache) return;
+// Zähler gegen Wettläufe: Bei schnellen Klicks gewinnt nur die zuletzt angeforderte Sprache.
+let anfrage = 0;
+
+/** Wörterbuch laden und erst danach umschalten. Liefert true, wenn umgeschaltet wurde. */
+async function wechsle(neu, { speichern }) {
+  if (!SPRACHEN.includes(neu)) return false;
+  const nr = ++anfrage;
+  if (neu === sprache) return false; // eine ältere, noch ladende Anfrage wird durch nr verworfen
+  try {
+    await ladeWoerterbuch(neu);
+  } catch (err) {
+    console.error(`Wörterbuch „${neu}“ konnte nicht geladen werden:`, err);
+    return false; // Sprache bleibt unverändert
+  }
+  if (nr !== anfrage) return false; // inzwischen wurde eine andere Sprache angefordert
   sprache = neu;
-  try { localStorage.setItem(SPEICHER_KEY, neu); } catch { /* Speicher gesperrt – Sprache gilt nur für diese Sitzung */ }
+  if (speichern) {
+    try { localStorage.setItem(SPEICHER_KEY, neu); } catch { /* Speicher gesperrt – Sprache gilt nur für diese Sitzung */ }
+  }
   uebersetzeDom();
   bus.emit('sprache', neu);
+  return true;
+}
+
+export async function setSprache(neu) {
+  return wechsle(neu, { speichern: true });
 }
 
 /** Sprache übernehmen, die ein anderer Tab gewählt hat – ohne erneut in den Speicher zu schreiben. */
-export function syncSprache(neu) {
-  if (!SPRACHEN.includes(neu) || neu === sprache) return;
-  sprache = neu;
-  uebersetzeDom();
-  bus.emit('sprache', neu);
+export async function syncSprache(neu) {
+  return wechsle(neu, { speichern: false });
 }
 
 /** Sprachwechsel in anderen Tabs (OOPlayground ↔ Erklärung) sofort übernehmen. */

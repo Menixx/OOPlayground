@@ -10,6 +10,7 @@ export default defineConfig({
   base: process.env.VITE_BASE || './',
   esbuild: { keepNames: true }, // NICHT entfernen: nötig für Klassennamen/Fehlermeldungen
   build: {
+    target: 'es2022', // Top-Level-await (i18n.js, docs/main.js) – Wörterbuch/Inhalt werden pro Sprache nachgeladen
     rollupOptions: {
       input: {
         main: file('./index.html'),
