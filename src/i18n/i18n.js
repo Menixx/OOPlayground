@@ -73,6 +73,13 @@ export function uebersetzeDom(root = document) {
   });
 }
 
+/** Arbeiten, die vor bzw. während des Wechsels fertig sein müssen (z. B. Inhalte der Erklärungsseite).
+ *  vorbereiten(lang): läuft vor dem Überblenden (Laden); zeichnen(lang): läuft im Überblenden (Neuaufbau). */
+const helfer = [];
+export function beimSprachwechsel({ vorbereiten, zeichnen }) { helfer.push({ vorbereiten, zeichnen }); }
+
+const WENIG_BEWEGUNG = matchMedia('(prefers-reduced-motion: reduce)');
+
 // Zähler gegen Wettläufe: Bei schnellen Klicks gewinnt nur die zuletzt angeforderte Sprache.
 let anfrage = 0;
 
@@ -83,6 +90,7 @@ async function wechsle(neu, { speichern }) {
   if (neu === sprache) return false; // eine ältere, noch ladende Anfrage wird durch nr verworfen
   try {
     await ladeWoerterbuch(neu);
+    await Promise.all(helfer.map((h) => h.vorbereiten?.(neu)));
   } catch (err) {
     console.error(`Wörterbuch „${neu}“ konnte nicht geladen werden:`, err);
     return false; // Sprache bleibt unverändert
@@ -92,8 +100,19 @@ async function wechsle(neu, { speichern }) {
   if (speichern) {
     try { localStorage.setItem(SPEICHER_KEY, neu); } catch { /* Speicher gesperrt – Sprache gilt nur für diese Sitzung */ }
   }
-  uebersetzeDom();
-  bus.emit('sprache', neu);
+  const anwenden = async () => {
+    uebersetzeDom();
+    bus.emit('sprache', neu);
+    await Promise.all(helfer.map((h) => h.zeichnen?.(neu)));
+  };
+  // Ganze Seite weich überblenden (View Transitions); ohne Unterstützung oder bei reduzierter Bewegung sofort
+  if (document.startViewTransition && !WENIG_BEWEGUNG.matches && !document.hidden) {
+    const vt = document.startViewTransition(anwenden);
+    vt.ready.catch(() => {}); vt.finished.catch(() => {}); // übersprungen bei schnellem Doppelklick – kein Fehler
+    await vt.updateCallbackDone.catch(() => {});
+  } else {
+    await anwenden();
+  }
   return true;
 }
 

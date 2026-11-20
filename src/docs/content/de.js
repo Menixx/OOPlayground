@@ -220,26 +220,6 @@ Mit dem Knopf **\`[[Leeren]]\`** machst du die Ausgabe wieder leer. Die Objekte 
       related: [{ id: 'begriff-feld', label: 'Feld & Zustand' }, { id: 'begriff-methode', label: 'Methode' }, { id: 'begriff-vererbung', label: 'Vererbung' }, { id: 'begriff-kapselung', label: 'Kapselung' }]
     },
     {
-      id: 'ui-bedienung', group: 'oberflaeche', num: 'O10', nav: 'Bedienung', type: 'ui',
-      title: 'So bedienst du den OOPlayground',
-      blocks: [
-        { k: 'md', md: `**Mit der Maus**
-- **Darüberfahren** – Eine Karte öffnet sich.
-- **Wegfahren** – Die Karte schließt sich kurz danach.
-- **Karte in der Karte** – Von der Objektkarte kannst du ganz ruhig zur Motorkarte fahren. Beide bleiben offen.
-- **Klick daneben** oder die Taste **Esc** – Alle Karten schließen sich.
-
-**Mit dem Finger (Handy, Tablet)**
-- **Tippen** auf ein Symbol öffnet die Karte.
-- **Noch einmal tippen** oder **daneben tippen** schließt sie.
-
-**Mit der Tastatur**
-- Mit **Tab** springst du von Symbol zu Symbol. Hat ein Symbol den Fokus, öffnet sich seine Karte.
-- Mit **Enter** drückst du den Knopf, der gerade markiert ist.
-- **Esc** schließt alle Karten.` }
-      ]
-    },
-    {
       id: 'begriffe-ueberblick', group: 'begriffe', num: 'B0', nav: 'Die vier Säulen', type: 'intro',
       title: 'Die vier Säulen der OOP',
       blocks: [

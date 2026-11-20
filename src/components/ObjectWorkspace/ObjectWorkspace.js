@@ -22,7 +22,7 @@ export function mountWorkspace(root) {
   if (obj instanceof Figur) { fig = el('span', { class: 'fig-wrap' }); fig.innerHTML = figurSvg(name); vis = fig; }
   else { anim = createAnimation(name); vis = anim?.el ?? icon(name, 'icon big'); }
   const t = el('button', { type: 'button', class: 'obj', 'aria-label': `${id} (${name})` }, vis, el('span', {}, id));
-  const pop = attach(t, { build: (api) => buildObjectCard(id, obj, api) });
+  const pop = attach(t, { klasse: 'pop-objekt', build: (api) => buildObjectCard(id, obj, api) });
   items.set(id, { pop, fig, obj, anim, tile: t });
   grid.append(t);
   leer.hidden = true;

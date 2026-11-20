@@ -5,6 +5,8 @@ section { min-width: 0; background: var(--panel); border: 1px solid var(--line);
 h2 { display: flex; align-items: center; gap: 8px; font-size: 15px; margin: 0 0 12px; }
 h2::before { content: ''; width: 4px; height: 16px; border-radius: 2px; background: var(--feld); }
 code, .out { font-family: var(--mono); font-size: 13px; }
+/* Kein blaues Tipp-Rechteck mobiler Browser – alle Knöpfe/Links haben eigene :active-Zustände */
+button, a, summary, [role="button"] { -webkit-tap-highlight-color: transparent; }
 button { font: inherit; font-weight: 500; color: inherit; background: linear-gradient(#fff, #e6ecf5); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 9px; padding: 6px 12px; cursor: pointer; box-shadow: var(--shine), var(--shadow-1); transition: background var(--t), transform var(--t), box-shadow var(--t); }
 button:hover:not(:disabled) { background: linear-gradient(#fff, #dbe4f1); transform: translateY(-1px); box-shadow: var(--shine), var(--shadow-2); }
 button:active:not(:disabled) { transform: translateY(1px); box-shadow: inset 0 2px 3px rgba(15,23,42,.18); }
@@ -20,3 +22,10 @@ button:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
 /* Hauptschaltfläche (z. B. „Alle bewegen“, „▶ So zeigst du es“) */
 .primary { background: linear-gradient(#3b82f6, #1d4ed8); color: #fff; border-color: #1e40af; font-weight: 600; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), var(--shadow-2); }
 .primary:hover:not(:disabled) { background: linear-gradient(#4b8ff8, #1e40af); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), var(--shadow-3); }
+
+/* Sprachwechsel: ganze Seite weich überblenden (i18n.js, View Transitions).
+   Der Sprachumschalter ist ausgenommen und bleibt live, damit seine eigene Animation sichtbar ist. */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 620ms; animation-timing-function: ease; } /* = dauer in LangToggle.js */
+.lang-toggle { view-transition-name: lang-toggle; } /* nur ein Umschalter pro Seite */
+::view-transition-old(lang-toggle) { display: none; }
+::view-transition-new(lang-toggle) { animation: none; }

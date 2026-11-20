@@ -222,26 +222,6 @@ The **\`[[Clear]]\`** button empties the output. Your objects stay where they ar
       related: [{ id: 'begriff-feld', label: 'Field & state' }, { id: 'begriff-methode', label: 'Method' }, { id: 'begriff-vererbung', label: 'Inheritance' }, { id: 'begriff-kapselung', label: 'Encapsulation' }]
     },
     {
-      id: 'ui-bedienung', group: 'oberflaeche', num: 'O10', nav: 'How to use', type: 'ui',
-      title: 'How to use OOPlayground',
-      blocks: [
-        { k: 'md', md: `**With a mouse**
-- **Hover** – a card opens.
-- **Move away** – the card closes shortly after.
-- **Card inside a card** – you can calmly move from the object card to the engine card. Both stay open.
-- **Click somewhere else** or press **Esc** – all cards close.
-
-**With a finger (phone, tablet)**
-- **Tap** a symbol to open its card.
-- **Tap again** or **tap somewhere else** to close it.
-
-**With a keyboard**
-- Press **Tab** to jump from symbol to symbol. When a symbol has focus, its card opens.
-- Press **Enter** to press the highlighted button.
-- **Esc** closes all cards.` }
-      ]
-    },
-    {
       id: 'begriffe-ueberblick', group: 'begriffe', num: 'B0', nav: 'The four pillars', type: 'intro',
       title: 'The four pillars of OOP',
       blocks: [

@@ -1,21 +1,64 @@
 /* Bedienelemente der dunklen Kopfzeile – im OOPlayground und auf der Erklärungsseite */
-/* Sprachumschalter: zwei Hälften, ein gleitender Schieber markiert die aktive Sprache */
-.lang-toggle { --pad: 3px; position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; padding: var(--pad); border: 1px solid rgba(255,255,255,.18); border-radius: 99px; background: rgba(255,255,255,.07); box-shadow: inset 0 2px 4px rgba(0,0,0,.45); color: #94a3b8; font: 700 12px var(--sans); letter-spacing: .04em; }
-.lang-toggle:hover:not(:disabled) { background: rgba(255,255,255,.12); transform: none; box-shadow: inset 0 2px 4px rgba(0,0,0,.45); }
-.lang-toggle:active:not(:disabled) { transform: none; box-shadow: inset 0 2px 4px rgba(0,0,0,.45); }
-.lang-thumb { position: absolute; top: var(--pad); bottom: var(--pad); left: var(--pad); width: calc(50% - var(--pad)); border-radius: 99px; background: linear-gradient(#3b82f6, #1d4ed8); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 2px 6px rgba(37,99,235,.55); transition: transform 340ms cubic-bezier(.34, 1.45, .64, 1); }
-.lang-toggle[data-lang="de"] .lang-thumb { transform: translateX(100%); }
-.lang-opt { position: relative; z-index: 1; min-width: 34px; padding: 3px 10px; text-align: center; transition: color 220ms ease; }
+/* Sprachumschalter: Schiene mit zwei Kürzeln, ein blauer Kreis liegt um das aktive Kürzel.
+   Beim Umschalten staucht sich der Kreis, schießt gestreckt hinüber und die Schiene zieht sich kurz zusammen
+   (Animation in LangToggle.js). --k = Kreisdurchmesser, --rand = Abstand Kreis–Schiene. */
+.lang-toggle { --k: 23px; --rand: 3px; position: relative; display: inline-grid; grid-template-columns: calc(var(--k) + 2 * var(--rand)) 1fr calc(var(--k) + 2 * var(--rand)); align-items: center; box-sizing: border-box; width: 60px; height: 29px; padding: 0; border: 0; background: none; box-shadow: none; color: #94a3b8; font: 700 11px var(--sans); letter-spacing: .02em; user-select: none; -webkit-user-select: none; }
+.lang-toggle:hover:not(:disabled), .lang-toggle:active:not(:disabled) { background: none; transform: none; box-shadow: none; }
+.lang-track { position: absolute; inset: 0; border: 1px solid rgba(255,255,255,.18); border-radius: 99px; background: rgba(255,255,255,.07); box-shadow: inset 0 2px 4px rgba(0,0,0,.45); transition: background var(--t); }
+.lang-toggle:hover .lang-track { background: rgba(255,255,255,.12); }
+.lang-thumb { position: absolute; top: 50%; left: calc(var(--rand) + var(--k) / 2); width: var(--k); height: var(--k); transform: translate(-50%, -50%); border-radius: 99px; background: linear-gradient(#3b82f6, #1d4ed8); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 1.5px 1.5px 1px rgba(0,0,0,.375); }
+.lang-toggle[data-lang="de"] .lang-thumb { left: calc(100% - var(--rand) - var(--k) / 2); }
+.lang-opt { position: relative; z-index: 1; text-align: center; line-height: 1; transition: color 180ms ease; }
+.lang-opt[data-l="de"] { grid-column: 3; }
 .lang-toggle[data-lang="en"] .lang-opt[data-l="en"],
-.lang-toggle[data-lang="de"] .lang-opt[data-l="de"] { color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,.3); }
-.lang-opt:hover { color: #e2e8f0; }
+.lang-toggle[data-lang="de"] .lang-opt[data-l="de"] { color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,.3); transition-delay: 410ms; }
+.lang-toggle[data-lang="en"]:hover .lang-opt[data-l="de"],
+.lang-toggle[data-lang="de"]:hover .lang-opt[data-l="en"] { color: #e2e8f0; }
 
 /* Pillen-Link in der Kopfzeile („? Erklärung“, „Zum OOPlayground“): gleiche Höhe und Glasoptik wie der Sprachumschalter */
 .head-link { display: inline-flex; align-items: center; gap: 6px; height: 29px; padding: 0 12px 0 6px; border: 1px solid rgba(255,255,255,.18); border-radius: 99px; background: rgba(255,255,255,.07); color: #e2e8f0; font: 600 12px var(--sans); letter-spacing: .02em; text-decoration: none; white-space: nowrap; transition: background var(--t), border-color var(--t), color var(--t); }
+/* Feste Mindestbreite = längere der beiden Sprachfassungen, damit beim Sprachwechsel nichts springt */
+.head-link { justify-content: center; }
+.head-link.docs-link { min-width: 102px; } /* „Erklärung“ / „Guide“ */
+.head-link.to-app { min-width: 167px; } /* „Zum OOPlayground“ / „Open OOPlayground“ */
 .head-link:hover, .head-link:focus-visible { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.3); color: #fff; }
 .head-link:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
-.head-link-icon { width: 18px; height: 18px; flex: none; }
+.head-link-icon { width: 18px; height: 18px; flex: none; overflow: visible; }
 @media (max-width: 479px) {
   .head-link, .head-link.to-app { padding: 0; width: 29px; justify-content: center; }
   .head-link-text { display: none; }
+}
+
+/* Menü der Kopfzeile (HeaderMenu.js): Desktop/Tablet – Elemente stehen direkt in der Kopfzeile */
+.head-menu { display: contents; }
+.head-menu-btn, .head-menu-backdrop { display: none; }
+
+/* Mobil: Knopf statt Elemente; geöffnet gleiten Sprachumschalter (oben) und Link (unten) von rechts herein */
+@media (max-width: 600px) {
+  .head-menu-btn { position: relative; z-index: 72; display: inline-grid; place-items: center; flex: none; width: 29px; height: 29px; margin-left: auto; padding: 0; border: 0; border-radius: 99px; background: none; color: #e2e8f0; box-shadow: none; }
+  .head-menu-btn:hover:not(:disabled), .head-menu-btn:active:not(:disabled) { background: none; color: #fff; transform: none; box-shadow: none; }
+  .head-menu-btn:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
+  .head-menu-icon { grid-area: 1 / 1; transition: opacity 180ms ease, transform 180ms ease; }
+  .head-menu-icon-open { width: 18px; height: 18px; }
+  .head-menu-icon-close { font-size: 22px; line-height: 1; opacity: 0; transform: rotate(-90deg); }
+  .head-menu-btn[aria-expanded="true"] .head-menu-icon-open { opacity: 0; transform: rotate(90deg); }
+  .head-menu-btn[aria-expanded="true"] .head-menu-icon-close { opacity: 1; transform: none; }
+
+  .head-menu-backdrop { display: block; position: fixed; inset: 0; z-index: 70; background: rgba(15,23,42,.6); opacity: 0; visibility: hidden; transition: opacity 250ms ease, visibility 0s 250ms; }
+  .head-menu-backdrop.open { opacity: 1; visibility: visible; transition: opacity 250ms ease; }
+
+  .head-menu { position: fixed; top: var(--menu-top, 64px); right: var(--menu-right, 12px); z-index: 71; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; visibility: hidden; transition: visibility 0s 300ms; }
+  .head-menu.open { visibility: visible; transition: none; }
+  /* Jedes Element startet hinter dem rechten Bildschirmrand */
+  .head-menu > * { margin: 0 !important; transform: translateX(calc(100% + var(--menu-right, 12px) + 16px)); transition: transform 300ms cubic-bezier(.2, .8, .2, 1); }
+  .head-menu.open > * { transform: none; }
+  .head-menu.open > :nth-child(2) { transition-delay: 50ms; }
+  /* Im Menü auf festem Grund (statt Glas) und mit Text */
+  .head-menu .lang-track { background: #1e293b; box-shadow: inset 0 2px 4px rgba(0,0,0,.45), 0 6px 16px rgba(0,0,0,.35); }
+  .head-menu .head-link { width: auto; height: 29px; padding: 0 12px 0 6px; background: #1e293b; box-shadow: 0 6px 16px rgba(0,0,0,.35); }
+  .head-menu .head-link:hover, .head-menu .head-link:focus-visible { background: #334155; }
+  .head-menu .head-link-text { display: inline; }
+}
+@media (max-width: 600px) and (prefers-reduced-motion: reduce) {
+  .head-menu > *, .head-menu-backdrop, .head-menu-icon { transition: none !important; }
 }

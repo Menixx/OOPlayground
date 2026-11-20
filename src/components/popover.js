@@ -27,8 +27,12 @@ function sperreSeitenScroll(pop) {
  *  Verschachtelte Karten (parent) liegen im DOM-Teilbaum der Elternkarte,
  *  daher löst der Wechsel zwischen ihnen kein mouseleave der Elternkarte aus.
  *  Touch: Tippen öffnet, erneutes Tippen auf den Trigger oder Tippen daneben schließt. */
-export function attach(trigger, { build, parent = null }) {
-  let pop = null, body = null, timer = null, touch = false, warOffen = false;
+const SCHLIESS_VERZOEGERUNG = 100; // ms nach dem Verlassen – reicht, um vom Trigger in die Karte zu wechseln
+const AUSBLENDEN = 150; // ms, muss zu .pop-closing in class-popover.css passen
+const WENIG_BEWEGUNG = matchMedia('(prefers-reduced-motion: reduce)');
+
+export function attach(trigger, { build, parent = null, klasse = '' }) {
+  let pop = null, body = null, timer = null, fade = null, touch = false, warOffen = false;
   const kids = new Set();
   const api = {
     get root() { return pop; },
@@ -58,15 +62,22 @@ export function attach(trigger, { build, parent = null }) {
     pop.style.left = Math.max(8, Math.min(x, W - w - 8)) + 'px';
     pop.style.top = Math.max(8, Math.min(y, H - h - 8)) + 'px';
   }
-  function open() {
+  /** Zurückkehren während des Ausblendens hält die Karte offen. */
+  function halten() {
     clearTimeout(timer);
+    if (!fade) return;
+    clearTimeout(fade); fade = null;
+    pop?.classList.remove('pop-closing');
+  }
+  function open() {
+    halten();
     if (pop) return;
     body = el('div', { class: 'pop-body' });
-    pop = el('div', { class: 'pop', role: 'dialog', tabindex: '-1' }, body);
+    pop = el('div', { class: `pop ${klasse}`.trim(), role: 'dialog', tabindex: '-1' }, body);
     (parent?.root ?? document.body).append(pop);
-    pop.addEventListener('mouseenter', () => clearTimeout(timer));
+    pop.addEventListener('mouseenter', halten);
     pop.addEventListener('mouseleave', schedule);
-    pop.addEventListener('focusin', () => clearTimeout(timer));
+    pop.addEventListener('focusin', halten);
     pop.addEventListener('focusout', schedule);
     sperreSeitenScroll(pop);
     render(); place();
@@ -74,13 +85,19 @@ export function attach(trigger, { build, parent = null }) {
     offene.set(close, { trigger, pop: () => pop });
   }
   function close() {
-    clearTimeout(timer);
+    clearTimeout(timer); clearTimeout(fade); fade = null;
     kids.forEach((f) => f());
     pop?.remove(); pop = body = null;
     trigger.setAttribute('aria-expanded', 'false');
     offene.delete(close);
   }
-  function schedule() { clearTimeout(timer); timer = setTimeout(close, 250); }
+  /** Nach dem Verlassen: kurz warten, dann ausblenden und schließen (Esc/Klick daneben schließen sofort). */
+  function ausblenden() {
+    if (!pop || WENIG_BEWEGUNG.matches) { close(); return; }
+    pop.classList.add('pop-closing');
+    fade = setTimeout(close, AUSBLENDEN);
+  }
+  function schedule() { clearTimeout(timer); if (!fade) timer = setTimeout(ausblenden, SCHLIESS_VERZOEGERUNG); }
 
   trigger.addEventListener('mouseenter', open);
   trigger.addEventListener('mouseleave', schedule);

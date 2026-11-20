@@ -10,3 +10,6 @@
 @import './components/engine-popover.css';
 @import './components/console.css';
 @import './responsive.css';
+
+/* Verspielte Schrift für die ganze Hauptseite; Code-Texte bleiben bei var(--mono) */
+:root { --sans: var(--fun); }
