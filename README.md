@@ -25,7 +25,7 @@ Telefon (Pult) steuert, Laptop (Bildschirm) zeigt dasselbe – über einen Node-
 
 - Der Server gibt beim Start die LAN-Adressen aus: `/demonstration/?rolle=bildschirm` (Laptop) und `/demonstration/?rolle=pult` (Telefon). Ohne `rolle` = Bildschirm. `/demonstration/Docs` = Erklärung.
 - Synchronisiert: Objekte erstellen/löschen, Methoden, „Alle bewegen/löschen“, `new Tier()`, Karten öffnen/schließen (Klasse, Objekt, Motor), Motor-Knöpfe, Ausgabe (inkl. „Leeren“), Thema, Sprache, Wechsel zur Erklärung und zurück, Suche, Menügruppen, Code-Blöcke, Abschnitte, „Nach oben“. Beim (Wieder-)Verbinden übernimmt der Bildschirm den kompletten Zustand.
-- Neue Bedienelemente einbinden: Knopf/Eingabefeld/`<details>` mit `data-sync="eindeutiger-schluessel"` versehen, Karten mit `attach(…, { key })` – dann überträgt `sync.js` sie automatisch. Nicht übertragen: freies Scrollen, mobile Menüs (Drei-Punkte-Menü, Seitenmenü-Schublade).
+- Neue Bedienelemente einbinden: Knopf/Eingabefeld/`<details>` mit `data-sync="eindeutiger-schluessel"` versehen, Karten mit `attach(…, { key })` – dann überträgt `sync.js` sie automatisch. Waagerechtes Scrollen der Objekte wird übertragen: Verschiebung am Bildschirm = Verschiebung am Pult × (Fensterbreite Bildschirm / Fensterbreite Pult). Nicht übertragen: Scrollen der Seite, mobile Menüs (Drei-Punkte-Menü, Seitenmenü-Schublade).
 - `?rolle=pult&test=1` zeigt einen Knopf „Fehlertest“ (Aufruf einer nicht existierenden Methode → `ack.ok: false`).
 - `GET /api/state` zeigt, was der Server hält (leer, wenn niemand verbunden ist).
 - Code: `server/server.js`, `src/sync/sync.js`; Protokoll siehe Kopf von `sync.js`.

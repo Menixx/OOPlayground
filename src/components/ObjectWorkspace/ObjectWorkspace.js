@@ -12,7 +12,7 @@ export function mountWorkspace(root) {
   const alle = el('button', { type: 'button', class: 'primary', disabled: true, onclick: () => manager.alleBewegen(), i18n: 'workspace.moveAll' });
   const alleLoeschen = el('button', { type: 'button', class: 'loeschen', disabled: true, onclick: () => manager.alleLoeschen(), i18n: 'workspace.deleteAll' });
   const leer = el('p', { class: 'hint', i18n: 'workspace.empty' });
-  const grid = el('div', { class: 'grid' });
+  const grid = el('div', { class: 'grid', 'data-sync': 'workspace:grid' }); // data-sync: Demonstration überträgt die Scrollposition
   root.append(el('div', { class: 'bar' }, alle, alleLoeschen), leer, grid);
   const items = new Map();
 

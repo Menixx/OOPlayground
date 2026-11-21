@@ -10,6 +10,8 @@
 //   klick {ziel}                    – Knopf mit data-sync (Ausgabe leeren, Motor-Knöpfe, „Nach oben“ …)
 //   eingabe {ziel, wert}            – Eingabefeld mit data-sync (Suche der Erklärung)
 //   aufklappen {ziel, offen}        – <details data-sync> (Menügruppen, Code-Blöcke der Erklärung)
+//   scroll {ziel, x, breite}        – waagerechtes Scrollen eines Bereichs mit data-sync (Objekte im Arbeitsbereich);
+//                                     Bildschirm: x · (eigene Fensterbreite / breite des Pults)
 //   navigate {hash} · thema {modus} · sprache {sprache}
 import './sync.css';
 import { bus } from '../services/EventBus.js';
@@ -121,6 +123,8 @@ function zustand() {
     popovers: offenePopovers(),
     gedrueckt: alle('button[data-sync][aria-expanded="true"]').map((b) => b.dataset.sync),
     eingaben: Object.fromEntries(alle('input[data-sync]').map((i) => [i.dataset.sync, i.value])),
+    scroll: Object.fromEntries(alle('[data-sync]').filter((e) => e.scrollLeft > 0).map((e) => [e.dataset.sync, e.scrollLeft])),
+    breite: innerWidth,
     details: Object.fromEntries(alle('details[data-sync]').map((d) => [d.dataset.sync, d.open]))
   };
   if (ROUTE === 'Docs') return { route: ROUTE, hash: aktuellerHash(), objects: [], counters: {}, ui };
@@ -178,6 +182,19 @@ if (ROLLE === 'pult') {
     const d = e.target.closest?.('summary')?.parentElement;
     if (d?.matches('details[data-sync]')) ereignis({ kind: 'aufklappen', ziel: d.dataset.sync, offen: !d.open });
   }, true);
+  // Waagerechtes Scrollen (scroll steigt nicht auf – daher Capture); höchstens ein Ereignis je Bild
+  const scrollOffen = new Map(); // ziel -> Element
+  let scrollBild = 0;
+  document.addEventListener('scroll', (e) => {
+    const z = e.target;
+    if (!(z instanceof Element) || !z.dataset.sync) return;
+    scrollOffen.set(z.dataset.sync, z);
+    scrollBild ||= requestAnimationFrame(() => {
+      scrollBild = 0;
+      scrollOffen.forEach((elm, ziel) => ereignis({ kind: 'scroll', ziel, x: Math.round(elm.scrollLeft), breite: innerWidth }));
+      scrollOffen.clear();
+    });
+  }, true);
   document.addEventListener('input', (e) => {
     const f = e.target.closest?.('input[data-sync], textarea[data-sync]');
     if (f) ereignis({ kind: 'eingabe', ziel: f.dataset.sync, wert: f.value });
@@ -213,6 +230,14 @@ function element(ziel) {
   const e = finde(ziel);
   if (!e) throw new Error(t('sync.keinElement', { ziel }));
   return e;
+}
+
+/** Scrollposition proportional zur Fensterbreite übernehmen: x · (Breite Bildschirm / Breite Pult). */
+function scrollen(e, x, breite) {
+  const faktor = breite > 0 ? innerWidth / breite : 1;
+  const ziel = Math.round((Number(x) || 0) * faktor);
+  e.scrollTo({ left: ziel, behavior: 'instant' }); // Browser begrenzt auf [0, scrollWidth - clientWidth]
+  return Math.round(e.scrollLeft) || ziel;
 }
 
 function eingeben(feld, wert) {
@@ -259,6 +284,7 @@ async function anwenden(ev) {
     case 'klick': element(ev.ziel).click(); return {};
     case 'eingabe': eingeben(element(ev.ziel), ev.wert ?? ''); return {};
     case 'aufklappen': element(ev.ziel).open = Boolean(ev.offen); return {};
+    case 'scroll': return { scroll: scrollen(element(ev.ziel), ev.x, ev.breite) };
     case 'thema': uebernehmeModus(ev.modus); return { modus: getModus() };
     case 'sprache': await syncSprache(ev.sprache); return { sprache: getSprache() };
     case 'navigate':
@@ -281,6 +307,7 @@ async function snapshotAnwenden(s, snapSeq) {
     versuch(() => manager.wiederherstellen(s));
     konsoleSetzen(s.konsole ?? []);
     for (const key of ui.popovers ?? []) popoverNach(key)?.open(); // Eltern vor Kindern
+    for (const [ziel, x] of Object.entries(ui.scroll ?? {})) { const e = finde(ziel); if (e) scrollen(e, x, ui.breite); }
     for (const ziel of ui.gedrueckt ?? []) {
       const b = finde(ziel);
       if (b && b.getAttribute('aria-expanded') !== 'true') b.click();

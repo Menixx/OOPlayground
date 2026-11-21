@@ -138,7 +138,7 @@ function nachricht(ws, text) {
       if (ws !== aktiverPult) return;
       if (!bildschirm) return; // niemand schaut zu – der nächste Snapshot holt es nach
       offeneAcks.push(msg.seq);
-      log(`event #${msg.seq} ${JSON.stringify(msg.event)}`);
+      if (msg.event?.kind !== 'scroll') log(`event #${msg.seq} ${JSON.stringify(msg.event)}`); // Scrollen nicht protokollieren (viele Ereignisse)
       schicke(bildschirm, text); // unverändert weiterleiten (seq bleibt)
       break;
 
@@ -147,7 +147,7 @@ function nachricht(ws, text) {
       schicke(aktiverPult, text);
       const geprueft = offeneAcks.length > 0 || msg.seq > ignorierBis;
       const erwartet = offeneAcks.shift();
-      log(`ack #${msg.seq} ok=${msg.ok}${msg.ok ? '' : ` error=${msg.error}`}`);
+      if (!msg.ok || !msg.result?.scroll) log(`ack #${msg.seq} ok=${msg.ok}${msg.ok ? '' : ` error=${msg.error}`}`);
       if (!geprueft) return;
       if (!msg.ok) snapshotAnfordern(`ack #${msg.seq} fehlgeschlagen`);
       else if (msg.seq !== erwartet) snapshotAnfordern(`ack #${msg.seq}, erwartet #${erwartet}`);
