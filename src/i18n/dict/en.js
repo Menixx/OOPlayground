@@ -103,6 +103,12 @@ export default {
   'sync.uebernommen': 'State taken over from the remote ({n} object(s)).',
   'sync.keinAbschnitt': 'Section "{hash}" not found.',
   'sync.keinElement': 'Element "{ziel}" not found.',
+  'sync.raum': 'Room {raum}',
+  'sync.raumFehlt': 'Enter the room code from the screen',
+  'sync.raumUngueltig': 'Invalid room code (3–12 letters/digits)',
+  'sync.verbinden': 'Connect',
+  'sync.andererPult': 'another remote is connected',
+  'sync.pultLink': 'Open remote:',
 
   'figur.drehen': '{name} was rotated by 90° (now {winkel}°).',
   'tier.halten': '{name} stops.',

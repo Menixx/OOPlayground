@@ -110,6 +110,12 @@ export default {
   'sync.uebernommen': 'Zustand vom Pult übernommen ({n} Objekt(e)).',
   'sync.keinAbschnitt': 'Abschnitt „{hash}“ nicht gefunden.',
   'sync.keinElement': 'Element „{ziel}“ nicht gefunden.',
+  'sync.raum': 'Raum {raum}',
+  'sync.raumFehlt': 'Raumcode vom Bildschirm eingeben',
+  'sync.raumUngueltig': 'Ungültiger Raumcode (3–12 Buchstaben/Ziffern)',
+  'sync.verbinden': 'Verbinden',
+  'sync.andererPult': 'ein anderes Pult ist verbunden',
+  'sync.pultLink': 'Pult öffnen:',
 
   // Terminal: Rückgaben der Methoden
   'figur.drehen': '{name} wurde um 90° gedreht (jetzt {winkel}°).',

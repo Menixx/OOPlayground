@@ -1,7 +1,8 @@
 // Demonstration „Pult → Bildschirm“: Node-Server mit WebSocket (ws).
 // - liefert dist/ aus (zuerst `npm run build`), /demonstration/ -> index.html, /demonstration/Docs -> docs.html
 // - leitet Ereignisse vom Pult an den Bildschirm weiter und acks zurück; keine Geschäftslogik
-// - Zustand nur im Speicher, solange mindestens ein Client verbunden ist
+// - Räume (?raum=CODE): je Raum ein Bildschirm und ein Pult-Gerät
+// - Zustand nur im Speicher, solange mindestens ein Client im Raum verbunden ist
 import http from 'node:http';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -68,116 +69,208 @@ const server = http.createServer((req, res) => {
   res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }).end('404');
 });
 
-// ---------- Synchronisation ----------
-const pults = new Set();       // mehrere Tabs auf dem Telefon möglich (Playground + Erklärung)
-let aktiverPult = null;        // der zuletzt gemeldete Tab ist die Quelle der Wahrheit
-let bildschirm = null;
-let snapshot = null;           // letzter Zustand vom Pult (nur zur Kontrolle / Fehlersuche)
-let offeneAcks = [];           // seq der weitergeleiteten Ereignisse, in Reihenfolge
-let ignorierBis = -1;          // acks zu Ereignissen vor dem letzten Snapshot werden nicht geprüft
-let angefordert = false;       // need_snapshot unterwegs – nicht mehrfach anfordern
+// ---------- Räume ----------
+// Pult und Bildschirm finden sich nur über denselben Raumcode (?raum=K7QF).
+// Je Raum: ein Bildschirm und ein Pult-Gerät. Ein Gerät darf mehrere Tabs haben (Playground + Erklärung);
+// es wird über eine zufällige Geräte-ID erkannt, die der Browser in localStorage ablegt.
+// Ein zweites Gerät wartet („anderer Pult verbunden“) und übernimmt, sobald das erste den Raum verlässt.
+const raeume = new Map(); // code -> Raum
+let lanIps = [];
 
+const RAUM_MUSTER = /^[A-Z0-9]{3,12}$/;
+const raumCode = (v) => { const c = String(v ?? '').trim().toUpperCase(); return RAUM_MUSTER.test(c) ? c : null; };
+
+function raumHolen(code) {
+  let r = raeume.get(code);
+  if (!r) {
+    r = {
+      code,
+      pults: new Set(),     // Tabs des Pult-Geräts, dem der Raum gehört
+      wartend: new Set(),   // Tabs anderer Geräte (abgelehnt, warten auf Übernahme)
+      besitzer: null,       // Geräte-ID des Pults
+      aktiverPult: null,    // der zuletzt benutzte, sichtbare Tab – Quelle der Wahrheit
+      bildschirm: null,
+      snapshot: null,       // letzter Zustand vom Pult (nur zur Kontrolle / Fehlersuche)
+      offeneAcks: [],       // seq der weitergeleiteten Ereignisse, in Reihenfolge
+      ignorierBis: -1,      // acks zu Ereignissen vor dem letzten Snapshot werden nicht geprüft
+      angefordert: false    // need_snapshot unterwegs – nicht mehrfach anfordern
+    };
+    raeume.set(code, r);
+    log(`[${code}] Raum eröffnet`);
+  }
+  return r;
+}
+
+const rlog = (r, text) => log(`[${r.code}] ${text}`);
 const offen = (ws) => ws && ws.readyState === ws.OPEN;
 const schicke = (ws, msg) => { if (offen(ws)) ws.send(typeof msg === 'string' ? msg : JSON.stringify(msg)); };
+const mitglieder = (r) => [...r.pults, ...r.wartend, ...(r.bildschirm ? [r.bildschirm] : [])];
 
 function zustandsBericht() {
   return {
-    clients: { pults: pults.size, bildschirm: Boolean(bildschirm) },
-    state: snapshot,
-    offeneAcks
+    raeume: [...raeume.values()].map((r) => ({
+      raum: r.code,
+      pultTabs: r.pults.size,
+      pausiert: [...r.pults].filter((p) => p.pausiert).length,
+      wartend: r.wartend.size,
+      bildschirm: Boolean(r.bildschirm),
+      state: r.snapshot,
+      offeneAcks: r.offeneAcks
+    }))
   };
 }
 
-function status() {
-  const basis = { type: 'status', pult: Boolean(aktiverPult), bildschirm: Boolean(bildschirm) };
-  for (const ws of wss.clients) schicke(ws, { ...basis, aktiv: ws === aktiverPult });
+function status(r) {
+  const basis = { type: 'status', raum: r.code, pult: Boolean(r.aktiverPult), bildschirm: Boolean(r.bildschirm) };
+  const pultUrls = lanIps.map((ip) => `http://${ip}:${PORT}/demonstration/?rolle=pult&raum=${r.code}`);
+  for (const ws of mitglieder(r)) {
+    schicke(ws, { ...basis, aktiv: ws === r.aktiverPult, abgelehnt: r.wartend.has(ws), ...(ws === r.bildschirm ? { pultUrls } : {}) });
+  }
 }
 
-function snapshotAnfordern(grund, { erzwingen = false } = {}) {
-  if (!aktiverPult || !bildschirm || (angefordert && !erzwingen)) return;
-  angefordert = true;
-  log(`need_snapshot -> Pult (${grund})`);
-  schicke(aktiverPult, { type: 'need_snapshot' });
+function snapshotAnfordern(r, grund, { erzwingen = false } = {}) {
+  if (!r.aktiverPult || !r.bildschirm || (r.angefordert && !erzwingen)) return;
+  r.angefordert = true;
+  rlog(r, `need_snapshot -> Pult (${grund})`);
+  schicke(r.aktiverPult, { type: 'need_snapshot' });
 }
 
-function hello(ws, rolle) {
-  if (rolle === 'pult') {
+/** Jüngster Pult-Tab, der gerade sichtbar ist – oder null. */
+const naechsterPult = (r) => [...r.pults].reverse().find((p) => !p.pausiert) ?? null;
+
+/** Kein Tab des Besitzers mehr da: das erste wartende Gerät übernimmt den Raum (mit allen seinen Tabs). */
+function befoerdern(r) {
+  if ([...r.pults].some((p) => p.geraet === r.besitzer)) return;
+  r.besitzer = null;
+  const erster = r.wartend.values().next().value;
+  if (!erster) return;
+  r.besitzer = erster.geraet;
+  for (const p of [...r.wartend]) if (p.geraet === r.besitzer) { r.wartend.delete(p); r.pults.add(p); }
+  r.aktiverPult = naechsterPult(r);
+  r.angefordert = false;
+  rlog(r, `wartender Pult übernimmt (${erster.ip})`);
+  snapshotAnfordern(r, 'neuer Pult', { erzwingen: true });
+}
+
+/** Pult-Tab verborgen (Telefon gesperrt, Tab gewechselt oder geschlossen): nicht mehr aktiv.
+ *  Mobile Browser schließen die Verbindung beim Schließen eines Tabs oft nicht sofort –
+ *  das Verbergen ist das zuverlässigste Signal. Wird der Tab wieder sichtbar, meldet er sich mit hello. */
+function pause(ws) {
+  const r = ws.raum;
+  if (!r || ws.rolle !== 'pult' || ws.pausiert) return;
+  ws.pausiert = true;
+  if (r.aktiverPult === ws) {
+    r.aktiverPult = naechsterPult(r);
+    r.angefordert = false;
+    rlog(r, `Pult pausiert${r.aktiverPult ? ' – anderer Tab übernimmt' : ''}`);
+    snapshotAnfordern(r, 'anderer Pult-Tab übernimmt', { erzwingen: true });
+  }
+  status(r);
+}
+
+function hello(ws, msg) {
+  const code = raumCode(msg.raum);
+  if (!code) { schicke(ws, { type: 'status', fehler: 'raum' }); return; }
+  if (ws.raum && ws.raum.code !== code) entfernen(ws);
+  const r = raumHolen(code);
+  ws.raum = r;
+
+  if (msg.rolle === 'pult') {
     ws.rolle = 'pult';
-    pults.add(ws);
-    if (aktiverPult !== ws) log(`Pult aktiv (${ws.ip}), Pult-Tabs: ${pults.size}`);
-    aktiverPult = ws;
-    snapshotAnfordern('Pult gemeldet', { erzwingen: true });
+    ws.geraet = String(msg.geraet || ws.ip).slice(0, 64);
+    ws.pausiert = false;
+    if (r.besitzer && r.besitzer !== ws.geraet) {
+      if (!r.wartend.has(ws)) rlog(r, `Pult abgelehnt (${ws.ip}) – im Raum ist schon ein Pult`);
+      r.wartend.add(ws);
+      status(r);
+      return;
+    }
+    r.besitzer = ws.geraet;
+    r.wartend.delete(ws);
+    r.pults.add(ws);
+    if (r.aktiverPult !== ws) rlog(r, `Pult aktiv (${ws.ip}), Pult-Tabs: ${r.pults.size}`);
+    r.aktiverPult = ws;
+    snapshotAnfordern(r, 'Pult gemeldet', { erzwingen: true });
   } else {
     ws.rolle = 'bildschirm';
-    if (bildschirm && bildschirm !== ws) { log('alter Bildschirm ersetzt'); bildschirm.close(4001, 'ersetzt'); }
-    bildschirm = ws;
-    offeneAcks = [];
-    log(`Bildschirm verbunden (${ws.ip})${aktiverPult ? '' : ' – warte auf Pult'}`);
-    snapshotAnfordern('Bildschirm verbunden', { erzwingen: true });
+    if (r.bildschirm && r.bildschirm !== ws) { rlog(r, 'alter Bildschirm ersetzt'); r.bildschirm.close(4001, 'ersetzt'); }
+    r.bildschirm = ws;
+    r.offeneAcks = [];
+    rlog(r, `Bildschirm verbunden (${ws.ip})${r.aktiverPult ? '' : ' – warte auf Pult'}`);
+    snapshotAnfordern(r, 'Bildschirm verbunden', { erzwingen: true });
   }
-  status();
+  status(r);
 }
 
 function nachricht(ws, text) {
   let msg;
   try { msg = JSON.parse(text); } catch { return; }
+  if (msg.type === 'hello') { hello(ws, msg); return; }
+  const r = ws.raum;
+  if (!r) return;
   switch (msg.type) {
-    case 'hello': hello(ws, msg.rolle === 'pult' ? 'pult' : 'bildschirm'); break;
+    case 'pause': pause(ws); break;
 
     case 'snapshot':
-      if (ws !== aktiverPult) return;
-      snapshot = msg.state ?? null;
-      angefordert = false;
-      offeneAcks = [];
-      ignorierBis = msg.seq ?? -1;
-      log(`snapshot seq=${msg.seq} route="${snapshot?.route ?? ''}" Objekte=${snapshot?.objects?.length ?? 0}`);
-      schicke(bildschirm, text);
+      if (ws !== r.aktiverPult) return;
+      r.snapshot = msg.state ?? null;
+      r.angefordert = false;
+      r.offeneAcks = [];
+      r.ignorierBis = msg.seq ?? -1;
+      rlog(r, `snapshot seq=${msg.seq} route="${r.snapshot?.route ?? ''}" Objekte=${r.snapshot?.objects?.length ?? 0}`);
+      schicke(r.bildschirm, text);
       break;
 
     case 'event':
-      if (ws !== aktiverPult) return;
-      if (!bildschirm) return; // niemand schaut zu – der nächste Snapshot holt es nach
-      offeneAcks.push(msg.seq);
-      if (msg.event?.kind !== 'scroll') log(`event #${msg.seq} ${JSON.stringify(msg.event)}`); // Scrollen nicht protokollieren (viele Ereignisse)
-      schicke(bildschirm, text); // unverändert weiterleiten (seq bleibt)
+      if (ws !== r.aktiverPult) return; // nur der aktive Tab des Raum-Pults steuert
+      if (!r.bildschirm) return;        // niemand schaut zu – der nächste Snapshot holt es nach
+      r.offeneAcks.push(msg.seq);
+      if (msg.event?.kind !== 'scroll') rlog(r, `event #${msg.seq} ${JSON.stringify(msg.event)}`); // Scrollen nicht protokollieren
+      schicke(r.bildschirm, text);      // unverändert weiterleiten (seq bleibt)
       break;
 
     case 'ack': {
-      if (ws !== bildschirm) return;
-      schicke(aktiverPult, text);
-      const geprueft = offeneAcks.length > 0 || msg.seq > ignorierBis;
-      const erwartet = offeneAcks.shift();
-      if (!msg.ok || !msg.result?.scroll) log(`ack #${msg.seq} ok=${msg.ok}${msg.ok ? '' : ` error=${msg.error}`}`);
+      if (ws !== r.bildschirm) return;
+      schicke(r.aktiverPult, text);
+      const geprueft = r.offeneAcks.length > 0 || msg.seq > r.ignorierBis;
+      const erwartet = r.offeneAcks.shift();
+      if (!msg.ok || !msg.result?.scroll) rlog(r, `ack #${msg.seq} ok=${msg.ok}${msg.ok ? '' : ` error=${msg.error}`}`);
       if (!geprueft) return;
-      if (!msg.ok) snapshotAnfordern(`ack #${msg.seq} fehlgeschlagen`);
-      else if (msg.seq !== erwartet) snapshotAnfordern(`ack #${msg.seq}, erwartet #${erwartet}`);
+      if (!msg.ok) snapshotAnfordern(r, `ack #${msg.seq} fehlgeschlagen`);
+      else if (msg.seq !== erwartet) snapshotAnfordern(r, `ack #${msg.seq}, erwartet #${erwartet}`);
       break;
     }
   }
 }
 
-function getrennt(ws) {
+/** Verbindung aus ihrem Raum nehmen; leere Räume werden mit ihrem Zustand gelöscht. */
+function entfernen(ws) {
+  const r = ws.raum;
+  if (!r) return;
+  ws.raum = null;
   if (ws.rolle === 'pult') {
-    pults.delete(ws);
-    log(`Pult getrennt, Pult-Tabs: ${pults.size}`);
-    if (aktiverPult === ws) {
-      aktiverPult = [...pults].at(-1) ?? null;
-      angefordert = false;
-      snapshotAnfordern('anderer Pult-Tab übernimmt', { erzwingen: true });
+    if (r.wartend.delete(ws)) rlog(r, 'wartender Pult getrennt');
+    if (r.pults.delete(ws)) {
+      rlog(r, `Pult getrennt, Pult-Tabs: ${r.pults.size}`);
+      if (r.aktiverPult === ws) {
+        r.aktiverPult = naechsterPult(r);
+        r.angefordert = false;
+        snapshotAnfordern(r, 'anderer Pult-Tab übernimmt', { erzwingen: true });
+      }
+      befoerdern(r);
     }
-  } else if (ws.rolle === 'bildschirm' && bildschirm === ws) {
-    bildschirm = null;
-    offeneAcks = [];
-    angefordert = false;
-    log('Bildschirm getrennt');
+  } else if (ws.rolle === 'bildschirm' && r.bildschirm === ws) {
+    r.bildschirm = null;
+    r.offeneAcks = [];
+    r.angefordert = false;
+    rlog(r, 'Bildschirm getrennt');
   }
-  if (!pults.size && !bildschirm && snapshot !== null) {
-    snapshot = null;
-    offeneAcks = [];
-    ignorierBis = -1;
-    log('Beide Seiten getrennt – Zustand gelöscht.');
+  if (!mitglieder(r).length) {
+    raeume.delete(r.code);
+    rlog(r, 'Raum leer – Zustand gelöscht.');
+    return;
   }
-  status();
+  status(r);
 }
 
 const wss = new WebSocketServer({ server, path: '/ws' });
@@ -186,7 +279,7 @@ wss.on('connection', (ws, req) => {
   ws.letzterPong = Date.now();
   ws.on('pong', () => { ws.letzterPong = Date.now(); });
   ws.on('message', (d) => nachricht(ws, d.toString()));
-  ws.on('close', () => getrennt(ws));
+  ws.on('close', () => entfernen(ws));
   ws.on('error', (e) => log('ws-Fehler', e.message));
 });
 
@@ -199,13 +292,13 @@ setInterval(() => {
 }, PING_MS).unref();
 
 server.listen(PORT, HOST, () => {
-  const ips = Object.values(os.networkInterfaces()).flat()
-    .filter((i) => i && i.family === 'IPv4' && !i.internal).map((i) => i.address);
+  lanIps = Object.values(os.networkInterfaces()).flat()
+    .filter((i) => i && i.family === 'IPv4' && !i.internal && !i.address.startsWith('169.254.')).map((i) => i.address);
   console.log(`\nOOPlayground-Demonstration läuft auf Port ${PORT}`);
-  for (const ip of ips.length ? ips : ['localhost']) {
+  for (const ip of lanIps.length ? lanIps : ['localhost']) {
     console.log(`\n  Netzwerk ${ip}:`);
-    console.log(`    Bildschirm: http://${ip}:${PORT}/demonstration/?rolle=bildschirm`);
-    console.log(`    Pult:       http://${ip}:${PORT}/demonstration/?rolle=pult`);
+    console.log(`    Bildschirm: http://${ip}:${PORT}/demonstration/`);
   }
-  console.log(`\n  Zustand:    http://localhost:${PORT}/api/state\n`);
+  console.log('\n  Der Bildschirm erzeugt einen Raumcode und zeigt den Link für das Pult an.');
+  console.log(`  Zustand:    http://localhost:${PORT}/api/state\n`);
 });

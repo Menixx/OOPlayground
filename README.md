@@ -23,7 +23,8 @@ Telefon (Pult) steuert, Laptop (Bildschirm) zeigt dasselbe – über einen Node-
     npm install
     npm run demo     # = vite build + node server/server.js (Port 8080, PORT=… änderbar)
 
-- Der Server gibt beim Start die LAN-Adressen aus: `/demonstration/?rolle=bildschirm` (Laptop) und `/demonstration/?rolle=pult` (Telefon). Ohne `rolle` = Bildschirm. `/demonstration/Docs` = Erklärung.
+- Der Server gibt beim Start die LAN-Adressen aus. Laptop: `/demonstration/` öffnen (ohne `rolle` = Bildschirm) – er erzeugt einen Raumcode (`?raum=K7QF`) und zeigt den Link für das Telefon (`?rolle=pult&raum=K7QF`). Pult ohne Raumcode fragt danach. `/demonstration/Docs` = Erklärung.
+- Räume: Pult und Bildschirm verbinden sich nur bei gleichem Raumcode. Je Raum ein Bildschirm (ein neuer ersetzt den alten) und ein Pult-Gerät – mehrere Tabs desselben Browsers zählen als ein Pult (Geräte-ID in `localStorage`). Ein zweites Gerät sieht „ein anderes Pult ist verbunden“ und übernimmt automatisch, sobald das erste den Raum verlässt.
 - Synchronisiert: Objekte erstellen/löschen, Methoden, „Alle bewegen/löschen“, `new Tier()`, Karten öffnen/schließen (Klasse, Objekt, Motor), Motor-Knöpfe, Ausgabe (inkl. „Leeren“), Thema, Sprache, Wechsel zur Erklärung und zurück, Suche, Menügruppen, Code-Blöcke, Abschnitte, „Nach oben“. Beim (Wieder-)Verbinden übernimmt der Bildschirm den kompletten Zustand.
 - Neue Bedienelemente einbinden: Knopf/Eingabefeld/`<details>` mit `data-sync="eindeutiger-schluessel"` versehen, Karten mit `attach(…, { key })` – dann überträgt `sync.js` sie automatisch. Waagerechtes Scrollen der Objekte wird übertragen: Verschiebung am Bildschirm = Verschiebung am Pult × (Fensterbreite Bildschirm / Fensterbreite Pult). Nicht übertragen: Scrollen der Seite, mobile Menüs (Drei-Punkte-Menü, Seitenmenü-Schublade).
 - `?rolle=pult&test=1` zeigt einen Knopf „Fehlertest“ (Aufruf einer nicht existierenden Methode → `ack.ok: false`).

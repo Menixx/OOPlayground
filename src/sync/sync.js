@@ -29,28 +29,88 @@ const ROUTE = document.body.classList.contains('docs') ? 'Docs' : '';
 /** Basis aller Demo-Routen, z. B. „/demonstration/“. */
 const BASIS = location.pathname.replace(/(\/demonstration)(\/.*)?$/i, '$1/');
 
+// ---------- Raum ----------
+// Pult und Bildschirm finden sich nur über denselben Raumcode (?raum=K7QF).
+// Der Bildschirm erzeugt ihn selbst, wenn er fehlt; das Pult fragt danach.
+const RAUM_MUSTER = /^[A-Z0-9]{3,12}$/;
+const raumAus = (v) => { const c = String(v ?? '').trim().toUpperCase(); return RAUM_MUSTER.test(c) ? c : null; };
+const ZEICHEN = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // ohne 0/O und 1/I – gut abzulesen
+function neuerRaum() {
+  const z = crypto.getRandomValues(new Uint32Array(4));
+  return [...z].map((n) => ZEICHEN[n % ZEICHEN.length]).join('');
+}
+let RAUM = raumAus(params.get('raum'));
+if (!RAUM && ROLLE === 'bildschirm') {
+  RAUM = neuerRaum();
+  const u = new URL(location.href);
+  u.searchParams.set('raum', RAUM);
+  history.replaceState(history.state, '', u.href); // Neuladen bleibt im selben Raum
+}
+
+/** Geräte-ID des Pults: alle Tabs desselben Browsers zählen als ein Pult (ein Pult je Raum). */
+const GERAET = (() => {
+  const KEY = 'ooplayground.geraet';
+  try {
+    let id = localStorage.getItem(KEY);
+    if (!id) { id = neuerRaum() + neuerRaum(); localStorage.setItem(KEY, id); }
+    return id;
+  } catch { return neuerRaum() + neuerRaum(); } // Speicher gesperrt: nur dieser Tab
+})();
+
 const KLASSE = new Map(KLASSEN.flatMap((g) => g.kinder));
 const aktuellerHash = () => decodeURIComponent(location.hash.slice(1));
 const log = (typ, text) => bus.emit('log', { typ, text });
 const finde = (ziel) => document.querySelector(`[data-sync="${CSS.escape(ziel)}"]`);
 
 // ---------- Statusanzeige ----------
-const status = { verbunden: false, pult: false, bildschirm: false, aktiv: false, info: '' };
+const status = { verbunden: false, pult: false, bildschirm: false, aktiv: false, abgelehnt: false, fehler: null, pultUrls: [], info: '' };
 const badge = el('div', { class: 'sync-badge', role: 'status' });
 document.body.append(badge);
 
+/** Pult ohne (gültigen) Raumcode: Eingabefeld – die Seite lädt dann mit ?raum=… neu. */
+function raumFormular() {
+  const feld = el('input', {
+    class: 'sync-raum-feld', type: 'text', inputmode: 'text', autocapitalize: 'characters', autocomplete: 'off',
+    spellcheck: 'false', maxlength: '12', placeholder: 'K7QF', 'aria-label': t('sync.raumFehlt'), value: params.get('raum') ?? ''
+  });
+  const form = el('form', {
+    class: 'sync-raum-form',
+    onsubmit: (e) => {
+      e.preventDefault();
+      const code = raumAus(feld.value);
+      if (!code) { feld.setCustomValidity(t('sync.raumUngueltig')); feld.reportValidity(); return; }
+      const u = new URL(location.href);
+      u.searchParams.set('raum', code);
+      location.assign(u.href);
+    }
+  }, feld, el('button', { type: 'submit', class: 'sync-test' }, t('sync.verbinden')));
+  feld.addEventListener('input', () => feld.setCustomValidity(''));
+  return form;
+}
+
 function zeichneStatus() {
   const punkt = el('span', { class: 'sync-dot' });
-  let text, zustand;
-  if (status.ersetzt) { text = t('sync.ersetzt'); zustand = 'aus'; }
+  const kopf = [punkt, el('b', {}, t(`sync.${ROLLE}`))];
+  if (RAUM && !status.fehler) kopf.push(' · ', el('span', { class: 'sync-raum' }, t('sync.raum', { raum: RAUM })));
+  let text, zustand, extra = null;
+  if (!RAUM || status.fehler === 'raum') {
+    text = t(RAUM ? 'sync.raumUngueltig' : 'sync.raumFehlt'); zustand = 'warten'; extra = raumFormular();
+  } else if (status.ersetzt) { text = t('sync.ersetzt'); zustand = 'aus'; }
   else if (!status.verbunden) { text = status.info || t('sync.verbinde'); zustand = 'aus'; }
+  else if (ROLLE === 'pult' && status.abgelehnt) { text = t('sync.andererPult'); zustand = 'aus'; }
   else if (ROLLE === 'pult' ? !status.bildschirm : !status.pult) {
     text = t(ROLLE === 'pult' ? 'sync.warteBildschirm' : 'sync.wartePult'); zustand = 'warten';
+    // Bildschirm: Link für das Telefon anzeigen (LAN-Adresse vom Server, sonst die eigene Adresse)
+    if (ROLLE === 'bildschirm') {
+      const url = status.pultUrls[0] ?? `${location.origin}${BASIS}?rolle=pult&raum=${RAUM}`;
+      extra = el('span', { class: 'sync-link' }, t('sync.pultLink'), ' ', el('code', {}, url));
+    }
   } else { text = t('sync.synchron'); zustand = 'an'; }
   badge.dataset.zustand = zustand;
-  badge.replaceChildren(punkt, el('b', {}, t(`sync.${ROLLE}`)), ` · ${text}`);
-  if (ROLLE === 'pult' && params.has('test')) {
-    badge.append(el('button', { type: 'button', class: 'sync-test', onclick: fehlerTest }, t('sync.fehlerTest')));
+  badge.replaceChildren(el('span', { class: 'sync-zeile' }, ...kopf, ` · ${text}`));
+  if (extra) badge.append(extra);
+  if (ROLLE === 'pult' && params.has('test') && !extra) {
+    badge.firstChild.append(el('button', { type: 'button', class: 'sync-test', onclick: fehlerTest }, t('sync.fehlerTest')));
   }
 }
 bus.on('sprache', zeichneStatus); // Sprachwechsel: Statustext neu übersetzen
@@ -59,13 +119,17 @@ bus.on('sprache', zeichneStatus); // Sprachwechsel: Statustext neu übersetzen
 let ws = null;
 let verzoegerung = 1000;
 let wiederholung = null;
+let verlassen = false; // Seite wird verlassen (pagehide) – nicht neu verbinden
 
 function senden(nachricht) {
   if (ws?.readyState === WebSocket.OPEN) { ws.send(JSON.stringify(nachricht)); return true; }
   return false;
 }
 
+const anmelden = () => senden({ type: 'hello', rolle: ROLLE, route: ROUTE, raum: RAUM, geraet: GERAET });
+
 function verbinden() {
+  if (!RAUM) return; // Pult ohne Raumcode: erst eingeben
   clearTimeout(wiederholung);
   wiederholung = null;
   const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -76,17 +140,25 @@ function verbinden() {
   sock.onopen = () => {
     verzoegerung = 1000;
     status.verbunden = true;
-    senden({ type: 'hello', rolle: ROLLE, route: ROUTE });
+    anmelden();
     zeichneStatus();
   };
   sock.onmessage = (m) => {
     let msg;
     try { msg = JSON.parse(m.data); } catch { return; }
-    if (msg.type === 'status') { Object.assign(status, { pult: msg.pult, bildschirm: msg.bildschirm, aktiv: msg.aktiv }); zeichneStatus(); return; }
+    if (msg.type === 'status') {
+      Object.assign(status, {
+        pult: Boolean(msg.pult), bildschirm: Boolean(msg.bildschirm), aktiv: Boolean(msg.aktiv),
+        abgelehnt: Boolean(msg.abgelehnt), fehler: msg.fehler ?? null, pultUrls: msg.pultUrls ?? status.pultUrls
+      });
+      zeichneStatus();
+      return;
+    }
     (ROLLE === 'pult' ? pultEmpfang : bildschirmEmpfang)(msg);
   };
   sock.onclose = (e) => {
     if (ws !== sock) return;
+    if (verlassen) { status.verbunden = false; beimTrennen(); return; }
     status.verbunden = false;
     beimTrennen();
     if (e.code === 4001) { status.ersetzt = true; zeichneStatus(); return; } // anderer Bildschirm hat übernommen
@@ -102,12 +174,23 @@ function verbinden() {
 // (mehrere Pult-Tabs: Playground + Erklärung – der Bildschirm folgt dem, der zuletzt benutzt wurde)
 function wiederAktiv() {
   if (document.visibilityState !== 'visible' || status.ersetzt) return;
-  if (ws?.readyState === WebSocket.OPEN) { if (ROLLE === 'pult' && !status.aktiv) senden({ type: 'hello', rolle: ROLLE, route: ROUTE }); }
+  if (ws?.readyState === WebSocket.OPEN) { if (ROLLE === 'pult' && !status.aktiv) anmelden(); }
   else if (ws?.readyState !== WebSocket.CONNECTING) { verzoegerung = 1000; verbinden(); }
 }
-document.addEventListener('visibilitychange', wiederAktiv);
+document.addEventListener('visibilitychange', () => {
+  // Verborgen: Pult meldet sich ab (der Bildschirm zeigt „warte auf Pult“); sichtbar: wieder anmelden
+  if (document.visibilityState === 'hidden') { if (ROLLE === 'pult') senden({ type: 'pause' }); }
+  else wiederAktiv();
+});
+// Tab wird geschlossen oder verlassen: Verbindung sofort sauber schließen
+window.addEventListener('pagehide', () => {
+  if (ROLLE === 'pult') senden({ type: 'pause' });
+  verlassen = true;
+  clearTimeout(wiederholung);
+  ws?.close(1000, 'pagehide');
+});
 window.addEventListener('focus', wiederAktiv);
-window.addEventListener('pageshow', (e) => { if (e.persisted) wiederAktiv(); }); // aus dem Back-Forward-Cache
+window.addEventListener('pageshow', (e) => { if (e.persisted) { verlassen = false; wiederAktiv(); } }); // aus dem Back-Forward-Cache
 
 // ---------- Pult ----------
 let seq = 0;              // zuletzt vergebene Nummer
@@ -246,7 +329,11 @@ function eingeben(feld, wert) {
   feld.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
-const nurPlayground = () => { if (ROUTE !== '') throw new Error('route'); };
+/** Sprache wechseln, aber höchstens 3 s warten: Bleibt die Überblendung hängen (Tab wird nicht gezeichnet),
+ *  darf das nicht die ganze Warteschlange blockieren. Der Wechsel selbst läuft trotzdem zu Ende. */
+const spracheUebernehmen = (lang) => Promise.race([syncSprache(lang), new Promise((r) => setTimeout(r, 3000))]);
+
+const nurPlayground =() => { if (ROUTE !== '') throw new Error('route'); };
 
 async function anwenden(ev) {
   switch (ev.kind) {
@@ -286,7 +373,7 @@ async function anwenden(ev) {
     case 'aufklappen': element(ev.ziel).open = Boolean(ev.offen); return {};
     case 'scroll': return { scroll: scrollen(element(ev.ziel), ev.x, ev.breite) };
     case 'thema': uebernehmeModus(ev.modus); return { modus: getModus() };
-    case 'sprache': await syncSprache(ev.sprache); return { sprache: getSprache() };
+    case 'sprache': await spracheUebernehmen(ev.sprache); return { sprache: getSprache() };
     case 'navigate':
       if (ROUTE !== 'Docs') throw new Error('route');
       springeZu(ev.hash);
@@ -300,7 +387,7 @@ async function snapshotAnwenden(s, snapSeq) {
   letzte = snapSeq;
   const ui = s.ui ?? {};
   if (ui.thema) uebernehmeModus(ui.thema);
-  if (ui.sprache) await syncSprache(ui.sprache); // Erklärung wird dabei neu gezeichnet – danach erst den Rest
+  if (ui.sprache) await spracheUebernehmen(ui.sprache); // Erklärung wird dabei neu gezeichnet – danach erst den Rest
   const versuch = (f) => { try { f(); } catch (e) { console.warn('[sync]', e.message); } };
   if (ROUTE === '') {
     allePopoversSchliessen();
@@ -355,6 +442,7 @@ document.addEventListener('click', (e) => {
   if (!seite) return;
   u.pathname = BASIS + (seite === 'docs' ? 'Docs' : '');
   u.searchParams.set('rolle', ROLLE);
+  if (RAUM) u.searchParams.set('raum', RAUM);
   a.href = u.href;
 }, true);
 
