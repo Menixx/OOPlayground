@@ -161,7 +161,8 @@ export function createNav({ nav, backdrop, menuBtn }) {
     inertSetzen();
     const a = aktiv && nav.querySelector(`a[data-id="${aktiv}"]`);
     if (a) insBild(a);
-    suche.focus({ preventScroll: true });
+    // Fokus auf den Schließen-Knopf statt auf die Suche – sonst springt auf Touch-Geräten die Tastatur auf
+    nav.querySelector('.toc-close')?.focus({ preventScroll: true });
   }
 
   function schliessen({ fokusZurueck = true } = {}) {

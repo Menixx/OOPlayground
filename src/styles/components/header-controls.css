@@ -52,9 +52,10 @@
   .head-menu-btn:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
   .head-menu-icon { grid-area: 1 / 1; transition: opacity 180ms ease, transform 180ms ease; }
   .head-menu-icon-open { width: 18px; height: 18px; }
-  .head-menu-icon-close { font-size: 22px; line-height: 1; opacity: 0; transform: rotate(-90deg); }
+  .head-menu-icon-close { font-size: 33px; line-height: 1; opacity: 0; transform: rotate(-90deg); }
   .head-menu-btn[aria-expanded="true"] .head-menu-icon-open { opacity: 0; transform: rotate(90deg); }
   .head-menu-btn[aria-expanded="true"] .head-menu-icon-close { opacity: 1; transform: none; }
+  .head-menu-icon-close { color: var(--muted); } /* wie der Schließen-Knopf im Menü der Erklärung */
 
   .head-menu-backdrop { display: block; position: fixed; inset: 0; z-index: 70; background: rgba(15,23,42,.6); opacity: 0; visibility: hidden; transition: opacity 250ms ease, visibility 0s 250ms; }
   .head-menu-backdrop.open { opacity: 1; visibility: visible; transition: opacity 250ms ease; }

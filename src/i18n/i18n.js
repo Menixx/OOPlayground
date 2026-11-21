@@ -79,6 +79,28 @@ const helfer = [];
 export function beimSprachwechsel({ vorbereiten, zeichnen }) { helfer.push({ vorbereiten, zeichnen }); }
 
 const WENIG_BEWEGUNG = matchMedia('(prefers-reduced-motion: reduce)');
+const UEBERBLENDEN = 620; // ms, = dauer in LangToggle.js und ::view-transition in base.css
+
+/** Ist gerade die (ein-/ausfahrende) Browserleiste mobiler Browser sichtbar?
+ *  Dann ist der sichtbare Bereich (innerHeight) kleiner als der große Viewport (100lvh).
+ *  In diesem Zustand zeichnen mobile Browser die View-Transition-Bilder um die Höhe der Leiste
+ *  verschoben – die Kopfzeile rutscht kurz unter die Leiste und „verschwindet“. */
+let sonde = null;
+function browserleisteSichtbar() {
+  if (!CSS.supports('height', '100lvh')) return false;
+  if (!sonde) {
+    sonde = document.createElement('div');
+    sonde.style.cssText = 'position:fixed;top:0;left:0;width:0;height:100lvh;visibility:hidden;pointer-events:none';
+    document.body.append(sonde);
+  }
+  return sonde.offsetHeight - innerHeight > 1;
+}
+
+/** Ersatz ohne View Transitions: Texte wechseln sofort und blenden weich auf – die Kopfzeile bleibt stehen. */
+function sanftEinblenden() {
+  document.querySelectorAll('main, #header h1, #header p, .topbar .brand, .head-link-text, .toc')
+    .forEach((e) => e.animate([{ opacity: 0.25 }, { opacity: 1 }], { duration: UEBERBLENDEN, easing: 'ease' }));
+}
 
 // Zähler gegen Wettläufe: Bei schnellen Klicks gewinnt nur die zuletzt angeforderte Sprache.
 let anfrage = 0;
@@ -106,12 +128,15 @@ async function wechsle(neu, { speichern }) {
     await Promise.all(helfer.map((h) => h.zeichnen?.(neu)));
   };
   // Ganze Seite weich überblenden (View Transitions); ohne Unterstützung oder bei reduzierter Bewegung sofort
-  if (document.startViewTransition && !WENIG_BEWEGUNG.matches && !document.hidden) {
+  if (WENIG_BEWEGUNG.matches || document.hidden) {
+    await anwenden();
+  } else if (!document.startViewTransition || browserleisteSichtbar()) {
+    await anwenden();
+    sanftEinblenden();
+  } else {
     const vt = document.startViewTransition(anwenden);
     vt.ready.catch(() => {}); vt.finished.catch(() => {}); // übersprungen bei schnellem Doppelklick – kein Fehler
     await vt.updateCallbackDone.catch(() => {});
-  } else {
-    await anwenden();
   }
   return true;
 }
