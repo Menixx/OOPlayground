@@ -57,6 +57,7 @@ document.getElementById('topbar').append(
 );
 
 toTop.removeAttribute('hidden');
+toTop.dataset.sync = 'docs:nachOben';
 toTop.append(el('span', { 'aria-hidden': 'true' }, '↑'), el('span', { i18n: 'docs.toTop' }));
 
 const nav = createNav({ nav: document.getElementById('toc'), backdrop: document.getElementById('toc-backdrop'), menuBtn });
@@ -65,6 +66,8 @@ const nav = createNav({ nav: document.getElementById('toc'), backdrop: document.
 async function zeichnen() {
   const inhalt = await ladeInhalt(getSprache());
   renderInhalt(main, inhalt);
+  // Aufklappbare Blöcke adressierbar machen (Demonstration: Auf-/Zuklappen wird übertragen)
+  main.querySelectorAll('details').forEach((d, i) => { d.dataset.sync = `inhalt:${i}`; });
   nav.render(inhalt);
   nav.observe(main);
   document.title = t('docs.pageTitle');

@@ -52,6 +52,8 @@ function wechsle(neu, { speichern }) {
 }
 
 export const setModus = (neu) => wechsle(neu, { speichern: true });
+/** Modus übernehmen, ohne ihn auf diesem Gerät zu speichern (Bildschirm der Demonstration). */
+export const uebernehmeModus = (neu) => wechsle(neu, { speichern: false });
 /** Nächster Modus im Kreis: hell → dunkel → System → hell. */
 export const naechsterModus = (m = modus) => MODI[(MODI.indexOf(m) + 1) % MODI.length];
 

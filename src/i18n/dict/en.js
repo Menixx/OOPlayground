@@ -102,6 +102,7 @@ export default {
   'sync.abweichung': 'Screen diverged at #{seq} – resending state.',
   'sync.uebernommen': 'State taken over from the remote ({n} object(s)).',
   'sync.keinAbschnitt': 'Section "{hash}" not found.',
+  'sync.keinElement': 'Element "{ziel}" not found.',
 
   'figur.drehen': '{name} was rotated by 90° (now {winkel}°).',
   'tier.halten': '{name} stops.',

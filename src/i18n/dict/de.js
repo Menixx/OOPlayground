@@ -109,6 +109,7 @@ export default {
   'sync.abweichung': 'Bildschirm weicht bei #{seq} ab – Zustand wird neu gesendet.',
   'sync.uebernommen': 'Zustand vom Pult übernommen ({n} Objekt(e)).',
   'sync.keinAbschnitt': 'Abschnitt „{hash}“ nicht gefunden.',
+  'sync.keinElement': 'Element „{ziel}“ nicht gefunden.',
 
   // Terminal: Rückgaben der Methoden
   'figur.drehen': '{name} wurde um 90° gedreht (jetzt {winkel}°).',

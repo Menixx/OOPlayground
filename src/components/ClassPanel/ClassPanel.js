@@ -8,7 +8,7 @@ export function mountClassPanel(root) {
   root.className = 'class-panel';
   KLASSEN.forEach((g) => {
     const b = el('button', { type: 'button', class: 'class-btn' }, icon(g.name, 'icon big'), el('span', {}, g.name), el('small', {}, 'abstract'));
-    attach(b, { build: () => buildClassPopover(g) });
+    attach(b, { key: `klasse:${g.name}`, build: () => buildClassPopover(g) });
     root.append(b);
   });
 }

@@ -1,6 +1,15 @@
 import { el } from '../utils/dom.js';
-// close-Funktion -> { trigger, pop() }, damit Klicks außerhalb erkannt werden können
+import { bus } from '../services/EventBus.js';
+// close-Funktion -> { trigger, pop(), key }, damit Klicks außerhalb erkannt werden können
 const offene = new Map();
+
+// Karten mit Schlüssel (z. B. „objekt:katze1“) lassen sich von außen öffnen/schließen –
+// die Demonstration „Pult → Bildschirm“ spielt so das Öffnen und Schließen nach.
+const REGISTER = new Map(); // key -> api
+export const popoverNach = (key) => REGISTER.get(key);
+/** Schlüssel der offenen Karten in der Reihenfolge des Öffnens (Eltern vor Kindern). */
+export const offenePopovers = () => [...offene.values()].map((o) => o.key).filter(Boolean);
+export const allePopoversSchliessen = () => [...offene.keys()].forEach((f) => f());
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') [...offene.keys()].forEach((f) => f()); });
 
 // Klick irgendwo außerhalb einer offenen Karte (und außerhalb ihres Triggers) schließt sie.
@@ -31,16 +40,20 @@ const SCHLIESS_VERZOEGERUNG = 100; // ms nach dem Verlassen – reicht, um vom T
 const AUSBLENDEN = 150; // ms, muss zu .pop-closing in class-popover.css passen
 const WENIG_BEWEGUNG = matchMedia('(prefers-reduced-motion: reduce)');
 
-export function attach(trigger, { build, parent = null, klasse = '' }) {
+export function attach(trigger, { build, parent = null, klasse = '', key = null }) {
   let pop = null, body = null, timer = null, fade = null, touch = false, warOffen = false;
   const kids = new Set();
   const api = {
     get root() { return pop; },
     kids,
     refresh() { if (pop) { render(); place(); } },
-    close
+    open,
+    close,
+    /** Aus dem Register nehmen (Objekt gelöscht). */
+    vergessen() { if (key && REGISTER.get(key) === api) REGISTER.delete(key); }
   };
   if (parent) parent.kids.add(close);
+  if (key) REGISTER.set(key, api);
   trigger.setAttribute('aria-haspopup', 'dialog');
   trigger.setAttribute('aria-expanded', 'false');
 
@@ -82,14 +95,17 @@ export function attach(trigger, { build, parent = null, klasse = '' }) {
     sperreSeitenScroll(pop);
     render(); place();
     trigger.setAttribute('aria-expanded', 'true');
-    offene.set(close, { trigger, pop: () => pop });
+    offene.set(close, { trigger, pop: () => pop, key });
+    if (key) bus.emit('popover', { key, offen: true });
   }
   function close() {
     clearTimeout(timer); clearTimeout(fade); fade = null;
     kids.forEach((f) => f());
+    const war = Boolean(pop);
     pop?.remove(); pop = body = null;
     trigger.setAttribute('aria-expanded', 'false');
     offene.delete(close);
+    if (war && key) bus.emit('popover', { key, offen: false });
   }
   /** Nach dem Verlassen: kurz warten, dann ausblenden und schließen (Esc/Klick daneben schließen sofort). */
   function ausblenden() {

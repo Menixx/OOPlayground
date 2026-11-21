@@ -1,11 +1,23 @@
 // Synchronisation „Pult → Bildschirm“ (Prototyp, nur unter /demonstration/ geladen).
-// Pult (Telefon, ?rolle=pult): hört auf den EventBus und sendet created/called/navigate als „event“ mit seq.
-// Bildschirm (Laptop, ?rolle=bildschirm oder ohne Parameter): spielt Ereignisse ab und antwortet mit „ack“.
-// Der Bildschirm sendet nie eigene Ereignisse – so entstehen keine Echo-Schleifen.
+// Pult (Telefon, ?rolle=pult): hört auf den EventBus und auf markierte Bedienelemente (data-sync)
+//   und sendet jede Aktion als „event“ mit fortlaufender seq.
+// Bildschirm (Laptop, ?rolle=bildschirm oder ohne Parameter): spielt die Ereignisse der Reihe nach ab
+//   und antwortet mit „ack“. Er sendet nie eigene Ereignisse – so entstehen keine Echo-Schleifen.
+//
+// Ereignisse (event.kind):
+//   created {cls} · called {id, methode} · versucht {cls} · deleted {id} · deletedAll · movedAll
+//   popover {key, offen}            – Karte geöffnet/geschlossen (Klasse, Objekt, Motor)
+//   klick {ziel}                    – Knopf mit data-sync (Ausgabe leeren, Motor-Knöpfe, „Nach oben“ …)
+//   eingabe {ziel, wert}            – Eingabefeld mit data-sync (Suche der Erklärung)
+//   aufklappen {ziel, offen}        – <details data-sync> (Menügruppen, Code-Blöcke der Erklärung)
+//   navigate {hash} · thema {modus} · sprache {sprache}
 import './sync.css';
 import { bus } from '../services/EventBus.js';
 import { manager, KLASSEN } from '../services/ObjectManager.js';
-import { t, getSprache } from '../i18n/i18n.js';
+import { t, getSprache, syncSprache } from '../i18n/i18n.js';
+import { getModus, uebernehmeModus } from '../services/Theme.js';
+import { popoverNach, offenePopovers, allePopoversSchliessen } from '../components/popover.js';
+import { konsolenVerlauf, konsoleSetzen } from '../components/Console/Console.js';
 import { el } from '../utils/dom.js';
 
 const params = new URLSearchParams(location.search);
@@ -18,9 +30,10 @@ const BASIS = location.pathname.replace(/(\/demonstration)(\/.*)?$/i, '$1/');
 const KLASSE = new Map(KLASSEN.flatMap((g) => g.kinder));
 const aktuellerHash = () => decodeURIComponent(location.hash.slice(1));
 const log = (typ, text) => bus.emit('log', { typ, text });
+const finde = (ziel) => document.querySelector(`[data-sync="${CSS.escape(ziel)}"]`);
 
 // ---------- Statusanzeige ----------
-const status = { verbunden: false, pult: false, bildschirm: false, info: '' };
+const status = { verbunden: false, pult: false, bildschirm: false, aktiv: false, info: '' };
 const badge = el('div', { class: 'sync-badge', role: 'status' });
 document.body.append(badge);
 
@@ -99,9 +112,19 @@ let seq = 0;              // zuletzt vergebene Nummer
 let synchron = false;     // erst nach dem ersten Snapshot werden Ereignisse gesendet
 const offen = new Map();  // seq -> { event, erwartet }
 
+/** Alles, was der Bildschirm braucht, um genauso auszusehen. */
 function zustand() {
-  const { objects, counters } = ROUTE === '' ? manager.exportieren() : { objects: [], counters: {} };
-  return { route: ROUTE, hash: ROUTE === 'Docs' ? aktuellerHash() : '', objects, counters };
+  const alle = (sel) => [...document.querySelectorAll(sel)];
+  const ui = {
+    thema: getModus(),
+    sprache: getSprache(),
+    popovers: offenePopovers(),
+    gedrueckt: alle('button[data-sync][aria-expanded="true"]').map((b) => b.dataset.sync),
+    eingaben: Object.fromEntries(alle('input[data-sync]').map((i) => [i.dataset.sync, i.value])),
+    details: Object.fromEntries(alle('details[data-sync]').map((d) => [d.dataset.sync, d.open]))
+  };
+  if (ROUTE === 'Docs') return { route: ROUTE, hash: aktuellerHash(), objects: [], counters: {}, ui };
+  return { route: ROUTE, hash: '', ...manager.exportieren(), konsole: konsolenVerlauf(), ui };
 }
 
 function snapshotSenden() {
@@ -138,11 +161,27 @@ function pultEmpfang(msg) {
 }
 
 if (ROLLE === 'pult') {
+  // Fachliche Aktionen (ObjectManager)
   bus.on('created', ({ id, obj }) => ereignis({ kind: 'created', cls: obj.constructor.name }, { id }));
-  bus.on('called', ({ id, methode, ergebnis }) => ereignis({ kind: 'called', id, methode }, { ergebnis }));
+  bus.on('called', ({ id, methode, ergebnis, teil }) => { if (!teil) ereignis({ kind: 'called', id, methode }, { ergebnis }); });
+  bus.on('aktion', (a) => ereignis(a)); // versucht / deleted / deletedAll / movedAll
+  // Oberfläche
+  bus.on('popover', ({ key, offen: auf }) => ereignis({ kind: 'popover', key, offen: auf }));
   bus.on('navigate', ({ hash }) => ereignis({ kind: 'navigate', hash }));
-  // Löschen ist (noch) kein eigenes Ereignis: der Bildschirm bekommt stattdessen den neuen Zustand
-  bus.on('deleted', () => { if (synchron) snapshotSenden(); });
+  bus.on('theme', (modus) => ereignis({ kind: 'thema', modus }));
+  bus.on('sprache', (sprache) => ereignis({ kind: 'sprache', sprache }));
+
+  // Markierte Bedienelemente: Knöpfe, Auf-/Zuklappen, Eingaben (Capture: vor den eigenen Handlern)
+  document.addEventListener('click', (e) => {
+    const knopf = e.target.closest?.('button[data-sync]');
+    if (knopf) { ereignis({ kind: 'klick', ziel: knopf.dataset.sync }); return; }
+    const d = e.target.closest?.('summary')?.parentElement;
+    if (d?.matches('details[data-sync]')) ereignis({ kind: 'aufklappen', ziel: d.dataset.sync, offen: !d.open });
+  }, true);
+  document.addEventListener('input', (e) => {
+    const f = e.target.closest?.('input[data-sync], textarea[data-sync]');
+    if (f) ereignis({ kind: 'eingabe', ziel: f.dataset.sync, wert: f.value });
+  }, true);
 }
 
 /** Testknopf (nur mit ?test): Aufruf einer Methode, die es nicht gibt → ack.ok === false. */
@@ -153,6 +192,7 @@ function fehlerTest() {
 
 // ---------- Bildschirm ----------
 let letzte = null; // zuletzt angewandte seq; null = noch kein Snapshot
+let kette = Promise.resolve(); // Nachrichten streng nacheinander abarbeiten (Sprachwechsel ist asynchron)
 
 /** URL der Seite, die zum Zustand des Pults passt (Rolle und andere Parameter bleiben erhalten). */
 function zielUrl(route, hash) {
@@ -169,50 +209,106 @@ function springeZu(hash) {
   else location.hash = hash; // löst hashchange -> springe() aus
 }
 
-function anwenden(ev) {
+function element(ziel) {
+  const e = finde(ziel);
+  if (!e) throw new Error(t('sync.keinElement', { ziel }));
+  return e;
+}
+
+function eingeben(feld, wert) {
+  if (feld.value === wert) return;
+  feld.value = wert;
+  feld.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+const nurPlayground = () => { if (ROUTE !== '') throw new Error('route'); };
+
+async function anwenden(ev) {
   switch (ev.kind) {
     case 'created': {
-      if (ROUTE !== '') throw new Error('route');
+      nurPlayground();
       const K = KLASSE.get(ev.cls);
       if (!K) throw new Error(t('error.unknownClass', { liste: ev.cls }));
       const id = manager.erstellen(K);
       if (!id) throw new Error(t('error.abstract'));
       return { id };
     }
-    case 'called': {
-      if (ROUTE !== '') throw new Error('route');
+    case 'called':
+      nurPlayground();
       return { ergebnis: manager.aufrufen(ev.id, ev.methode), sprache: getSprache() };
+    case 'versucht': {
+      nurPlayground();
+      const g = KLASSEN.find((k) => k.name === ev.cls);
+      if (!g) throw new Error(t('error.unknownClass', { liste: ev.cls }));
+      manager.versuchen(g.cls);
+      return {};
     }
-    case 'navigate': {
+    case 'deleted':
+      nurPlayground();
+      if (!manager.alle.some((o) => o.id === ev.id)) throw new Error(t('error.noObject', { id: ev.id }));
+      manager.loeschen(ev.id);
+      return {};
+    case 'deletedAll': nurPlayground(); manager.alleLoeschen(); return {};
+    case 'movedAll': nurPlayground(); manager.alleBewegen(); return {};
+    case 'popover': {
+      const api = popoverNach(ev.key);
+      if (!api) { if (!ev.offen) return {}; throw new Error(t('sync.keinElement', { ziel: ev.key })); } // weg = schon zu
+      if (ev.offen) api.open(); else api.close();
+      return {};
+    }
+    case 'klick': element(ev.ziel).click(); return {};
+    case 'eingabe': eingeben(element(ev.ziel), ev.wert ?? ''); return {};
+    case 'aufklappen': element(ev.ziel).open = Boolean(ev.offen); return {};
+    case 'thema': uebernehmeModus(ev.modus); return { modus: getModus() };
+    case 'sprache': await syncSprache(ev.sprache); return { sprache: getSprache() };
+    case 'navigate':
       if (ROUTE !== 'Docs') throw new Error('route');
       springeZu(ev.hash);
       return { hash: ev.hash };
-    }
     default: throw new Error(`unknown kind: ${ev.kind}`);
   }
 }
 
-function bildschirmEmpfang(msg) {
-  if (msg.type === 'snapshot') {
-    const s = msg.state ?? {};
-    if ((s.route ?? '') !== ROUTE) { location.replace(zielUrl(s.route ?? '', s.hash)); return; }
-    letzte = msg.seq;
-    if (ROUTE === '') {
-      try { manager.wiederherstellen(s); } catch (e) { log('fehler', e.message); }
-      log('info', t('sync.uebernommen', { n: s.objects?.length ?? 0 }));
-    } else {
-      try { springeZu(s.hash); } catch { /* Abschnitt fehlt – Seite bleibt, wo sie ist */ }
+async function snapshotAnwenden(s, snapSeq) {
+  if ((s.route ?? '') !== ROUTE) { location.replace(zielUrl(s.route ?? '', s.hash)); return; }
+  letzte = snapSeq;
+  const ui = s.ui ?? {};
+  if (ui.thema) uebernehmeModus(ui.thema);
+  if (ui.sprache) await syncSprache(ui.sprache); // Erklärung wird dabei neu gezeichnet – danach erst den Rest
+  const versuch = (f) => { try { f(); } catch (e) { console.warn('[sync]', e.message); } };
+  if (ROUTE === '') {
+    allePopoversSchliessen();
+    versuch(() => manager.wiederherstellen(s));
+    konsoleSetzen(s.konsole ?? []);
+    for (const key of ui.popovers ?? []) popoverNach(key)?.open(); // Eltern vor Kindern
+    for (const ziel of ui.gedrueckt ?? []) {
+      const b = finde(ziel);
+      if (b && b.getAttribute('aria-expanded') !== 'true') b.click();
     }
-    return;
+  } else {
+    // Erst die Position (Scrollspy klappt dabei Gruppen auf), dann Suche und Auf-/Zuklappen wie beim Pult
+    if (s.hash) versuch(() => springeZu(s.hash));
+    else { history.replaceState(null, '', location.pathname + location.search); window.scrollTo({ top: 0, behavior: 'instant' }); }
+    for (const [ziel, wert] of Object.entries(ui.eingaben ?? {})) { const f = finde(ziel); if (f) eingeben(f, wert); }
+    for (const [ziel, auf] of Object.entries(ui.details ?? {})) { const d = finde(ziel); if (d) d.open = auf; }
   }
+  console.info(`[sync] Zustand vom Pult übernommen (seq ${snapSeq}, ${s.objects?.length ?? 0} Objekt(e)).`);
+}
+
+async function verarbeiten(msg) {
+  if (msg.type === 'snapshot') { await snapshotAnwenden(msg.state ?? {}, msg.seq); return; }
   if (msg.type !== 'event') return;
   if (letzte === null || msg.seq !== letzte + 1) {
     senden({ type: 'ack', seq: msg.seq, ok: false, error: 'seq_gap' });
     return;
   }
   letzte = msg.seq;
-  try { senden({ type: 'ack', seq: msg.seq, ok: true, result: anwenden(msg.event) }); }
+  try { senden({ type: 'ack', seq: msg.seq, ok: true, result: await anwenden(msg.event) }); }
   catch (e) { senden({ type: 'ack', seq: msg.seq, ok: false, error: e.message }); }
+}
+
+function bildschirmEmpfang(msg) {
+  kette = kette.then(() => verarbeiten(msg)).catch((e) => console.error('[sync]', e));
 }
 
 function beimTrennen() {

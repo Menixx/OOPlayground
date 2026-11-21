@@ -30,10 +30,10 @@ export function createNav({ nav, backdrop, menuBtn }) {
   function render(inhalt) {
     const q = suche?.value ?? '';
     suche = el('input', {
-      type: 'search', class: 'toc-search', placeholder: L('docs.search'), 'aria-label': L('docs.search'),
+      type: 'search', class: 'toc-search', 'data-sync': 'toc:suche', placeholder: L('docs.search'), 'aria-label': L('docs.search'),
       autocomplete: 'off', spellcheck: 'false', oninput: filtern,
       onkeydown: (e) => {
-        if (e.key === 'Escape' && suche.value) { e.preventDefault(); e.stopPropagation(); suche.value = ''; filtern(); }
+        if (e.key === 'Escape' && suche.value) { e.preventDefault(); e.stopPropagation(); suche.value = ''; suche.dispatchEvent(new Event('input', { bubbles: true })); }
       }
     });
     suche.value = q;
@@ -42,7 +42,7 @@ export function createNav({ nav, backdrop, menuBtn }) {
       inhalt.sections.filter((s) => s.group === 'start').map(eintrag),
       inhalt.groups.map((g) => {
         const d = el('details', {
-          class: 'toc-details', open: offen.has(g.key),
+          class: 'toc-details', 'data-sync': `toc:${g.key}`, open: offen.has(g.key),
           ontoggle: () => { if (offenVorSuche == null) (d.open ? offen.add(g.key) : offen.delete(g.key)); }
         },
         el('summary', {}, el('span', {}, g.nav)),

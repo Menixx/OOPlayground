@@ -46,6 +46,7 @@ export class ObjectManager {
 
   // Demonstration: abstrakte Klassen lassen sich nicht instanziieren
   versuchen(cls) {
+    bus.emit('aktion', { kind: 'versucht', cls: klassenName(cls) });
     log('befehl', `new ${klassenName(cls)}()`);
     try { new cls(); } catch (e) { log('fehler', e.message); }
   }
@@ -73,13 +74,14 @@ export class ObjectManager {
 
   // Polymorphie: ein Aufruf, viele Implementierungen – keine Prüfung auf konkrete Klassen
   alleBewegen() {
+    bus.emit('aktion', { kind: 'movedAll' });
     log('befehl', t('workspace.moveAll'));
     this.alle
       .filter(({ obj }) => obj instanceof Tier || obj instanceof Transport)
       .forEach(({ id, obj }) => {
         const ergebnis = obj.bewegen();
         log('ergebnis', `${id}: ${ergebnis}.`);
-        bus.emit('called', { id, methode: 'bewegen', ergebnis });
+        bus.emit('called', { id, methode: 'bewegen', ergebnis, teil: true }); // Teil von „Alle bewegen“
       });
   }
 
@@ -87,6 +89,7 @@ export class ObjectManager {
   loeschen(id) {
     const obj = this.#objekte.get(id);
     if (!obj) return;
+    bus.emit('aktion', { kind: 'deleted', id });
     this.#objekte.delete(id);
     // Gibt es keine Instanz dieser Klasse mehr, beginnt die Nummerierung wieder bei 1
     const key = klassenName(obj.constructor).toLowerCase();
@@ -103,6 +106,7 @@ export class ObjectManager {
     this.#objekte.clear();
     this.#zaehler = {};                      // alle Nummern beginnen wieder bei 1
     if (!still) {
+      bus.emit('aktion', { kind: 'deletedAll' });
       log('befehl', t('workspace.deleteAll'));
       log('ergebnis', t('log.deletedAll', { n: ids.length }));
     }
