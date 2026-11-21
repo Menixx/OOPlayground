@@ -11,3 +11,6 @@ mountWorkspace(document.getElementById('workspace'));
 mountConsole(document.getElementById('console'));
 uebersetzeDom(); // gespeicherte Sprache auf statische Texte (index.html) anwenden
 folgeAnderenTabs(); // Sprachwechsel auf der Erklärungsseite hier übernehmen
+
+// Demonstration „Pult → Bildschirm“ (nur über den Node-Server unter /demonstration/)
+if (/\/demonstration(\/|$)/i.test(location.pathname)) import('./sync/sync.js');

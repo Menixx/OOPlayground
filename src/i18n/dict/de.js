@@ -91,6 +91,24 @@ export default {
   'error.abstract': 'Abstrakte Klassen können nicht instanziiert werden.',
   'error.notImplemented': 'Die Methode {methode}() muss implementiert werden.',
   'error.private': 'Zugriff verweigert – {methode} ist privat. ({fehler})',
+  'error.noObject': 'Objekt {id} existiert nicht.',
+  'error.noMethod': 'Methode {methode}() nicht gefunden.',
+  'error.unknownClass': 'Unbekannte Klasse: {liste}',
+
+  // Demonstration: Synchronisation Pult -> Bildschirm
+  'sync.pult': 'Pult',
+  'sync.bildschirm': 'Bildschirm',
+  'sync.verbinde': 'verbinde …',
+  'sync.getrennt': 'getrennt – neuer Versuch in {s} s',
+  'sync.ersetzt': 'ein anderer Bildschirm hat übernommen',
+  'sync.wartePult': 'warte auf Pult',
+  'sync.warteBildschirm': 'kein Bildschirm verbunden',
+  'sync.synchron': 'verbunden',
+  'sync.fehlerTest': 'Fehlertest',
+  'sync.ackFehler': 'Bildschirm meldet Fehler bei #{seq}: {fehler}',
+  'sync.abweichung': 'Bildschirm weicht bei #{seq} ab – Zustand wird neu gesendet.',
+  'sync.uebernommen': 'Zustand vom Pult übernommen ({n} Objekt(e)).',
+  'sync.keinAbschnitt': 'Abschnitt „{hash}“ nicht gefunden.',
 
   // Terminal: Rückgaben der Methoden
   'figur.drehen': '{name} wurde um 90° gedreht (jetzt {winkel}°).',

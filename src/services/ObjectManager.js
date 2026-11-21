@@ -18,6 +18,7 @@ export const KLASSEN = [
   { name: 'Transport', cls: Transport, kinder: [['Auto', Auto], ['Flugzeug', Flugzeug], ['Zug', Zug]] },
   { name: 'Figur', cls: Figur, kinder: [['Dreieck', Dreieck], ['Kreis', Kreis], ['Stern', Stern]] }
 ];
+const KINDKLASSEN = new Map(KLASSEN.flatMap((g) => g.kinder));
 const NAMEN = new Map(KLASSEN.flatMap((g) => [[g.cls, g.name], ...g.kinder.map(([n, c]) => [c, n])]));
 export const klassenName = (cls) => NAMEN.get(cls) ?? cls.name;
 
@@ -49,14 +50,25 @@ export class ObjectManager {
     try { new cls(); } catch (e) { log('fehler', e.message); }
   }
 
-    aufrufen(id, methode) {
+  /** Ruft eine öffentliche Methode auf. Gibt das Ergebnis zurück oder wirft den Fehler weiter
+   *  (der Sync-Bridge baut daraus seinen ack); protokolliert wird beides wie bisher. */
+  aufrufen(id, methode) {
     const obj = this.#objekte.get(id);
     log('befehl', `${id}.${methode}()`);
     try {
-      log('ergebnis', obj[methode]());
-      bus.emit('called', { id, methode });   // Animation anstoßen
-    } catch (e) { log('fehler', e.message); }
-    bus.emit('changed', { id });
+      if (!obj) throw new Error(t('error.noObject', { id }));
+      const erlaubt = Object.getPrototypeOf(obj.constructor).methoden?.some(([n]) => n === methode);
+      if (!erlaubt || typeof obj[methode] !== 'function') throw new Error(t('error.noMethod', { methode }));
+      const ergebnis = obj[methode]();
+      log('ergebnis', ergebnis);
+      bus.emit('called', { id, methode, ergebnis });   // Animation anstoßen (und Pult: Ereignis senden)
+      return ergebnis;
+    } catch (e) {
+      log('fehler', e.message);
+      throw e;
+    } finally {
+      bus.emit('changed', { id });
+    }
   }
 
   // Polymorphie: ein Aufruf, viele Implementierungen – keine Prüfung auf konkrete Klassen
@@ -65,8 +77,9 @@ export class ObjectManager {
     this.alle
       .filter(({ obj }) => obj instanceof Tier || obj instanceof Transport)
       .forEach(({ id, obj }) => {
-        log('ergebnis', `${id}: ${obj.bewegen()}.`);
-        bus.emit('called', { id, methode: 'bewegen' });  
+        const ergebnis = obj.bewegen();
+        log('ergebnis', `${id}: ${ergebnis}.`);
+        bus.emit('called', { id, methode: 'bewegen', ergebnis });
       });
   }
 
@@ -84,14 +97,58 @@ export class ObjectManager {
     bus.emit('deleted', { ids: [id] });
   }
 
-  alleLoeschen() {
+  alleLoeschen({ still = false } = {}) {
     if (!this.#objekte.size) return;
     const ids = [...this.#objekte.keys()];
     this.#objekte.clear();
     this.#zaehler = {};                      // alle Nummern beginnen wieder bei 1
-    log('befehl', t('workspace.deleteAll'));
-    log('ergebnis', t('log.deletedAll', { n: ids.length }));
+    if (!still) {
+      log('befehl', t('workspace.deleteAll'));
+      log('ergebnis', t('log.deletedAll', { n: ids.length }));
+    }
     bus.emit('deleted', { ids });
+  }
+
+  // ---------- Synchronisation (Demonstration „Pult → Bildschirm“) ----------
+
+  /** Zustand als JSON-fähiges Objekt: nur öffentliche Felder (Object.keys), Motor als eigener Eintrag.
+   *  Ausnahme: der gekapselte Drehwinkel der Figuren (#winkel) – er ist über den Getter lesbar und
+   *  wird in wiederherstellen() über drehen90() nachgebaut. */
+  exportieren() {
+    const objects = this.alle.map(({ id, obj }) => {
+      const fields = {};
+      let engine = null;
+      for (const k of Object.keys(obj)) {
+        const v = obj[k];
+        if (v && typeof v === 'object') engine = { cls: v.constructor.name, fields: { ...v } };
+        else fields[k] = v;
+      }
+      const eintrag = { id, cls: klassenName(obj.constructor), fields, engine };
+      if (obj instanceof Figur) eintrag.privat = { winkel: obj.winkel };
+      return eintrag;
+    });
+    return { objects, counters: { ...this.#zaehler } };
+  }
+
+  /** Zustand übernehmen (Bildschirm): alles still leeren und die Objekte mit denselben ids neu anlegen.
+   *  Zähler kommen ausschließlich aus state.counters. Unbekannte Klassen werden übersprungen. */
+  wiederherstellen(state) {
+    this.alleLoeschen({ still: true });
+    const fehler = [];
+    for (const { id, cls, fields = {}, engine, privat } of state.objects ?? []) {
+      const K = KINDKLASSEN.get(cls);
+      if (!K) { fehler.push(`${id}: ${cls}`); continue; }
+      const obj = new K();
+      Object.assign(obj, fields);
+      if (engine && obj.motor && obj.motor.constructor.name === engine.cls) Object.assign(obj.motor, engine.fields);
+      if (privat?.winkel && obj instanceof Figur) for (let w = 0; w < privat.winkel; w += 90) obj.drehen90();
+      this.#objekte.set(id, obj);
+      bus.emit('created', { id, obj });
+      bus.emit('changed', { id });
+    }
+    this.#zaehler = { ...(state.counters ?? {}) };
+    bus.emit('changed', {});
+    if (fehler.length) throw new Error(t('error.unknownClass', { liste: fehler.join(', ') }));
   }
 }
 export const manager = new ObjectManager();

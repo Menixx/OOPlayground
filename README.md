@@ -17,6 +17,18 @@ Zweite Einstiegsseite (Vite multi-page), erreichbar über den Link „Erklärung
 - `src/docs/render.js` (Daten → HTML), `src/docs/nav.js` (Menü, Scrollspy, Suche, Schublade), `src/styles/docs.css`.
 - Die Sprache wird zwischen beiden Tabs synchronisiert (`localStorage`-Schlüssel `ooplayground.sprache`).
 
+## Demonstration „Pult → Bildschirm“ (Branch `demo-sync`, Prototyp)
+Telefon (Pult) steuert, Laptop (Bildschirm) zeigt dasselbe – über einen Node-Server mit WebSocket (`ws`).
+
+    npm install
+    npm run demo     # = vite build + node server/server.js (Port 8080, PORT=… änderbar)
+
+- Der Server gibt beim Start die LAN-Adressen aus: `/demonstration/?rolle=bildschirm` (Laptop) und `/demonstration/?rolle=pult` (Telefon). Ohne `rolle` = Bildschirm. `/demonstration/Docs` = Erklärung.
+- Synchronisiert: Objekt erstellen (`created`), Methode aufrufen (`called`), Abschnitt der Erklärung (`navigate`); Löschen schickt den ganzen Zustand neu. Nicht: Sprache, Thema.
+- `?rolle=pult&test=1` zeigt einen Knopf „Fehlertest“ (Aufruf einer nicht existierenden Methode → `ack.ok: false`).
+- `GET /api/state` zeigt, was der Server hält (leer, wenn niemand verbunden ist).
+- Code: `server/server.js`, `src/sync/sync.js`; Protokoll siehe Kopf von `sync.js`.
+
 ## Icons
 SVG-Dateien nach `public/icons/` legen. Dateinamen: siehe `public/icons/README.md` und `src/icons.js`.
 Fehlende Icons werden durch einen Platzhalter ersetzt.

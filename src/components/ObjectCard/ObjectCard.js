@@ -24,6 +24,6 @@ export function buildObjectCard(id, obj, api) {
     el('h4', { i18n: 'card.methods' }),
     el('ul', { class: 'rows' }, methoden.map(([n, k]) =>
       el('li', {}, signatur(['public'], 'void', n), el('span', { class: `tag ${k}`, i18n: `tag.${k}` }),
-        el('button', { type: 'button', class: 'run', 'data-tip': L('tip.run'), onclick: () => manager.aufrufen(id, n), i18n: 'card.run' })))),
+        el('button', { type: 'button', class: 'run', 'data-tip': L('tip.run'), onclick: () => { try { manager.aufrufen(id, n); } catch { /* bereits protokolliert */ } }, i18n: 'card.run' })))),
     el('button', { type: 'button', class: 'loeschen', onclick: () => manager.loeschen(id) }, `${id} = null`));
 }

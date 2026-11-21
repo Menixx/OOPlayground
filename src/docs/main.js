@@ -1,6 +1,7 @@
 // Einstieg der Erklärungsseite (docs.html): Kopfleiste, Inhalt, Menü, Sprache, Sprungziele.
 import '../styles/docs.css';
 import { el, L } from '../utils/dom.js';
+import { bus } from '../services/EventBus.js';
 import { t, getSprache, uebersetzeDom, folgeAnderenTabs, bindAttr, beimSprachwechsel } from '../i18n/i18n.js';
 import { langToggle } from '../components/LangToggle/LangToggle.js';
 import { themeToggle } from '../components/ThemeToggle/ThemeToggle.js';
@@ -77,6 +78,7 @@ function springe(id, { sofort = false, fokus = true } = {}) {
   nav.pausieren();
   ziel.scrollIntoView({ block: 'start', behavior: sofort || WENIG_BEWEGUNG.matches ? 'instant' : 'smooth' });
   history.replaceState(null, '', `#${id}`);
+  bus.emit('navigate', { hash: id }); // replaceState löst kein hashchange aus; weitergeleitet wird nur auf dem Pult
   const sek = ziel.closest('.doc-sec') ?? ziel.querySelector('.doc-sec');
   if (sek) nav.setActive(sek.id);
   if (fokus) ziel.querySelector(':scope > h2, :scope > h3')?.focus({ preventScroll: true });
@@ -118,6 +120,9 @@ document.addEventListener('click', (e) => {
   springe(id);
 });
 window.addEventListener('hashchange', () => springe(decodeURIComponent(location.hash.slice(1))));
+
+// Demonstration „Pult → Bildschirm“ (nur über den Node-Server unter /demonstration/)
+if (/\/demonstration(\/|$)/i.test(location.pathname)) import('../sync/sync.js');
 
 // ---------- „Nach oben“ ----------
 let tick = false;
