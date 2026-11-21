@@ -109,6 +109,12 @@ export default {
   'sync.verbinden': 'Connect',
   'sync.andererPult': 'another remote is connected',
   'sync.pultLink': 'Open remote:',
+  'sync.qrTitel': 'Connect a remote',
+  'sync.qrHinweis': 'Scan with your phone camera',
+  'sync.qrLink': 'Link',
+  'sync.qrCode': 'Room code',
+  'sync.qrOeffnen': 'Show QR code for the remote',
+  'sync.schliessen': 'Close',
 
   'figur.drehen': '{name} was rotated by 90° (now {winkel}°).',
   'tier.halten': '{name} stops.',

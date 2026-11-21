@@ -116,6 +116,12 @@ export default {
   'sync.verbinden': 'Verbinden',
   'sync.andererPult': 'ein anderes Pult ist verbunden',
   'sync.pultLink': 'Pult öffnen:',
+  'sync.qrTitel': 'Pult verbinden',
+  'sync.qrHinweis': 'Mit der Kamera des Telefons scannen',
+  'sync.qrLink': 'Link',
+  'sync.qrCode': 'Raumcode',
+  'sync.qrOeffnen': 'QR-Code für das Pult anzeigen',
+  'sync.schliessen': 'Schließen',
 
   // Terminal: Rückgaben der Methoden
   'figur.drehen': '{name} wurde um 90° gedreht (jetzt {winkel}°).',

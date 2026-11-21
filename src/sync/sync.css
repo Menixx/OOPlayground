@@ -26,4 +26,41 @@
   color: var(--text, #0f172a); background: var(--bg, #fff); border: 1px solid var(--line, #aab8cf);
 }
 .sync-raum-form .sync-test { margin-left: 0; color: var(--text, #0f172a); background: var(--btn, #e3e9f2); border-color: var(--line, #aab8cf); }
-@media print { .sync-badge { display: none; } }
+.sync-badge.klickbar { cursor: pointer; }
+.sync-badge.klickbar:hover { opacity: 1; }
+.sync-badge.klickbar:focus, .sync-badge.klickbar:focus-visible { outline: none; }
+
+/* QR-Code-Fenster (Bildschirm) */
+.sync-qr-backdrop {
+  position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 16px;
+  background: rgba(2, 6, 23, .62); animation: sync-qr-ein 180ms ease;
+}
+.sync-qr {
+  position: relative; display: grid; justify-items: center; gap: 12px;
+  width: min(420px, 100%); max-height: calc(100vh - 32px); overflow: auto; box-sizing: border-box;
+  padding: 28px 28px 24px; border-radius: 20px;
+  color: var(--text, #0f172a); background: var(--bg, #fff); border: 1px solid var(--line, #aab8cf);
+  box-shadow: var(--shadow-3, 0 22px 44px rgba(15,23,42,.3)); font-family: var(--fun, system-ui, sans-serif);
+  animation: sync-qr-auf 220ms cubic-bezier(.2, .8, .2, 1);
+}
+.sync-qr-zu {
+  position: absolute; top: 8px; right: 8px; display: grid; place-items: center; width: 54px; height: 54px;
+  border: 0; border-radius: 50%; background: transparent; color: var(--muted, #4b5568);
+  font: 400 39px/1 var(--sans, system-ui, sans-serif); cursor: pointer; outline: none; box-shadow: none;
+}
+/* ohne Rahmen und ohne Hintergrund: Hover und Tastaturfokus färben nur das × dunkler */
+.sync-qr-zu:hover, .sync-qr-zu:focus-visible { background: transparent; color: var(--text, #0f172a); }
+.sync-qr .sync-qr-titel { display: block; margin: 0; padding: 0; border: 0; font: 700 20px/1.25 var(--fun, system-ui, sans-serif); color: inherit; text-align: center; }
+.sync-qr .sync-qr-titel::before, .sync-qr .sync-qr-titel::after { content: none; display: none; } /* globale h2-Markierung */
+.sync-qr-hinweis { margin: -6px 0 0; color: var(--muted, #4b5568); font-size: 14px; text-align: center; }
+.sync-qr-bild { width: min(300px, 70vw); aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: inset 0 0 0 1px rgba(15,23,42,.08); }
+.sync-qr-bild svg { display: block; width: 100%; height: 100%; }
+.sync-qr-zeile { display: grid; justify-items: center; gap: 2px; width: 100%; text-align: center; }
+.sync-qr-label { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted, #4b5568); }
+.sync-qr-url { font: 13px/1.4 var(--mono, monospace); overflow-wrap: anywhere; user-select: all; }
+.sync-qr-raum { font: 700 30px/1.1 var(--mono, monospace); letter-spacing: .18em; user-select: all; }
+@keyframes sync-qr-ein { from { opacity: 0; } }
+@keyframes sync-qr-auf { from { opacity: 0; transform: translateY(8px) scale(.97); } }
+@media (prefers-reduced-motion: reduce) { .sync-qr-backdrop, .sync-qr { animation: none; } }
+
+@media print { .sync-badge, .sync-qr-backdrop { display: none; } }

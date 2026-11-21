@@ -12,15 +12,18 @@
 //   aufklappen {ziel, offen}        – <details data-sync> (Menügruppen, Code-Blöcke der Erklärung)
 //   scroll {ziel, x, breite}        – waagerechtes Scrollen eines Bereichs mit data-sync (Objekte im Arbeitsbereich);
 //                                     Bildschirm: x · (eigene Fensterbreite / breite des Pults)
+//   seite {i, anteil}               – senkrechtes Scrollen der Erklärung: Anker-Element i (bzw. -1 = vor dem ersten,
+//                                     -2 = ganz unten) und wie weit es schon unter der Kopfleiste durchgelaufen ist
 //   navigate {hash} · thema {modus} · sprache {sprache}
 import './sync.css';
 import { bus } from '../services/EventBus.js';
 import { manager, KLASSEN } from '../services/ObjectManager.js';
-import { t, getSprache, syncSprache } from '../i18n/i18n.js';
-import { getModus, uebernehmeModus } from '../services/Theme.js';
+import { t, getSprache, setSprache, SPRACHEN } from '../i18n/i18n.js';
+import { getModus, setModus, MODI } from '../services/Theme.js';
 import { popoverNach, offenePopovers, allePopoversSchliessen } from '../components/popover.js';
 import { konsolenVerlauf, konsoleSetzen } from '../components/Console/Console.js';
 import { el } from '../utils/dom.js';
+import { zeigeQr, schliesseQr, qrOffen, qrNeuZeichnen } from './qrDialog.js';
 
 const params = new URLSearchParams(location.search);
 export const ROLLE = params.get('rolle') === 'pult' ? 'pult' : 'bildschirm';
@@ -67,6 +70,22 @@ const status = { verbunden: false, pult: false, bildschirm: false, aktiv: false,
 const badge = el('div', { class: 'sync-badge', role: 'status' });
 document.body.append(badge);
 
+/** Link, mit dem das Telefon als Pult in diesen Raum kommt (LAN-Adresse vom Server, sonst die eigene Adresse). */
+const pultLink = () => status.pultUrls[0] ?? `${location.origin}${BASIS}?rolle=pult&raum=${RAUM}`;
+const qrZeigen = () => { if (RAUM) zeigeQr({ url: pultLink(), raum: RAUM }); };
+let qrGezeigt = false; // beim Start einmal automatisch öffnen
+
+// Bildschirm: Klick (oder Enter/Leertaste) auf die Statusleiste öffnet den QR-Code
+if (ROLLE === 'bildschirm') {
+  badge.classList.add('klickbar');
+  badge.setAttribute('role', 'button');
+  badge.tabIndex = 0;
+  badge.dataset.keinSchliessen = ''; // Klick schließt keine offenen Karten (popover.js)
+  badge.addEventListener('click', qrZeigen);
+  badge.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); qrZeigen(); } });
+  bus.on('sprache', qrNeuZeichnen);
+}
+
 /** Pult ohne (gültigen) Raumcode: Eingabefeld – die Seite lädt dann mit ?raum=… neu. */
 function raumFormular() {
   const feld = el('input', {
@@ -101,12 +120,10 @@ function zeichneStatus() {
   else if (ROLLE === 'pult' ? !status.bildschirm : !status.pult) {
     text = t(ROLLE === 'pult' ? 'sync.warteBildschirm' : 'sync.wartePult'); zustand = 'warten';
     // Bildschirm: Link für das Telefon anzeigen (LAN-Adresse vom Server, sonst die eigene Adresse)
-    if (ROLLE === 'bildschirm') {
-      const url = status.pultUrls[0] ?? `${location.origin}${BASIS}?rolle=pult&raum=${RAUM}`;
-      extra = el('span', { class: 'sync-link' }, t('sync.pultLink'), ' ', el('code', {}, url));
-    }
+    // Bildschirm: kein Link in der Leiste – den gibt es im QR-Fenster (Klick auf die Leiste)
   } else { text = t('sync.synchron'); zustand = 'an'; }
   badge.dataset.zustand = zustand;
+  if (ROLLE === 'bildschirm') badge.title = t('sync.qrOeffnen');
   badge.replaceChildren(el('span', { class: 'sync-zeile' }, ...kopf, ` · ${text}`));
   if (extra) badge.append(extra);
   if (ROLLE === 'pult' && params.has('test') && !extra) {
@@ -126,7 +143,10 @@ function senden(nachricht) {
   return false;
 }
 
-const anmelden = () => senden({ type: 'hello', rolle: ROLLE, route: ROUTE, raum: RAUM, geraet: GERAET });
+// sichtbar: Nach einem Verbindungsabbruch melden sich alle Pult-Tabs neu – nur der sichtbare darf steuern
+const anmelden = () => senden({
+  type: 'hello', rolle: ROLLE, route: ROUTE, raum: RAUM, geraet: GERAET, sichtbar: document.visibilityState === 'visible'
+});
 
 function verbinden() {
   if (!RAUM) return; // Pult ohne Raumcode: erst eingeben
@@ -147,11 +167,17 @@ function verbinden() {
     let msg;
     try { msg = JSON.parse(m.data); } catch { return; }
     if (msg.type === 'status') {
+      const warPult = status.pult;
       Object.assign(status, {
         pult: Boolean(msg.pult), bildschirm: Boolean(msg.bildschirm), aktiv: Boolean(msg.aktiv),
         abgelehnt: Boolean(msg.abgelehnt), fehler: msg.fehler ?? null, pultUrls: msg.pultUrls ?? status.pultUrls
       });
       zeichneStatus();
+      if (ROLLE === 'bildschirm' && !msg.fehler) {
+        // Beim Start ohne Pult: QR-Code zeigen; sobald ein Pult kommt, schließt er sich von selbst
+        if (!qrGezeigt) { qrGezeigt = true; if (!status.pult) qrZeigen(); }
+        else if (qrOffen()) { if (!warPult && status.pult) schliesseQr(); else qrZeigen(); }
+      }
       return;
     }
     (ROLLE === 'pult' ? pultEmpfang : bildschirmEmpfang)(msg);
@@ -210,7 +236,7 @@ function zustand() {
     breite: innerWidth,
     details: Object.fromEntries(alle('details[data-sync]').map((d) => [d.dataset.sync, d.open]))
   };
-  if (ROUTE === 'Docs') return { route: ROUTE, hash: aktuellerHash(), objects: [], counters: {}, ui };
+  if (ROUTE === 'Docs') return { route: ROUTE, hash: aktuellerHash(), objects: [], counters: {}, ui: { ...ui, seite: seitenPosition() } };
   return { route: ROUTE, hash: '', ...manager.exportieren(), konsole: konsolenVerlauf(), ui };
 }
 
@@ -265,6 +291,14 @@ if (ROLLE === 'pult') {
     const d = e.target.closest?.('summary')?.parentElement;
     if (d?.matches('details[data-sync]')) ereignis({ kind: 'aufklappen', ziel: d.dataset.sync, offen: !d.open });
   }, true);
+  // Senkrechtes Scrollen der Erklärung: höchstens ein Ereignis je Bild
+  if (ROUTE === 'Docs') {
+    let seiteBild = 0;
+    window.addEventListener('scroll', () => {
+      seiteBild ||= requestAnimationFrame(() => { seiteBild = 0; ereignis({ kind: 'seite', ...seitenPosition() }); });
+    }, { passive: true });
+  }
+
   // Waagerechtes Scrollen (scroll steigt nicht auf – daher Capture); höchstens ein Ereignis je Bild
   const scrollOffen = new Map(); // ziel -> Element
   let scrollBild = 0;
@@ -315,6 +349,54 @@ function element(ziel) {
   return e;
 }
 
+// ---------- Scrollen der Erklärung ----------
+// Telefon und Laptop brechen den Text verschieden um – die Seite ist auf dem Telefon viel länger. Deshalb kein
+// Verhältnis der Höhen, sondern ein Anker: das Text-Element, das gerade unter der Kopfleiste steht, und der Anteil,
+// um den es schon durchgelaufen ist (bis zum nächsten Element). Beide Seiten zeigen so dieselbe Textstelle oben.
+const ANKER = '#inhalt :is(h2, h3, h4, p, pre, ul, ol, table, details, figure, blockquote, hr, img)';
+
+/** Unterkante der festen Kopfleiste – die Lesekante (eigene Höhe je Gerät). */
+const lesekante = () => Math.max(0, document.getElementById('topbar')?.getBoundingClientRect().bottom ?? 0);
+
+/** Sichtbare Anker mit ihrer Oberkante in Seitenkoordinaten (zugeklappte Inhalte haben keine Höhe und fallen weg). */
+function anker() {
+  const y0 = window.scrollY;
+  return [...document.querySelectorAll(ANKER)]
+    .map((e) => e.getBoundingClientRect())
+    .filter((r) => r.height > 0)
+    .map((r) => r.top + y0);
+}
+
+function seitenPosition() {
+  const max = document.documentElement.scrollHeight - innerHeight;
+  if (window.scrollY >= max - 1 && max > 0) return { i: -2, anteil: 0 }; // ganz unten
+  const tops = anker();
+  const y = window.scrollY + lesekante();
+  let i = -1;
+  for (let k = 0; k < tops.length && tops[k] <= y; k++) i = k;
+  if (i < 0) { // vor dem ersten Anker: Anteil der Strecke bis dorthin
+    const bis = (tops[0] ?? y) - lesekante();
+    return { i: -1, anteil: bis > 0 ? Math.min(1, window.scrollY / bis) : 0 };
+  }
+  const naechste = tops[i + 1] ?? document.documentElement.scrollHeight;
+  return { i, anteil: Math.min(1, Math.max(0, (y - tops[i]) / Math.max(1, naechste - tops[i]))) };
+}
+
+function seiteSetzen({ i, anteil = 0 }) {
+  const max = document.documentElement.scrollHeight - innerHeight;
+  const tops = anker();
+  let ziel;
+  if (i === -2) ziel = max;
+  else if (i === -1) ziel = anteil * Math.max(0, (tops[0] ?? 0) - lesekante());
+  else {
+    if (tops[i] === undefined) throw new Error(t('sync.keinElement', { ziel: `#${i}` }));
+    const naechste = tops[i + 1] ?? document.documentElement.scrollHeight;
+    ziel = tops[i] + anteil * (naechste - tops[i]) - lesekante();
+  }
+  window.scrollTo({ top: Math.round(ziel), behavior: 'instant' });
+  return Math.round(window.scrollY);
+}
+
 /** Scrollposition proportional zur Fensterbreite übernehmen: x · (Breite Bildschirm / Breite Pult). */
 function scrollen(e, x, breite) {
   const faktor = breite > 0 ? innerWidth / breite : 1;
@@ -331,7 +413,17 @@ function eingeben(feld, wert) {
 
 /** Sprache wechseln, aber höchstens 3 s warten: Bleibt die Überblendung hängen (Tab wird nicht gezeichnet),
  *  darf das nicht die ganze Warteschlange blockieren. Der Wechsel selbst läuft trotzdem zu Ende. */
-const spracheUebernehmen = (lang) => Promise.race([syncSprache(lang), new Promise((r) => setTimeout(r, 3000))]);
+// Der Bildschirm speichert Sprache und Thema des Pults (setSprache/setModus) – so startet jede neu geladene
+// Seite (z. B. beim Wechsel zwischen Playground und Erklärung) gleich in der Sprache des Pults.
+const spracheUebernehmen = (lang) => Promise.race([setSprache(lang), new Promise((r) => setTimeout(r, 3000))]);
+
+/** Vor dem Seitenwechsel: Sprache und Thema des Pults direkt speichern (gelesen beim Laden, vor dem ersten Zeichnen). */
+function vorabSpeichern(ui = {}) {
+  try {
+    if (SPRACHEN.includes(ui.sprache)) localStorage.setItem('ooplayground.sprache', ui.sprache); // = SPEICHER_KEY in i18n.js
+    if (MODI.includes(ui.thema)) localStorage.setItem('ooplayground.theme', ui.thema);            // = SPEICHER_KEY in Theme.js
+  } catch { /* Speicher gesperrt – dann wie bisher erst nach dem Snapshot */ }
+}
 
 const nurPlayground =() => { if (ROUTE !== '') throw new Error('route'); };
 
@@ -372,7 +464,10 @@ async function anwenden(ev) {
     case 'eingabe': eingeben(element(ev.ziel), ev.wert ?? ''); return {};
     case 'aufklappen': element(ev.ziel).open = Boolean(ev.offen); return {};
     case 'scroll': return { scroll: scrollen(element(ev.ziel), ev.x, ev.breite) };
-    case 'thema': uebernehmeModus(ev.modus); return { modus: getModus() };
+    case 'seite':
+      if (ROUTE !== 'Docs') throw new Error('route');
+      return { scroll: seiteSetzen(ev) };
+    case 'thema': setModus(ev.modus); return { modus: getModus() };
     case 'sprache': await spracheUebernehmen(ev.sprache); return { sprache: getSprache() };
     case 'navigate':
       if (ROUTE !== 'Docs') throw new Error('route');
@@ -383,10 +478,10 @@ async function anwenden(ev) {
 }
 
 async function snapshotAnwenden(s, snapSeq) {
-  if ((s.route ?? '') !== ROUTE) { location.replace(zielUrl(s.route ?? '', s.hash)); return; }
+  if ((s.route ?? '') !== ROUTE) { vorabSpeichern(s.ui); location.replace(zielUrl(s.route ?? '', s.hash)); return; }
   letzte = snapSeq;
   const ui = s.ui ?? {};
-  if (ui.thema) uebernehmeModus(ui.thema);
+  if (ui.thema) setModus(ui.thema);
   if (ui.sprache) await spracheUebernehmen(ui.sprache); // Erklärung wird dabei neu gezeichnet – danach erst den Rest
   const versuch = (f) => { try { f(); } catch (e) { console.warn('[sync]', e.message); } };
   if (ROUTE === '') {
@@ -400,11 +495,14 @@ async function snapshotAnwenden(s, snapSeq) {
       if (b && b.getAttribute('aria-expanded') !== 'true') b.click();
     }
   } else {
-    // Erst die Position (Scrollspy klappt dabei Gruppen auf), dann Suche und Auf-/Zuklappen wie beim Pult
-    if (s.hash) versuch(() => springeZu(s.hash));
-    else { history.replaceState(null, '', location.pathname + location.search); window.scrollTo({ top: 0, behavior: 'instant' }); }
+    // Suche und Auf-/Zuklappen wie beim Pult, danach die genaue Scrollposition (hängt von den Höhen ab)
     for (const [ziel, wert] of Object.entries(ui.eingaben ?? {})) { const f = finde(ziel); if (f) eingeben(f, wert); }
     for (const [ziel, auf] of Object.entries(ui.details ?? {})) { const d = finde(ziel); if (d) d.open = auf; }
+    // Hash nur still setzen – springe() würde zum Abschnittsanfang scrollen
+    history.replaceState(null, '', location.pathname + location.search + (s.hash ? `#${encodeURIComponent(s.hash)}` : ''));
+    if (ui.seite) versuch(() => seiteSetzen(ui.seite));
+    else if (s.hash) versuch(() => springeZu(s.hash));
+    else window.scrollTo({ top: 0, behavior: 'instant' });
   }
   console.info(`[sync] Zustand vom Pult übernommen (seq ${snapSeq}, ${s.objects?.length ?? 0} Objekt(e)).`);
 }

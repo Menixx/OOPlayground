@@ -178,7 +178,8 @@ function hello(ws, msg) {
   if (msg.rolle === 'pult') {
     ws.rolle = 'pult';
     ws.geraet = String(msg.geraet || ws.ip).slice(0, 64);
-    ws.pausiert = false;
+    // Verborgene Tabs (z. B. nach einem Verbindungsabbruch neu verbunden) melden sich an, steuern aber nicht
+    ws.pausiert = msg.sichtbar === false;
     if (r.besitzer && r.besitzer !== ws.geraet) {
       if (!r.wartend.has(ws)) rlog(r, `Pult abgelehnt (${ws.ip}) – im Raum ist schon ein Pult`);
       r.wartend.add(ws);
@@ -188,9 +189,14 @@ function hello(ws, msg) {
     r.besitzer = ws.geraet;
     r.wartend.delete(ws);
     r.pults.add(ws);
-    if (r.aktiverPult !== ws) rlog(r, `Pult aktiv (${ws.ip}), Pult-Tabs: ${r.pults.size}`);
-    r.aktiverPult = ws;
-    snapshotAnfordern(r, 'Pult gemeldet', { erzwingen: true });
+    if (ws.pausiert) {
+      rlog(r, `Pult-Tab im Hintergrund angemeldet (${ws.ip}), Pult-Tabs: ${r.pults.size}`);
+      if (r.aktiverPult === ws) { r.aktiverPult = naechsterPult(r); r.angefordert = false; snapshotAnfordern(r, 'anderer Pult-Tab übernimmt', { erzwingen: true }); }
+    } else {
+      if (r.aktiverPult !== ws) rlog(r, `Pult aktiv (${ws.ip}), Pult-Tabs: ${r.pults.size}`);
+      r.aktiverPult = ws;
+      snapshotAnfordern(r, 'Pult gemeldet', { erzwingen: true });
+    }
   } else {
     ws.rolle = 'bildschirm';
     if (r.bildschirm && r.bildschirm !== ws) { rlog(r, 'alter Bildschirm ersetzt'); r.bildschirm.close(4001, 'ersetzt'); }
@@ -225,7 +231,7 @@ function nachricht(ws, text) {
       if (ws !== r.aktiverPult) return; // nur der aktive Tab des Raum-Pults steuert
       if (!r.bildschirm) return;        // niemand schaut zu – der nächste Snapshot holt es nach
       r.offeneAcks.push(msg.seq);
-      if (msg.event?.kind !== 'scroll') rlog(r, `event #${msg.seq} ${JSON.stringify(msg.event)}`); // Scrollen nicht protokollieren
+      if (!['scroll', 'seite'].includes(msg.event?.kind)) rlog(r, `event #${msg.seq} ${JSON.stringify(msg.event)}`); // Scrollen nicht protokollieren
       schicke(r.bildschirm, text);      // unverändert weiterleiten (seq bleibt)
       break;
 
@@ -234,7 +240,7 @@ function nachricht(ws, text) {
       schicke(r.aktiverPult, text);
       const geprueft = r.offeneAcks.length > 0 || msg.seq > r.ignorierBis;
       const erwartet = r.offeneAcks.shift();
-      if (!msg.ok || !msg.result?.scroll) rlog(r, `ack #${msg.seq} ok=${msg.ok}${msg.ok ? '' : ` error=${msg.error}`}`);
+      if (!msg.ok || msg.result?.scroll === undefined) rlog(r, `ack #${msg.seq} ok=${msg.ok}${msg.ok ? '' : ` error=${msg.error}`}`);
       if (!geprueft) return;
       if (!msg.ok) snapshotAnfordern(r, `ack #${msg.seq} fehlgeschlagen`);
       else if (msg.seq !== erwartet) snapshotAnfordern(r, `ack #${msg.seq}, erwartet #${erwartet}`);

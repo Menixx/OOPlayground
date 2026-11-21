@@ -15,6 +15,7 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') [...offene
 // Klick irgendwo außerhalb einer offenen Karte (und außerhalb ihres Triggers) schließt sie.
 // Capture-Phase: funktioniert auch, wenn ein Handler stopPropagation() aufruft.
 document.addEventListener('click', (e) => {
+  if (e.target.closest?.('[data-kein-schliessen]')) return; // z. B. Statusleiste/QR-Fenster der Demonstration
   [...offene].forEach(([close, { trigger, pop }]) => {
     const p = pop();
     if (trigger.contains(e.target) || p?.contains(e.target)) return;
