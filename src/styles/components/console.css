@@ -1,7 +1,7 @@
 #console { position: relative; }
 #console > .mini { position: absolute; top: -38px; right: 0; }
 /* Terminal: dunkel -> maximaler Kontrast zur hellen Seite, wirkt eingelassen */
-.out { background: #0b1220; color: #e2e8f0; border: 1px solid #020617; border-radius: 10px; padding: 10px 14px; height: 190px; overflow: auto; white-space: pre-wrap; box-shadow: inset 0 3px 8px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.8); }
+.out { background: var(--console); color: #e2e8f0; border: 1px solid var(--console-line); border-radius: 10px; padding: 10px 14px; height: 190px; overflow: auto; white-space: pre-wrap; box-shadow: inset 0 3px 8px rgba(0,0,0,.55), 0 1px 0 var(--console-lip); }
 .zeile.befehl, .zeile.info { color: #94a3b8; }
 .zeile.fehler { color: #fca5a5; }
 .zeile.ergebnis { color: #86efac; }

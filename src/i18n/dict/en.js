@@ -5,6 +5,9 @@
 export default {
   'header.subtitle': 'An interactive introduction to object-oriented programming',
   'lang.toggle': 'Switch language (German / English)',
+  'theme.light': 'Theme: light – click for dark',
+  'theme.dark': 'Theme: dark – click to follow the system',
+  'theme.system': 'Theme: follows the system – click for light',
   'header.docs': 'Guide',
   'header.docsTip': 'Open the guide in a new tab',
   'header.menu': 'Menu',

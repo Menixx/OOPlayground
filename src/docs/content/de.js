@@ -56,6 +56,7 @@ Diese Seite hat drei Teile:
         { k: 'md', md: `Ganz oben steht der Name **OOPlayground**. Rechts findest du:
 
 - **Den Knopf \`[[? Erklärung]]\`** – er öffnet diese Seite in einem neuen Tab.
+- **Den runden Knopf für das Farbschema** – ein Klick wechselt der Reihe nach: ☀ hell, ☾ dunkel und 🖥 wie im System (dann folgt die Seite der Einstellung deines Computers).
 - **Den Sprachschalter \`[[EN | DE]]\`** – er wechselt alle Texte zwischen Englisch und Deutsch. Die Namen der Klassen und Objekte (zum Beispiel \`Katze\` oder \`auto1\`) bleiben immer deutsch. Sie sind nämlich Namen im Programmcode – und Code übersetzt man nicht.
 
 Die Sprache merkt sich der OOPlayground. Wechselst du sie hier, wechselt sie auch auf dieser Erklärungsseite.` }

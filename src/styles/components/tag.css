@@ -1,4 +1,4 @@
 /* Abzeichen (Tags) der Karten – auch auf der Erklärungsseite benutzt */
 .tag { margin-left: auto; font: 600 11px var(--sans); padding: 1px 8px; border-radius: 99px; background: var(--btn); color: var(--muted); border: 1px solid var(--line-soft); }
-.tag.eigen { background: #dbeafe; color: #1e40af; border-color: #93c5fd; } .tag.ueber { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
-.tag.abstract { background: #f3e8ff; color: #7e22ce; border-color: #d8b4fe; } .tag.impl { background: #dcfce7; color: #166534; border-color: #86efac; }
+.tag.eigen { background: var(--tag-eigen-bg); color: var(--tag-eigen-text); border-color: var(--tag-eigen-line); } .tag.ueber { background: var(--tag-ueber-bg); color: var(--tag-ueber-text); border-color: var(--tag-ueber-line); }
+.tag.abstract { background: var(--tag-abstract-bg); color: var(--tag-abstract-text); border-color: var(--tag-abstract-line); } .tag.impl { background: var(--tag-impl-bg); color: var(--tag-impl-text); border-color: var(--tag-impl-line); }

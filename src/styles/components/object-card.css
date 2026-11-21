@@ -1,7 +1,7 @@
 .run, .mini { margin-left: 4px; padding: 1px 9px; font: 600 12px var(--sans); border-bottom-width: 2px; }
-.run { color: var(--methode); border-color: #86efac; background: linear-gradient(#fff, #e4f7ea); }
+.run { color: var(--methode); border-color: var(--run-line); background: linear-gradient(var(--btn-a), var(--run-b)); }
 .link { padding: 0 6px; font: 13px var(--mono); color: var(--feld); background: transparent; border: 0; border-bottom: 1px dashed var(--feld); border-radius: 0; box-shadow: none; }
-.link:hover:not(:disabled) { background: #dbeafe; transform: none; box-shadow: none; }
-.loeschen { color: #b91c1c; font-weight: 600; border-color: #fca5a5; background: linear-gradient(#fff, #fee2e2); }
-.loeschen:hover:not(:disabled) { background: linear-gradient(#fff, #fecaca); }
+.link:hover:not(:disabled) { background: var(--link-hover); transform: none; box-shadow: none; }
+.loeschen { color: var(--del-text); font-weight: 600; border-color: var(--del-line); background: linear-gradient(var(--btn-a), var(--del-b)); }
+.loeschen:hover:not(:disabled) { background: linear-gradient(var(--btn-a), var(--del-hover-b)); }
 .pop .loeschen { display: block; margin-top: 12px; font: 600 12px var(--mono); }

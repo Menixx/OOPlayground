@@ -6,6 +6,9 @@ export default {
   // Kopfzeile & Abschnitte
   'header.subtitle': 'Interaktive Einführung in die objektorientierte Programmierung',
   'lang.toggle': 'Sprache wechseln (Deutsch / Englisch)',
+  'theme.light': 'Farbschema: hell – Klick: dunkel',
+  'theme.dark': 'Farbschema: dunkel – Klick: wie im System',
+  'theme.system': 'Farbschema: wie im System – Klick: hell',
   'header.docs': 'Erklärung',
   'header.docsTip': 'Erklärung in neuem Tab öffnen',
   'header.menu': 'Menü',

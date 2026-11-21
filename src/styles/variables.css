@@ -1,17 +1,73 @@
 :root {
+  color-scheme: light;
   /* Flächen: Seite dunkler als Panels, Karten weiß -> klare Tiefenstaffelung */
   --page: #cfd9e8; --panel: #eef2f8; --bg: #ffffff; --btn: #e3e9f2;
   --text: #0f172a; --muted: #4b5568; --line: #aab8cf; --line-soft: #d5dde9;
   --header: #0f172a;
   /* Semantische Farben (laut TZ) */
   --feld: #2563eb; --methode: #15803d; --abstrakt: #9333ea;
+  --typ: #b45309; --mod: #be185d; --leit: #1d4ed8;
   /* Schatten: Kontaktschatten + weicher Schatten = Volumen */
   --shadow-1: 0 1px 1px rgba(15,23,42,.10), 0 2px 4px rgba(15,23,42,.10);
   --shadow-2: 0 1px 2px rgba(15,23,42,.14), 0 4px 10px rgba(15,23,42,.12), 0 10px 24px rgba(15,23,42,.08);
   --shadow-3: 0 2px 3px rgba(15,23,42,.16), 0 10px 20px rgba(15,23,42,.18), 0 22px 44px rgba(15,23,42,.16);
   --shine: inset 0 1px 0 rgba(255,255,255,.95);
+  --inset: inset 0 2px 3px rgba(15,23,42,.18); --inset-soft: inset 0 1px 2px rgba(15,23,42,.08);
+  /* Schaltflächen und Kacheln (Verläufe oben -> unten) */
+  --btn-a: #fff; --btn-b: #e6ecf5; --btn-hover-b: #dbe4f1;
+  --class-b: #f1f5fb; --class-hover-b: #f6efff;
+  --obj-b: #f4f7fc; --obj-hover-b: #eef4ff;
+  --hover-soft: #f4f7fb;
+  --tip-bg: #0f172a; --tip-text: #fff;
+  --thumb: #94a3b8; --thumb-hover: #64748b;
+  /* Aktionen in den Karten */
+  --run-line: #86efac; --run-b: #e4f7ea;
+  --del-text: #d14b4b; --del-line: #f4b8b8; --del-b: #fdeded; --del-hover-b: #fbdfdf;
+  --link-hover: #dbeafe;
+  /* Abzeichen */
+  --tag-eigen-bg: #dbeafe; --tag-eigen-text: #1e40af; --tag-eigen-line: #93c5fd;
+  --tag-ueber-bg: #fef3c7; --tag-ueber-text: #92400e; --tag-ueber-line: #fcd34d;
+  --tag-abstract-bg: #f3e8ff; --tag-abstract-text: #7e22ce; --tag-abstract-line: #d8b4fe;
+  --tag-impl-bg: #dcfce7; --tag-impl-text: #166534; --tag-impl-line: #86efac;
+  /* Erklärungsseite */
+  --chip-bg: #eff6ff; --chip-hover-bg: #dbeafe; --chip-text: #1e40af; --chip-line: #bfdbfe; --chip-hover-line: #93c5fd;
+  --note-bg: #fffbeb; --note-line: #f59e0b;
+  /* Konsole: in beiden Schemata dunkel */
+  --console: #0b1220; --console-line: #020617; --console-lip: rgba(255,255,255,.8);
+
   --sans: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --fun: Quicksand, system-ui, -apple-system, 'Segoe UI', sans-serif; /* Hauptseite + Kopfleiste der Erklärung */
   --mono:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --t: 200ms;
+}
+
+/* Dunkles Schema – data-theme setzt Theme.js (bzw. das Inline-Skript im <head>) */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0c1322; --panel: #151e31; --bg: #1b263c; --btn: #24314a;
+  --text: #e2e8f0; --muted: #9aa8bd; --line: #33425e; --line-soft: #29364f;
+  --header: #070c17;
+  --feld: #60a5fa; --methode: #4ade80; --abstrakt: #c084fc;
+  --typ: #fbbf24; --mod: #f472b6; --leit: #93c5fd;
+  --shadow-1: 0 1px 1px rgba(0,0,0,.30), 0 2px 4px rgba(0,0,0,.25);
+  --shadow-2: 0 1px 2px rgba(0,0,0,.35), 0 4px 10px rgba(0,0,0,.30), 0 10px 24px rgba(0,0,0,.22);
+  --shadow-3: 0 2px 3px rgba(0,0,0,.40), 0 10px 20px rgba(0,0,0,.40), 0 22px 44px rgba(0,0,0,.35);
+  --shine: inset 0 1px 0 rgba(255,255,255,.06);
+  --inset: inset 0 2px 3px rgba(0,0,0,.45); --inset-soft: inset 0 1px 3px rgba(0,0,0,.35);
+  --btn-a: #2a3854; --btn-b: #212d45; --btn-hover-b: #2a3a58;
+  --class-b: #1c2840; --class-hover-b: #2a2347;
+  --obj-b: #1d2942; --obj-hover-b: #1f2f52;
+  --hover-soft: #1f2b43;
+  --tip-bg: #e2e8f0; --tip-text: #0f172a;
+  --thumb: #475569; --thumb-hover: #64748b;
+  --run-line: #166534; --run-b: #173826;
+  --del-text: #f2a7a7; --del-line: #5e3a45; --del-b: #2f2532; --del-hover-b: #3a2c3a;
+  --link-hover: #1e3a5f;
+  --tag-eigen-bg: #172f55; --tag-eigen-text: #93c5fd; --tag-eigen-line: #1e40af;
+  --tag-ueber-bg: #3a2a0c; --tag-ueber-text: #fcd34d; --tag-ueber-line: #92400e;
+  --tag-abstract-bg: #2e1a4a; --tag-abstract-text: #d8b4fe; --tag-abstract-line: #6b21a8;
+  --tag-impl-bg: #14321f; --tag-impl-text: #86efac; --tag-impl-line: #166534;
+  --chip-bg: #172f55; --chip-hover-bg: #1e3a6a; --chip-text: #bfdbfe; --chip-line: #1e40af; --chip-hover-line: #3b82f6;
+  --note-bg: #2f2410; --note-line: #f59e0b;
+  --console: #060b16; --console-line: #020617; --console-lip: rgba(255,255,255,.05);
 }

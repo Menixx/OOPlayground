@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>OOPlayground</title>
+  <script>
+    // Farbschema vor dem ersten Zeichnen setzen (kein helles Aufblitzen) – Logik wie in src/services/Theme.js
+    try { var m = localStorage.getItem('ooplayground.theme'); } catch (e) {}
+    document.documentElement.dataset.theme = m === 'light' || m === 'dark' ? m
+      : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400..700&display=swap" />

@@ -15,6 +15,18 @@
 .lang-toggle[data-lang="en"]:hover .lang-opt[data-l="de"],
 .lang-toggle[data-lang="de"]:hover .lang-opt[data-l="en"] { color: #e2e8f0; }
 
+/* Farbschema-Umschalter (ThemeToggle.js): runder Knopf ohne Hintergrund, nur dünner Rand.
+   Alle drei Symbole liegen übereinander; das aktive dreht sich herein, die anderen blenden aus. */
+.theme-toggle { position: relative; display: inline-grid; place-items: center; flex: none; box-sizing: border-box; width: 29px; height: 29px; padding: 0; border: 1px solid rgba(255,255,255,.18); border-radius: 50%; background: none; box-shadow: none; color: #e2e8f0; overflow: hidden; transition: border-color var(--t), color var(--t); }
+.theme-toggle:hover:not(:disabled), .theme-toggle:active:not(:disabled) { background: none; transform: none; box-shadow: none; }
+.theme-toggle:hover, .theme-toggle:focus-visible { border-color: rgba(255,255,255,.4); color: #fff; }
+.theme-toggle:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
+.theme-icon { grid-area: 1 / 1; width: 17px; height: 17px; opacity: 0; transform: rotate(-90deg) scale(.5); transition: opacity 250ms ease, transform 400ms cubic-bezier(.2, .8, .2, 1.2); }
+.theme-toggle[data-mode="light"] .theme-icon[data-m="light"],
+.theme-toggle[data-mode="dark"] .theme-icon[data-m="dark"],
+.theme-toggle[data-mode="system"] .theme-icon[data-m="system"] { opacity: 1; transform: none; }
+.theme-toggle:active .theme-icon { transition-duration: 120ms; }
+
 /* Pillen-Link in der Kopfzeile („? Erklärung“, „Zum OOPlayground“): gleiche Höhe und Glasoptik wie der Sprachumschalter */
 .head-link { display: inline-flex; align-items: center; gap: 6px; height: 29px; padding: 0 12px 0 6px; border: 1px solid rgba(255,255,255,.18); border-radius: 99px; background: rgba(255,255,255,.07); color: #e2e8f0; font: 600 12px var(--sans); letter-spacing: .02em; text-decoration: none; white-space: nowrap; transition: background var(--t), border-color var(--t), color var(--t); }
 /* Feste Mindestbreite = längere der beiden Sprachfassungen, damit beim Sprachwechsel nichts springt */
@@ -47,17 +59,24 @@
   .head-menu-backdrop { display: block; position: fixed; inset: 0; z-index: 70; background: rgba(15,23,42,.6); opacity: 0; visibility: hidden; transition: opacity 250ms ease, visibility 0s 250ms; }
   .head-menu-backdrop.open { opacity: 1; visibility: visible; transition: opacity 250ms ease; }
 
-  .head-menu { position: fixed; top: var(--menu-top, 64px); right: var(--menu-right, 12px); z-index: 71; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; visibility: hidden; transition: visibility 0s 300ms; }
+  /* Farbschema + Sprache in einer Reihe, der Link darunter über die ganze Breite (rechtsbündig) */
+  .head-menu { position: fixed; top: var(--menu-top, 64px); right: var(--menu-right, 12px); z-index: 71; display: grid; grid-template-columns: 1fr auto; justify-items: end; align-items: center; gap: 12px 8px; visibility: hidden; transition: visibility 0s 300ms; }
   .head-menu.open { visibility: visible; transition: none; }
   /* Jedes Element startet hinter dem rechten Bildschirmrand */
   .head-menu > * { margin: 0 !important; transform: translateX(calc(100% + var(--menu-right, 12px) + 16px)); transition: transform 300ms cubic-bezier(.2, .8, .2, 1); }
+  .head-menu > .head-link { grid-column: 1 / -1; }
+  /* Farbschema-Knopf steht links neben dem Sprachumschalter (60px + 8px Abstand) -> weiter hinausschieben */
+  .head-menu > .theme-toggle { transform: translateX(calc(100% + 68px + var(--menu-right, 12px) + 16px)); }
   .head-menu.open > * { transform: none; }
   .head-menu.open > :nth-child(2) { transition-delay: 50ms; }
+  .head-menu.open > :nth-child(3) { transition-delay: 100ms; }
   /* Im Menü auf festem Grund (statt Glas) und mit Text */
   .head-menu .lang-track { background: #1e293b; box-shadow: inset 0 2px 4px rgba(0,0,0,.45), 0 6px 16px rgba(0,0,0,.35); }
   .head-menu .head-link { width: auto; height: 29px; padding: 0 12px 0 6px; background: #1e293b; box-shadow: 0 6px 16px rgba(0,0,0,.35); }
   .head-menu .head-link:hover, .head-menu .head-link:focus-visible { background: #334155; }
   .head-menu .head-link-text { display: inline; }
+  .head-menu .theme-toggle { background: #1e293b; box-shadow: 0 6px 16px rgba(0,0,0,.35); }
+  .head-menu .theme-toggle:hover:not(:disabled) { background: #334155; }
 }
 @media (max-width: 600px) and (prefers-reduced-motion: reduce) {
   .head-menu > *, .head-menu-backdrop, .head-menu-icon { transition: none !important; }

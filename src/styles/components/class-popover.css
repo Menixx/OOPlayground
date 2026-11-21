@@ -11,9 +11,9 @@
 .feld { color: var(--feld); font-weight: 600; } .methode { color: var(--methode); font-weight: 600; } .abstrakt { color: var(--abstrakt); font-weight: 600; } .privat { color: var(--muted); }
 /* Java-Felddeklaration: Typ vor dem Namen, Kommentar für Einheiten */
 .dekl { min-width: 0; }
-.typ { color: #b45309; font-weight: 600; }
+.typ { color: var(--typ); font-weight: 600; }
 .kommentar { color: var(--muted); font-style: italic; }
-.mod { color: #be185d; font-weight: 600; } /* Modifikatoren: public, private, abstract */
+.mod { color: var(--mod); font-weight: 600; } /* Modifikatoren: public, private, abstract */
 .rows li > .dekl + button { margin-left: auto; } /* „testen“ rechts, wenn kein Tag davor steht */
 .erben { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
 .erbe { display: grid; justify-items: center; gap: 2px; padding: 6px 10px; }
@@ -24,10 +24,10 @@
 .pop::-webkit-scrollbar { width: 8px; height: 8px; background: transparent; }
 .pop::-webkit-scrollbar-track { background: transparent; margin: 10px 0; }
 .pop::-webkit-scrollbar-corner { background: transparent; }
-.pop::-webkit-scrollbar-thumb { background: #94a3b8; border: 2px solid transparent; background-clip: padding-box; border-radius: 99px; }
-.pop::-webkit-scrollbar-thumb:hover { background: #64748b; background-clip: padding-box; }
+.pop::-webkit-scrollbar-thumb { background: var(--thumb); border: 2px solid transparent; background-clip: padding-box; border-radius: 99px; }
+.pop::-webkit-scrollbar-thumb:hover { background: var(--thumb-hover); background-clip: padding-box; }
 @supports not selector(::-webkit-scrollbar) {
-  .pop { scrollbar-width: thin; scrollbar-color: #94a3b8 transparent; }
+  .pop { scrollbar-width: thin; scrollbar-color: var(--thumb) transparent; }
 }
 
 /* Tooltip der „new Tier()“-Schaltfläche: linksbündig an der Schaltfläche, bleibt innerhalb der Karte */

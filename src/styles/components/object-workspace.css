@@ -4,11 +4,11 @@
 .grid::-webkit-scrollbar { height: 6px; background: transparent; }
 .grid::-webkit-scrollbar-track, .grid::-webkit-scrollbar-corner { background: transparent; }
 .grid::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
-.grid::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
-.grid::-webkit-scrollbar-thumb:hover { background: #64748b; }
+.grid::-webkit-scrollbar-thumb { background: var(--thumb); border-radius: 10px; }
+.grid::-webkit-scrollbar-thumb:hover { background: var(--thumb-hover); }
 /* Standard properties only where ::-webkit-scrollbar is unsupported (Firefox) — in Chromium they would override the rules above and bring back the arrows */
-@supports not selector(::-webkit-scrollbar) { .grid { scrollbar-width: thin; scrollbar-color: #94a3b8 transparent; } }
-.obj { display: grid; justify-items: center; align-content: center; gap: 2px; width: 132px; min-width: 132px; max-width: 132px; height: 144px; min-height: 144px; max-height: 144px; flex: 0 0 132px; box-sizing: border-box; padding: 10px; background: linear-gradient(#fff, #f4f7fc); border: 1px solid var(--line); border-bottom: 4px solid var(--feld); border-radius: 12px; box-shadow: var(--shine), var(--obj-shadow); font-size: 12px; font-weight: 600; font-family: var(--mono); }.obj:hover:not(:disabled) { background: linear-gradient(#fff, #eef4ff); transform: translateY(-3px); box-shadow: var(--shine), var(--obj-shadow-hover); }
+@supports not selector(::-webkit-scrollbar) { .grid { scrollbar-width: thin; scrollbar-color: var(--thumb) transparent; } }
+.obj { display: grid; justify-items: center; align-content: center; gap: 2px; width: 132px; min-width: 132px; max-width: 132px; height: 144px; min-height: 144px; max-height: 144px; flex: 0 0 132px; box-sizing: border-box; padding: 10px; background: linear-gradient(var(--btn-a), var(--obj-b)); border: 1px solid var(--line); border-bottom: 4px solid var(--feld); border-radius: 12px; box-shadow: var(--shine), var(--obj-shadow); font-size: 12px; font-weight: 600; font-family: var(--mono); }.obj:hover:not(:disabled) { background: linear-gradient(var(--btn-a), var(--obj-hover-b)); transform: translateY(-3px); box-shadow: var(--shine), var(--obj-shadow-hover); }
 /* Half-length versions of --shadow-2 / --shadow-3, so the shadow is not clipped by the scroll container */
 .obj { --obj-shadow: 0 .5px 1px rgba(15,23,42,.14), 0 2px 5px rgba(15,23,42,.12), 0 5px 12px rgba(15,23,42,.08); --obj-shadow-hover: 0 1px 1.5px rgba(15,23,42,.16), 0 5px 10px rgba(15,23,42,.18), 0 11px 22px rgba(15,23,42,.16); }
 .fig-wrap { display: block; width: 48px; height: 48px; transition: transform 300ms ease; }

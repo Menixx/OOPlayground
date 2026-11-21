@@ -3,6 +3,7 @@ import '../styles/docs.css';
 import { el, L } from '../utils/dom.js';
 import { t, getSprache, uebersetzeDom, folgeAnderenTabs, bindAttr, beimSprachwechsel } from '../i18n/i18n.js';
 import { langToggle } from '../components/LangToggle/LangToggle.js';
+import { themeToggle } from '../components/ThemeToggle/ThemeToggle.js';
 import { headerMenu } from '../components/HeaderMenu/HeaderMenu.js';
 import { renderInhalt } from './render.js';
 import { createNav } from './nav.js';
@@ -48,6 +49,7 @@ document.getElementById('topbar').append(
   menuBtn,
   el('h1', { class: 'brand', i18n: 'docs.brand' }),
   ...headerMenu(
+    themeToggle(),
     langToggle(),
     el('a', { class: 'head-link to-app', href: './index.html', target: '_blank', rel: 'noopener', 'aria-label': L('docs.toApp') },
       puzzleIcon(), el('span', { class: 'head-link-text', i18n: 'docs.toApp' })))

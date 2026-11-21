@@ -58,6 +58,7 @@ Note: the class names in the app (\`Tier\`, \`Katze\`, \`Auto\` …) are always 
         { k: 'md', md: `At the very top you see the name **OOPlayground**. On the right you'll find:
 
 - **The \`[[? Guide]]\` button** – it opens this page in a new tab.
+- **The round color-scheme button** – each click switches in turn: ☀ light, ☾ dark and 🖥 like the system (the page then follows your computer’s setting).
 - **The language switch \`[[EN | DE]]\`** – it switches all texts between English and German. The names of classes and objects (for example \`Katze\` or \`auto1\`) always stay German. That's because they are names in the program code – and code doesn't get translated.
 
 OOPlayground remembers your language. If you switch it there, it also switches on this guide page.` }
