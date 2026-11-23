@@ -42,7 +42,7 @@ const AUSBLENDEN = 150; // ms, muss zu .pop-closing in class-popover.css passen
 const WENIG_BEWEGUNG = matchMedia('(prefers-reduced-motion: reduce)');
 
 export function attach(trigger, { build, parent = null, klasse = '', key = null }) {
-  let pop = null, body = null, timer = null, fade = null, touch = false, warOffen = false;
+  let pop = null, body = null, groesse = null, timer = null, fade = null, touch = false, warOffen = false;
   const kids = new Set();
   const api = {
     get root() { return pop; },
@@ -95,6 +95,9 @@ export function attach(trigger, { build, parent = null, klasse = '', key = null 
     pop.addEventListener('focusout', schedule);
     sperreSeitenScroll(pop);
     render(); place();
+    // Inhalt wächst (z. B. „Implementierung anzeigen“) -> neu platzieren, damit die Karte im Fenster bleibt
+    groesse = new ResizeObserver(() => pop && place());
+    groesse.observe(pop);
     trigger.setAttribute('aria-expanded', 'true');
     offene.set(close, { trigger, pop: () => pop, key });
     if (key) bus.emit('popover', { key, offen: true });
@@ -103,6 +106,7 @@ export function attach(trigger, { build, parent = null, klasse = '', key = null 
     clearTimeout(timer); clearTimeout(fade); fade = null;
     kids.forEach((f) => f());
     const war = Boolean(pop);
+    groesse?.disconnect(); groesse = null;
     pop?.remove(); pop = body = null;
     trigger.setAttribute('aria-expanded', 'false');
     offene.delete(close);

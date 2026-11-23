@@ -10,7 +10,7 @@ export function buildObjectCard(id, obj, api) {
     const v = obj[n];
     if (v && typeof v === 'object') { // Referenz auf ein Motor-Objekt -> verschachtelte Karte
       const b = el('button', { type: 'button', class: 'link' }, v.constructor.bezeichnung);
-      attach(b, { parent: api, key: `motor:${id}`, build: (eapi) => buildEngine(v, eapi, `motor:${id}`) });
+      attach(b, { parent: api, klasse: 'pop-motor', key: `motor:${id}`, build: (eapi) => buildEngine(v, eapi, `motor:${id}`) });
       return b;
     }
     return javaLiteral(v, t);

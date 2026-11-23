@@ -89,8 +89,8 @@ Move your mouse over a symbol. The **class card** opens with all the details.` }
 **1. Fields** – What every animal has. For example \`name\`, \`anzahlBeine\` (number of legs) or \`kannFliegen\` (can fly). Only \`name\` already has a value: the placeholder \`"Unbenannt"\` (unnamed). The other fields are empty. The blueprint only says: "This exists." Exactly how many legs – only the finished animal knows that.
 
 **2. Methods** – What every animal can do. Each method has a badge:
-- {{abstract}} (purple) – This ability exists, but **how** it works isn't written here yet. Each child has to decide that itself. Example: \`essen()\` (eat).
-- {{implemented}} (green) – This ability is already finished and works the same for all children. Example: \`halten()\` (stop) in Tier, or \`drehen90()\` (rotate by 90°) in Figur.
+- {{abstract}} – This ability exists, but **how** it works isn't written here yet. Each child has to decide that itself. Example: \`essen()\` (eat).
+- {{implemented}} – This ability is already finished and works the same for all children. Example: \`halten()\` (stop) in Tier, or \`drehen90()\` (rotate by 90°) in Figur.
 
 **3. Subclasses** – The children of this class, as buttons: for example \`[[Katze]]\`, \`[[Krokodil]]\`, \`[[Mensch]]\`. When you hover over one, it says **Instantiate**. One click builds a new object. It appears under **Created objects**.
 
@@ -127,12 +127,12 @@ When the area is empty, a small hint tells you how to build your first object.` 
         { k: 'md', md: `Move your mouse over an object, for example \`katze1\`. Its card opens. At the top it says \`class Katze katze1\`. That means: "I am the object \`katze1\`, built from the blueprint \`Katze\`."
 
 **Fields** – Now all fields have a value, for example \`int anzahlBeine = 4;\`. Each field has a badge:
-- {{inherited}} (grey) – This field comes from the parent class (here: Tier).
-- {{own}} (blue) – Only this class has this field. For the cat it's \`schnurrt\` (purrs).
+- {{inherited}} – This field comes from the parent class (here: Tier).
+- {{own}} – Only this class has this field. For the cat it's \`schnurrt\` (purrs).
 
 **Methods** – There are badges here too:
-- {{overridden}} (yellow) – The class has written its own version of this method. Example: \`essen()\` – the cat eats in its own way.
-- {{inherited}} (grey) – The method comes unchanged from the parents. Example: \`halten()\`.
+- {{overridden}} – The class has written its own version of this method. Example: \`essen()\` – the cat eats in its own way.
+- {{inherited}} – The method comes unchanged from the parents. Example: \`halten()\`.
 
 Next to every method there is a **\`[[Run]]\`** button. One click really calls the method. The answer appears in the **Output**.
 
@@ -204,9 +204,9 @@ OOPlayground runs in JavaScript. The window shows how the same program would sit
 
 | Column | What's in it? |
 |---|---|
-| {{Stack}} (blue) | The frame \`main(String[] args)\` with one variable for each object, for example \`Katze katze1 = @1159cc2d\`. When you click **Run**, that method's frame sits on top for about two seconds, for example \`Katze.essen()\` with \`this\`. |
-| {{Heap}} (orange) | Every object as a box: class, address, name and all fields with their values. An engine is a box of its own, for example \`auto1.motor\`. |
-| {{Metaspace}} (purple) | All classes with \`extends\`, their own fields and methods. They are there before you build the first object, and they never change. |
+| {{Stack}} | The frame \`main(String[] args)\` with one variable for each object, for example \`Katze katze1 = @1159cc2d\`. When you click **Run**, that method's frame sits on top for about two seconds, for example \`Katze.essen()\` with \`this\`. |
+| {{Heap}} | Every object as a box: class, address, name and all fields with their values. An engine is a box of its own, for example \`auto1.motor\`. |
+| {{Metaspace}} | All classes with \`extends\`, their own fields and methods. They are there before you build the first object, and they never change. |
 
 **Highlighting:** hover over an object or an address. Then everything that belongs to it lights up: the variable on the stack, the object in the heap and its class in the metaspace. If the class is out of sight, the metaspace scrolls there by itself.
 
@@ -250,9 +250,9 @@ You can close the window with **×**, with the **Esc** key or by clicking next t
 
 | Area | What's stored there? |
 |---|---|
-| {{Stack}} (blue) | frames of the running methods with their variables and references |
-| {{Heap}} (orange) | the objects with their fields; addresses like \`@1159cc2d\` are orange too |
-| {{Metaspace}} (purple) | the classes (blueprints) |` }
+| {{Stack}} | frames of the running methods with their variables and references |
+| {{Heap}} | the objects with their fields; addresses like \`@1159cc2d\` are orange too |
+| {{Metaspace}} | the classes (blueprints) |` }
       ],
       related: [{ id: 'begriff-feld', label: 'Field & state' }, { id: 'begriff-methode', label: 'Method' }, { id: 'begriff-vererbung', label: 'Inheritance' }, { id: 'begriff-kapselung', label: 'Encapsulation' }]
     },
@@ -319,9 +319,9 @@ Katze katze1 = new Katze();         // one thing built from the blueprint
         { k: 'life', md: `🏭 Imagine a workshop. On the wall there's a shelf of **blueprints** – that's the metaspace. In the big hall stand the **things that were built** – that's the heap. And on the desk there's a **pile of notes**: the note for the job you're doing right now is always on top. It says, for example: "katze1 is in the hall at spot 7." That's the stack.` },
         { k: 'inApp', md: `At the bottom left of OOPlayground there's a small button with a memory icon. A click opens the **JVM memory** window with three coloured columns:
 
-- {{Stack}} (blue) – one **frame** per method call with local variables, parameters and references. At the very bottom is the frame of \`main(String[] args)\`.
-- {{Heap}} (orange) – all **objects** with their fields. Every object has an **address**, for example \`@1159cc2d\`.
-- {{Metaspace}} (purple) – the **description of the classes**: fields, methods and who they inherit from.
+- {{Stack}} – one **frame** per method call with local variables, parameters and references. At the very bottom is the frame of \`main(String[] args)\`.
+- {{Heap}} – all **objects** with their fields. Every object has an **address**, for example \`@1159cc2d\`.
+- {{Metaspace}} – the **description of the classes**: fields, methods and who they inherit from.
 
 Hover over an object or an address. Then everything that belongs to it lights up: the variable on the stack, the object in the heap and its class in the metaspace.
 
@@ -660,7 +660,7 @@ OOPlayground is quicker: after \`katze1 = null\` the variable on the stack and t
       title: 'Getting ready',
       blocks: [
         { k: 'goal', md: `Start with a clean slate so that everything looks exactly like in the instructions.` },
-        { k: 'steps', md: `1. Open OOPlayground with the **Open OOPlayground** button at the top of this page. Ideally, put both windows side by side: OOPlayground on the left, this guide on the right.
+        { k: 'steps', md: `1. Open OOPlayground with the **Open playground** button at the top of this page. Ideally, put both windows side by side: OOPlayground on the left, this guide on the right.
 2. Choose the language in the top right: **EN** or **DE**.
 3. Are there objects already? Then click **\`[[Delete all]]\`**.
 4. In the output, click **\`[[Clear]]\`**.` },

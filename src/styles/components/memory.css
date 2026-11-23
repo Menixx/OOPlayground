@@ -98,6 +98,11 @@ body:has(.sync-badge) .mem-btn { left: 12px; bottom: calc(12px + var(--sync-badg
 @keyframes mem-frame { from { opacity: 0; transform: translateY(-6px); } }
 @keyframes mem-ein { from { opacity: 0; } }
 @keyframes mem-auf { from { opacity: 0; transform: translateY(8px) scale(.98); } }
+/* Schließen: Hintergrund blendet aus, Fenster sinkt leicht (Dauer = AUSBLENDEN in Memory.js) */
+.mem-backdrop.mem-schliesst { pointer-events: none; animation: mem-aus 180ms ease-in forwards; }
+.mem-backdrop.mem-schliesst .mem { animation: mem-ab 180ms ease-in forwards; }
+@keyframes mem-aus { to { opacity: 0; } }
+@keyframes mem-ab { to { opacity: 0; transform: translateY(8px) scale(.98); } }
 
 @media (max-width: 900px) {
   .mem-bereiche { grid-template-columns: 1fr; overflow: auto; }

@@ -223,7 +223,7 @@ body.drawer-open { overflow: hidden; }
   .steps > li::before { width: 30px; height: 30px; font-size: 15px; }
   .entry-cards { grid-template-columns: minmax(0, 1fr); }
   .doc-console .out { font-size: 13px; padding: 10px 12px; }
-  .docs-main code { white-space: normal; overflow-wrap: anywhere; }
+  .docs-main :not(pre) > code { white-space: normal; overflow-wrap: anywhere; }
   .to-top { right: 12px; bottom: 12px; }
 }
 

@@ -20,7 +20,7 @@ export default {
   // Erklärungsseite (docs.html)
   'docs.pageTitle': 'OOPlayground – Erklärung',
   'docs.brand': 'OOPlayground · Erklärung',
-  'docs.toApp': 'Zum OOPlayground',
+  'docs.toApp': 'Zum Playground',
   'docs.skip': 'Zum Inhalt springen',
   'docs.contents': 'Inhalt',
   'docs.menuOpen': 'Inhalt',

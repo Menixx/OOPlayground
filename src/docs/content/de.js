@@ -87,8 +87,8 @@ Fahr mit der Maus über ein Symbol. Dann öffnet sich die **Klassenkarte** mit a
 **1. Felder** – Was jedes Tier hat. Zum Beispiel \`name\`, \`anzahlBeine\` (Anzahl der Beine) oder \`kannFliegen\`. Nur \`name\` hat schon einen Wert: den Platzhalter \`"Unbenannt"\`. Die anderen Felder sind leer. Der Bauplan sagt nur: „Das gibt es." Wie viele Beine genau – das weiß erst das fertige Tier.
 
 **2. Methoden** – Was jedes Tier kann. Jede Methode hat ein Abzeichen:
-- {{abstract}} (lila) – Diese Fähigkeit gibt es, aber **wie** sie funktioniert, steht hier noch nicht. Das muss jedes Kind selbst festlegen. Beispiel: \`essen()\`.
-- {{implemented}} (grün) – Diese Fähigkeit ist schon fertig und funktioniert für alle Kinder gleich. Beispiel: \`halten()\` bei Tier oder \`drehen90()\` bei Figur.
+- {{abstract}} – Diese Fähigkeit gibt es, aber **wie** sie funktioniert, steht hier noch nicht. Das muss jedes Kind selbst festlegen. Beispiel: \`essen()\`.
+- {{implemented}} – Diese Fähigkeit ist schon fertig und funktioniert für alle Kinder gleich. Beispiel: \`halten()\` bei Tier oder \`drehen90()\` bei Figur.
 
 **3. Erben** – Die Kinder dieser Klasse, als Knöpfe: zum Beispiel \`[[Katze]]\`, \`[[Krokodil]]\`, \`[[Mensch]]\`. Wenn du darüberfährst, steht da **Instanziieren**. Ein Klick baut ein neues Objekt. Es erscheint unter **Erstellte Objekte**.
 
@@ -125,12 +125,12 @@ Ist der Bereich leer, steht dort ein kleiner Hinweis, wie du dein erstes Objekt 
         { k: 'md', md: `Fahr mit der Maus über ein Objekt, zum Beispiel \`katze1\`. Dann öffnet sich seine Karte. Oben steht \`class Katze katze1\`. Das heißt: „Ich bin das Objekt \`katze1\`, gebaut nach dem Bauplan \`Katze\`."
 
 **Felder** – Jetzt haben alle Felder einen Wert, zum Beispiel \`int anzahlBeine = 4;\`. Jedes Feld hat ein Abzeichen:
-- {{geerbt}} (grau) – Dieses Feld kommt von der Elternklasse (hier: Tier).
-- {{eigen}} (blau) – Dieses Feld hat nur diese Klasse. Bei der Katze ist das \`schnurrt\`.
+- {{geerbt}} – Dieses Feld kommt von der Elternklasse (hier: Tier).
+- {{eigen}} – Dieses Feld hat nur diese Klasse. Bei der Katze ist das \`schnurrt\`.
 
 **Methoden** – Auch hier gibt es Abzeichen:
-- {{überschrieben}} (gelb) – Die Klasse hat eine eigene Version dieser Methode geschrieben. Beispiel: \`essen()\` – die Katze frisst auf ihre Art.
-- {{geerbt}} (grau) – Die Methode kommt unverändert von den Eltern. Beispiel: \`halten()\`.
+- {{überschrieben}} – Die Klasse hat eine eigene Version dieser Methode geschrieben. Beispiel: \`essen()\` – die Katze frisst auf ihre Art.
+- {{geerbt}} – Die Methode kommt unverändert von den Eltern. Beispiel: \`halten()\`.
 
 Neben jeder Methode gibt es den Knopf **\`[[Ausführen]]\`**. Ein Klick ruft die Methode wirklich auf. Die Antwort erscheint in der **Ausgabe**.
 
@@ -202,9 +202,9 @@ Der OOPlayground läuft in JavaScript. Das Fenster zeigt, wie dasselbe Programm 
 
 | Spalte | Was steht darin? |
 |---|---|
-| {{Stack}} (blau) | Der Frame \`main(String[] args)\` mit einer Variable für jedes Objekt, zum Beispiel \`Katze katze1 = @1159cc2d\`. Klickst du auf **Ausführen**, liegt für etwa zwei Sekunden der Frame dieser Methode obendrauf, zum Beispiel \`Katze.essen()\` mit \`this\`. |
-| {{Heap}} (orange) | Jedes Objekt als Kasten: Klasse, Adresse, Name und alle Felder mit ihren Werten. Ein Motor ist ein eigener Kasten, zum Beispiel \`auto1.motor\`. |
-| {{Metaspace}} (lila) | Alle Klassen mit \`extends\`, ihren eigenen Feldern und Methoden. Sie sind schon da, bevor du das erste Objekt baust, und ändern sich nie. |
+| {{Stack}} | Der Frame \`main(String[] args)\` mit einer Variable für jedes Objekt, zum Beispiel \`Katze katze1 = @1159cc2d\`. Klickst du auf **Ausführen**, liegt für etwa zwei Sekunden der Frame dieser Methode obendrauf, zum Beispiel \`Katze.essen()\` mit \`this\`. |
+| {{Heap}} | Jedes Objekt als Kasten: Klasse, Adresse, Name und alle Felder mit ihren Werten. Ein Motor ist ein eigener Kasten, zum Beispiel \`auto1.motor\`. |
+| {{Metaspace}} | Alle Klassen mit \`extends\`, ihren eigenen Feldern und Methoden. Sie sind schon da, bevor du das erste Objekt baust, und ändern sich nie. |
 
 **Hervorheben:** Fahr mit der Maus über ein Objekt oder eine Adresse. Dann leuchtet alles auf, was dazugehört: die Variable im Stack, das Objekt im Heap und seine Klasse im Metaspace. Ist die Klasse gerade nicht zu sehen, rollt der Metaspace von selbst dorthin.
 
@@ -248,9 +248,9 @@ Schließen kannst du das Fenster mit **×**, mit der Taste **Esc** oder mit eine
 
 | Bereich | Was liegt dort? |
 |---|---|
-| {{Stack}} (blau) | Frames der laufenden Methoden mit ihren Variablen und Referenzen |
-| {{Heap}} (orange) | die Objekte mit ihren Feldern; Adressen wie \`@1159cc2d\` sind auch orange |
-| {{Metaspace}} (lila) | die Klassen (Baupläne) |` }
+| {{Stack}} | Frames der laufenden Methoden mit ihren Variablen und Referenzen |
+| {{Heap}} | die Objekte mit ihren Feldern; Adressen wie \`@1159cc2d\` sind auch orange |
+| {{Metaspace}} | die Klassen (Baupläne) |` }
       ],
       related: [{ id: 'begriff-feld', label: 'Feld & Zustand' }, { id: 'begriff-methode', label: 'Methode' }, { id: 'begriff-vererbung', label: 'Vererbung' }, { id: 'begriff-kapselung', label: 'Kapselung' }]
     },
@@ -317,9 +317,9 @@ Katze katze1 = new Katze();         // ein Ding nach dem Bauplan
         { k: 'life', md: `🏭 Stell dir eine Werkstatt vor. An der Wand hängt ein Regal mit **Bauplänen** – das ist der Metaspace. In der großen Halle stehen die **gebauten Dinge** – das ist der Heap. Und auf dem Schreibtisch liegt ein **Stapel Notizzettel**: Oben liegt immer der Zettel für die Arbeit, die du gerade machst. Darauf steht zum Beispiel: „katze1 steht in der Halle auf Platz 7." Das ist der Stack.` },
         { k: 'inApp', md: `Unten links im OOPlayground gibt es einen kleinen Knopf mit einem Speicher-Symbol. Ein Klick öffnet das Fenster **Speicher der JVM** mit drei farbigen Spalten:
 
-- {{Stack}} (blau) – pro Methodenaufruf ein **Frame** mit lokalen Variablen, Parametern und Referenzen. Ganz unten liegt der Frame von \`main(String[] args)\`.
-- {{Heap}} (orange) – alle **Objekte** mit ihren Feldern. Jedes Objekt hat eine **Adresse**, zum Beispiel \`@1159cc2d\`.
-- {{Metaspace}} (lila) – die **Beschreibung der Klassen**: Felder, Methoden und von wem sie erben.
+- {{Stack}} – pro Methodenaufruf ein **Frame** mit lokalen Variablen, Parametern und Referenzen. Ganz unten liegt der Frame von \`main(String[] args)\`.
+- {{Heap}} – alle **Objekte** mit ihren Feldern. Jedes Objekt hat eine **Adresse**, zum Beispiel \`@1159cc2d\`.
+- {{Metaspace}} – die **Beschreibung der Klassen**: Felder, Methoden und von wem sie erben.
 
 Fahr mit der Maus über ein Objekt oder eine Adresse. Dann leuchtet alles auf, was dazugehört: die Variable im Stack, das Objekt im Heap und seine Klasse im Metaspace.
 
@@ -658,7 +658,7 @@ Im OOPlayground geht es schneller: Nach \`katze1 = null\` verschwinden die Varia
       title: 'Vorbereitung',
       blocks: [
         { k: 'goal', md: `Einen sauberen Start haben, damit alles genau so aussieht wie in den Anleitungen.` },
-        { k: 'steps', md: `1. Öffne den OOPlayground mit dem Knopf **Zum OOPlayground** oben auf dieser Seite. Am besten legst du beide Fenster nebeneinander: links der OOPlayground, rechts diese Anleitung.
+        { k: 'steps', md: `1. Öffne den OOPlayground mit dem Knopf **Zum Playground** oben auf dieser Seite. Am besten legst du beide Fenster nebeneinander: links der OOPlayground, rechts diese Anleitung.
 2. Wähle oben rechts die Sprache: **EN** oder **DE**.
 3. Sind schon Objekte da? Dann klick auf **\`[[Alle löschen]]\`**.
 4. Klick in der Ausgabe auf **\`[[Leeren]]\`**.` },

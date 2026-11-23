@@ -1,6 +1,7 @@
 .pop { position: fixed; z-index: 20; width: min(420px, calc(100vw - 16px)); /* breit genug für Java-Signaturen + Tag + Schaltfläche in einer Zeile */ max-height: 70vh; overflow: auto; background: var(--bg); border: 1px solid var(--line); border-top: 4px solid var(--abstrakt); border-radius: 12px; box-shadow: var(--shadow-3); padding: 12px 14px 14px; animation: pop-in 150ms ease-out; overscroll-behavior: contain; }
 @keyframes pop-in { from { opacity: 0; } }
 .pop.pop-objekt { border-top-color: var(--feld); } /* Objektkarte: blau wie die Objektkachel */
+.pop.pop-motor { max-height: calc(100vh - 16px); } /* Motorkarte: wächst mit der Implementierung und rückt nach oben, statt zu scrollen */
 .pop.pop-closing { opacity: 0; transition: opacity 150ms ease-in; } /* Dauer = AUSBLENDEN in popover.js */
 .pop h3 { margin: 0 0 8px; padding-bottom: 8px; border-bottom: 1px solid var(--line-soft); font-size: 14px; font-family: var(--mono); }
 .pop h3 small { color: var(--muted); font-weight: 400; }

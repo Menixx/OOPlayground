@@ -14,6 +14,8 @@ import { Benzinmotor } from '../../models/engines/Benzinmotor.js';
 import { Elektromotor } from '../../models/engines/Elektromotor.js';
 import { Turbofan } from '../../models/engines/Turbofan.js';
 
+const AUSBLENDEN = 180; // ms, muss zu .mem-schliesst in memory.css passen
+const WENIG_BEWEGUNG = matchMedia('(prefers-reduced-motion: reduce)');
 const AUFRUF_DAUER = 2400; // ms, so lange bleibt der Frame eines Methodenaufrufs sichtbar
 
 const SSD_SVG = `<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
@@ -309,8 +311,11 @@ export function oeffneSpeicher() {
 export function schliesseSpeicher() {
   if (!backdrop) return;
   window.removeEventListener('keydown', taste, true);
-  backdrop.remove();
+  // Zustand sofort „zu“ (Demonstration/Sync), das Element blendet noch kurz aus und verschwindet dann
+  const alt = backdrop;
   backdrop = null;
+  if (WENIG_BEWEGUNG.matches) alt.remove();
+  else { alt.classList.add('mem-schliesst'); setTimeout(() => alt.remove(), AUSBLENDEN); }
   hellAdr = null;
   knopf?.setAttribute('aria-expanded', 'false');
   if (vorherFokus && vorherFokus !== knopf) vorherFokus.focus?.({ preventScroll: true });
