@@ -1,6 +1,7 @@
 /* Statusanzeige der Demonstration „Pult → Bildschirm“ */
 .sync-badge {
-  position: fixed; left: 12px; bottom: 12px; z-index: 1000;
+  /* immer ganz oben – auch über offenen Fenstern (Speicher, QR): auf dem gesperrten Bildschirm ist sie der einzige Zugang */
+  position: fixed; left: 12px; bottom: 12px; z-index: 2147483000;
   display: flex; flex-direction: column; align-items: flex-start; gap: 6px; max-width: calc(100vw - 24px);
   padding: 6px 12px; border-radius: 16px;
   font: 500 13px/1.3 var(--fun, system-ui, sans-serif);
@@ -32,7 +33,7 @@
 
 /* QR-Code-Fenster (Bildschirm) */
 .sync-qr-backdrop {
-  position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 16px;
+  position: fixed; inset: 0; z-index: 2147482000; display: grid; place-items: center; padding: 16px; /* über dem Speicher, unter der Statusleiste */
   background: rgba(2, 6, 23, .62); animation: sync-qr-ein 180ms ease;
 }
 .sync-qr {

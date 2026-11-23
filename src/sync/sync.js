@@ -14,6 +14,8 @@
 //                                     Bildschirm: x · (eigene Fensterbreite / breite des Pults)
 //   seite {i, anteil}               – senkrechtes Scrollen der Seite (Playground und Erklärung): Anker-Element i (bzw. -1 = vor
 //                                     dem ersten, -2 = ganz unten) und wie weit es schon unter der Kopfleiste durchgelaufen ist
+//   speicher {art: 'scroll', bereich, anker, anteil} – Scrollen im Speicher-Fenster: Eintrag oben + Anteil (Memory.js)
+//   speicher {art: 'hell', adr}     – hervorgehobene Adresse im Speicher-Fenster
 //   navigate {hash} · thema {modus} · sprache {sprache}
 import './sync.css';
 import { bus } from '../services/EventBus.js';
@@ -23,6 +25,7 @@ import { getModus, setModus, MODI } from '../services/Theme.js';
 import { popoverNach, offenePopovers, allePopoversSchliessen } from '../components/popover.js';
 import { konsolenVerlauf, konsoleSetzen } from '../components/Console/Console.js';
 import { el } from '../utils/dom.js';
+import { speicherZustand, speicherZustandSetzen, speicherAnwenden } from '../components/Memory/Memory.js';
 import { zeigeQr, schliesseQr, qrOffen, qrNeuZeichnen } from './qrDialog.js';
 
 const params = new URLSearchParams(location.search);
@@ -334,6 +337,7 @@ function zustand() {
   };
   ui.seite = seitenPosition();
   if (ROUTE === 'Docs') return { route: ROUTE, hash: aktuellerHash(), objects: [], counters: {}, ui };
+  ui.speicher = speicherZustand();
   return { route: ROUTE, hash: '', ...manager.exportieren(), konsole: konsolenVerlauf(), ui };
 }
 
@@ -380,6 +384,7 @@ if (ROLLE === 'pult') {
   bus.on('navigate', ({ hash }) => ereignis({ kind: 'navigate', hash }));
   bus.on('theme', (modus) => ereignis({ kind: 'thema', modus }));
   bus.on('sprache', (sprache) => ereignis({ kind: 'sprache', sprache }));
+  bus.on('speicher', (d) => ereignis({ kind: 'speicher', ...d }));
 
   // Markierte Bedienelemente: Knöpfe, Auf-/Zuklappen, Eingaben (Capture: vor den eigenen Handlern)
   document.addEventListener('click', (e) => {
@@ -564,6 +569,7 @@ async function anwenden(ev) {
     case 'aufklappen': element(ev.ziel).open = Boolean(ev.offen); return {};
     case 'scroll': return { scroll: scrollen(element(ev.ziel), ev.x, ev.breite) };
     case 'seite': return { scroll: seiteSetzen(ev) };
+    case 'speicher': nurPlayground(); return speicherAnwenden(ev);
     case 'thema': setModus(ev.modus); return { modus: getModus() };
     case 'sprache': await spracheUebernehmen(ev.sprache); return { sprache: getSprache() };
     case 'navigate':
@@ -591,6 +597,9 @@ async function snapshotAnwenden(s, snapSeq) {
       const b = finde(ziel);
       if (b && b.getAttribute('aria-expanded') !== 'true') b.click();
     }
+    // Speicher-Fenster: offen wie beim Pult (über gedrueckt), sonst schließen; dann Lesepositionen und Hervorhebung
+    if (!(ui.gedrueckt ?? []).includes('speicher:oeffnen')) finde('speicher:schliessen')?.click();
+    if (ui.speicher) versuch(() => speicherZustandSetzen(ui.speicher));
     if (ui.seite) versuch(() => seiteSetzen(ui.seite));
   } else {
     // Suche und Auf-/Zuklappen wie beim Pult, danach die genaue Scrollposition (hängt von den Höhen ab)

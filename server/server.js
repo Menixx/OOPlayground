@@ -232,7 +232,7 @@ function nachricht(ws, text) {
       if (ws !== r.aktiverPult) return; // nur der aktive Tab des Raum-Pults steuert
       if (!r.bildschirm) return;        // niemand schaut zu – der nächste Snapshot holt es nach
       r.offeneAcks.push(msg.seq);
-      if (!['scroll', 'seite'].includes(msg.event?.kind)) rlog(r, `event #${msg.seq} ${JSON.stringify(msg.event)}`); // Scrollen nicht protokollieren
+      if (!['scroll', 'seite', 'speicher'].includes(msg.event?.kind)) rlog(r, `event #${msg.seq} ${JSON.stringify(msg.event)}`); // Scrollen nicht protokollieren
       schicke(r.bildschirm, text);      // unverändert weiterleiten (seq bleibt)
       break;
 
@@ -241,7 +241,7 @@ function nachricht(ws, text) {
       schicke(r.aktiverPult, text);
       const geprueft = r.offeneAcks.length > 0 || msg.seq > r.ignorierBis;
       const erwartet = r.offeneAcks.shift();
-      if (!msg.ok || msg.result?.scroll === undefined) rlog(r, `ack #${msg.seq} ok=${msg.ok}${msg.ok ? '' : ` error=${msg.error}`}`);
+      if (!msg.ok || (msg.result?.scroll === undefined && !msg.result?.still)) rlog(r, `ack #${msg.seq} ok=${msg.ok}${msg.ok ? '' : ` error=${msg.error}`}`);
       if (!geprueft) return;
       if (!msg.ok) snapshotAnfordern(r, `ack #${msg.seq} fehlgeschlagen`);
       else if (msg.seq !== erwartet) snapshotAnfordern(r, `ack #${msg.seq}, erwartet #${erwartet}`);
