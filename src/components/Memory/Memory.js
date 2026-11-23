@@ -160,15 +160,18 @@ function zeichnen() {
   const gesamt = backdrop.querySelector('.mem-bereiche')?.scrollTop ?? 0;
   const zu = el('button', { type: 'button', class: 'mem-zu', 'data-sync': 'speicher:schliessen', 'aria-label': L('mem.schliessen'), title: L('mem.schliessen'), onclick: schliesseSpeicher },
     el('span', { 'aria-hidden': 'true' }, '×'));
-  const box = el('div', { class: 'mem', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'mem-titel', tabindex: '-1' },
+  const inhalt = [
     zu,
     el('h2', { id: 'mem-titel', class: 'mem-titel', i18n: 'mem.titel' }),
     el('p', { class: 'mem-hinweis', i18n: 'mem.hinweis' }),
     el('div', { class: 'mem-bereiche' },
       bereich('stack', 'Stack', 'mem.stackText', stack(objekte)),
       bereich('heap', 'Heap', 'mem.heapText', heap(objekte)),
-      bereich('meta', 'Metaspace', 'mem.metaText', metaspace())));
-  backdrop.replaceChildren(box);
+      bereich('meta', 'Metaspace', 'mem.metaText', metaspace()))];
+  // Das Fenster selbst bleibt bestehen – ein neues .mem würde die Öffnen-Animation wiederholen (Fenster blinkt)
+  const box = backdrop.querySelector('.mem');
+  if (box) box.replaceChildren(...inhalt);
+  else backdrop.append(el('div', { class: 'mem', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'mem-titel', tabindex: '-1' }, ...inhalt));
   backdrop.querySelectorAll('.mem-inhalt').forEach((e, i) => { e.scrollTop = scroll[i] ?? 0; });
   backdrop.querySelector('.mem-bereiche').scrollTop = gesamt;
   backdrop.querySelector('.mem-heap .neu')?.scrollIntoView({ block: 'nearest' });
