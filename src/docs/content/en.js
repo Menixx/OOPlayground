@@ -7,7 +7,7 @@ export default {
   groups: [
     { id: 'teil-oberflaeche', key: 'oberflaeche', nav: 'Part 1: The interface' },
     { id: 'teil-begriffe', key: 'begriffe', nav: 'Part 2: The concepts' },
-    { id: 'teil-vorfuehren', key: 'vorfuehren', nav: 'Part 3: Demo guide' }
+    { id: 'teil-vorfuehren', key: 'vorfuehren', nav: 'Part 3: Try it yourself' }
   ],
   sections: [
     {
@@ -16,7 +16,7 @@ export default {
       cards: [
         { id: 'teil-oberflaeche', title: 'The interface', text: 'What is what?' },
         { id: 'teil-begriffe', title: 'The concepts', text: 'What does it mean?' },
-        { id: 'teil-vorfuehren', title: 'Demo guide', text: 'How do I show it?' }
+        { id: 'teil-vorfuehren', title: 'Try it yourself', text: 'How do I try it?' }
       ],
       blocks: [
         { k: 'md', md: `Here you'll learn how programs are built from **objects**. This is called **object-oriented programming**, or **OOP** for short.
@@ -29,9 +29,9 @@ This page has three parts:
 
 1. **The interface** – What do you see in OOPlayground, and what is it for?
 2. **The concepts** – The most important OOP words, explained very simply.
-3. **Demo guide** – Step-by-step instructions: how to show each concept in OOPlayground.
+3. **Try it yourself** – Step-by-step instructions: experience each concept yourself in OOPlayground.
 
-**Tip:** Open OOPlayground in a second window and try everything as you read. Each concept has a **▶ Show me how** button. It takes you to the matching instructions.
+**Tip:** Open OOPlayground in a second window and try everything as you read. Each concept has a **▶ Try it yourself** button. It takes you to the matching instructions.
 
 Note: the class names in the app (\`Tier\`, \`Katze\`, \`Auto\` …) are always German, because they are names in the program code. On this page we translate them in brackets the first time they appear.` }
       ]
@@ -47,7 +47,9 @@ Note: the class names in the app (\`Tier\`, \`Katze\`, \`Auto\` …) are always 
 3. **Created objects** – all the things you have built from the blueprints.
 4. **Output** – the program's diary. It shows what has happened.` },
         { k: 'zones' },
-        { k: 'md', md: `How to play: look at a blueprint, build objects from it, give the objects commands – and read their answers in the output.` }
+        { k: 'md', md: `How to play: look at a blueprint, build objects from it, give the objects commands – and read their answers in the output.
+
+And if you want to know what happens inside: a small button at the bottom left opens [memory](#ui-speicher).` }
       ],
       related: [{ id: 'begriff-klasse', label: 'Class' }, { id: 'begriff-objekt', label: 'Object' }]
     },
@@ -193,7 +195,31 @@ The **\`[[Clear]]\`** button empties the output. Your objects stay where they ar
       related: [{ id: 'begriff-methode', label: 'Method' }, { id: 'begriff-nachrichten', label: 'Message passing' }]
     },
     {
-      id: 'ui-legende', group: 'oberflaeche', num: 'O9', nav: 'Colours & badges', type: 'ui',
+      id: 'ui-speicher', group: 'oberflaeche', num: 'O9', nav: 'Memory', type: 'ui',
+      title: 'Memory – a look inside the JVM',
+      blocks: [
+        { k: 'md', md: `In the bottom left corner there's a small button with a **memory icon**. When you hover over it, it says: **Take a look into memory**. A click opens the **JVM memory** window.
+
+OOPlayground runs in JavaScript. The window shows how the same program would sit in memory in **Java**. It has three coloured columns:
+
+| Column | What's in it? |
+|---|---|
+| {{Stack}} (blue) | The frame \`main(String[] args)\` with one variable for each object, for example \`Katze katze1 = @1159cc2d\`. When you click **Run**, that method's frame sits on top for about two seconds, for example \`Katze.essen()\` with \`this\`. |
+| {{Heap}} (orange) | Every object as a box: class, address, name and all fields with their values. An engine is a box of its own, for example \`auto1.motor\`. |
+| {{Metaspace}} (purple) | All classes with \`extends\`, their own fields and methods. They are there before you build the first object, and they never change. |
+
+**Highlighting:** hover over an object or an address. Then everything that belongs to it lights up: the variable on the stack, the object in the heap and its class in the metaspace. If the class is out of sight, the metaspace scrolls there by itself.
+
+**Live:** the window changes along with the program. New objects light up briefly, changed values (for example \`laeuft = true\`) appear straight away, deleted objects disappear.
+
+**Addresses:** numbers like \`@1159cc2d\` are made up. It looks a bit like this when Java prints an object – Java never shows real memory addresses.
+
+You can close the window with **×**, with the **Esc** key or by clicking next to it. The button only appears on larger screens, not on phones.` }
+      ],
+      related: [{ id: 'begriff-speicher', label: 'Memory (JVM)' }, { id: 'begriff-objekt', label: 'Object' }, { id: 'begriff-polymorphie', label: 'Polymorphism' }, { id: 'begriff-null', label: 'Reference & null' }]
+    },
+    {
+      id: 'ui-legende', group: 'oberflaeche', num: 'O10', nav: 'Colours & badges', type: 'ui',
       title: 'Colours and badges',
       blocks: [
         { k: 'md', md: `In OOPlayground every colour means something. Here's the overview:
@@ -218,7 +244,15 @@ The **\`[[Clear]]\`** button empties the output. Your objects stay where they ar
 | {{implemented}} | The method is finished and already works. |
 | {{inherited}} | Comes unchanged from the parent class. |
 | {{own}} | Exists only in this class. |
-| {{overridden}} | The class has written its own version of the method. |` }
+| {{overridden}} | The class has written its own version of the method. |
+
+**Colours in memory**
+
+| Area | What's stored there? |
+|---|---|
+| {{Stack}} (blue) | frames of the running methods with their variables and references |
+| {{Heap}} (orange) | the objects with their fields; addresses like \`@1159cc2d\` are orange too |
+| {{Metaspace}} (purple) | the classes (blueprints) |` }
       ],
       related: [{ id: 'begriff-feld', label: 'Field & state' }, { id: 'begriff-methode', label: 'Method' }, { id: 'begriff-vererbung', label: 'Inheritance' }, { id: 'begriff-kapselung', label: 'Encapsulation' }]
     },
@@ -235,7 +269,9 @@ The **\`[[Clear]]\`** button empties the output. Your objects stay where they ar
 | [Polymorphism](#begriff-polymorphie) | One command, and everyone does it their own way. |
 | [Encapsulation](#begriff-kapselung) | The inside is secret; you only use the buttons you're allowed to. |
 
-To understand the pillars you need a few basic words. It's best to start with **Object** and **Class** and then read in order.` }
+To understand the pillars you need a few basic words. It's best to start with **Object** and **Class** and then read in order.
+
+**New: In memory.** Every concept has an **In memory** block. It explains what happens in the JVM's memory – on the {{Stack}}, in the {{Heap}} and in the {{Metaspace}}. What these three areas are is explained in [Memory](#begriff-speicher).` }
       ]
     },
     {
@@ -245,6 +281,11 @@ To understand the pillars you need a few basic words. It's best to start with **
         { k: 'short', md: `An object is a thing in a program that **knows** something and **can do** something.` },
         { k: 'life', md: `🐈 Think of a real cat. It knows things about itself: it has four legs and a tail. And it can do things: eat and walk. In a program it's exactly the same – except the cat is made of code.` },
         { k: 'inApp', md: `Each little box under **Created objects** is an object, for example \`katze1\` or \`auto1\`. Hover over it. Under **Fields** you see what it knows. Under **Methods** you see what it can do.` },
+        { k: 'memory', md: `An object **lives in the {{Heap}}**. There it has its own place with an **address**, for example \`@1159cc2d\`, and that's where all its fields are.
+
+The name \`katze1\` is **not** the object itself. It's a small variable on the {{Stack}} that only holds the address – like a note with a house number on it.
+
+Every object also knows which blueprint it was built from: it points to its class in the {{Metaspace}}. In the **memory** window this is shown on every object as \`→ Katze.class\`. What stack, heap and metaspace are exactly is explained in [Memory](#begriff-speicher).` },
         { k: 'remember', md: `Object = knowing + doing.` }
       ]
     },
@@ -255,6 +296,9 @@ To understand the pillars you need a few basic words. It's best to start with **
         { k: 'short', md: `A class is a **blueprint** for objects.` },
         { k: 'life', md: `🍪 Think of a cookie cutter. You can't eat the cutter itself. But with it you can make lots and lots of cookies. They all have the same shape – and yet each one is its own cookie. The cutter is the class. The cookies are the objects.` },
         { k: 'inApp', md: `\`Katze\` (cat) is a class. \`katze1\` and \`katze2\` are objects built from the \`Katze\` blueprint. The class says: "Every cat has legs and can eat." The object says: "I am **this particular** cat right here."` },
+        { k: 'memory', md: `A class lives in the {{Metaspace}} – and only **once**, no matter how many objects you build. \`katze1\` and \`katze2\` are both in the {{Heap}} and point to the **same** class \`Katze\`.
+
+In Java the JVM loads a class the first time it's needed. After that it stays and doesn't change any more. In OOPlayground all classes are in the metaspace right from the start.` },
         { k: 'remember', md: `Class = blueprint. Object = the thing that was built.` },
         { k: 'code', md: `\`\`\`java
 class Katze extends Tier {          // the blueprint
@@ -268,7 +312,33 @@ Katze katze1 = new Katze();         // one thing built from the blueprint
       ]
     },
     {
-      id: 'begriff-feld', group: 'begriffe', num: 'B3', nav: 'Field & state', type: 'concept', demo: 'demo-zustand',
+      id: 'begriff-speicher', group: 'begriffe', num: 'B3', nav: 'Memory (JVM)', type: 'concept', demo: 'demo-speicher',
+      title: 'Memory: stack, heap and metaspace',
+      blocks: [
+        { k: 'short', md: `When a Java program runs, the **Java Virtual Machine** (JVM) puts everything into its **memory**. Three areas matter to us: the {{Stack}}, the {{Heap}} and the {{Metaspace}}.` },
+        { k: 'life', md: `🏭 Imagine a workshop. On the wall there's a shelf of **blueprints** – that's the metaspace. In the big hall stand the **things that were built** – that's the heap. And on the desk there's a **pile of notes**: the note for the job you're doing right now is always on top. It says, for example: "katze1 is in the hall at spot 7." That's the stack.` },
+        { k: 'inApp', md: `At the bottom left of OOPlayground there's a small button with a memory icon. A click opens the **JVM memory** window with three coloured columns:
+
+- {{Stack}} (blue) – one **frame** per method call with local variables, parameters and references. At the very bottom is the frame of \`main(String[] args)\`.
+- {{Heap}} (orange) – all **objects** with their fields. Every object has an **address**, for example \`@1159cc2d\`.
+- {{Metaspace}} (purple) – the **description of the classes**: fields, methods and who they inherit from.
+
+Hover over an object or an address. Then everything that belongs to it lights up: the variable on the stack, the object in the heap and its class in the metaspace.
+
+Every concept on this page has an **In memory** block. It tells you what happens in memory for that concept.` },
+        { k: 'remember', md: `Metaspace = blueprints. Heap = objects. Stack = what is running right now.` },
+        { k: 'code', md: `\`\`\`java
+public static void main(String[] args) {   // frame of main() on the stack
+    Katze katze1 = new Katze();
+    // katze1      → variable on the stack, only holds the address
+    // new Katze() → the object in the heap
+    // Katze       → the blueprint in the metaspace
+}
+\`\`\`` }
+      ]
+    },
+    {
+      id: 'begriff-feld', group: 'begriffe', num: 'B4', nav: 'Field & state', type: 'concept', demo: 'demo-zustand',
       title: 'What are fields, and what is state?',
       blocks: [
         { k: 'short', md: `A **field** is a property of an object – a little compartment with a name and a value. All the values together are called the object's **state**.` },
@@ -279,16 +349,26 @@ Katze katze1 = new Katze();         // one thing built from the blueprint
 - \`boolean\` – yes or no: \`true\` or \`false\`
 
 The state changes, for example, with the engine: before starting it shows \`laeuft = false\` (running = false), afterwards \`laeuft = true\`. And every object has its **own** state: if you start the engine of \`auto1\`, the engine of \`auto2\` still isn't running.` },
+        { k: 'memory', md: `The values of the fields are stored **inside the object** in the {{Heap}}. Every object has its **own** compartments – that's why nothing changes for \`auto2\` when the engine of \`auto1\` starts. The {{Metaspace}} only says **which** fields there are and what type they have – but no values.
+
+Small values like \`4\` or \`true\` sit directly in the compartment. If the value is an object – for example the field \`motor\` –, the compartment only holds an **address**. It points to another object in the heap.
+
+Fields marked \`static\` (there are none in OOPlayground) don't belong to an object but to the class. There is only **one** value of them for all objects.` },
         { k: 'remember', md: `Fields = what an object knows. State = the values right now.` }
       ]
     },
     {
-      id: 'begriff-methode', group: 'begriffe', num: 'B4', nav: 'Method', type: 'concept', demo: 'demo-methode',
+      id: 'begriff-methode', group: 'begriffe', num: 'B5', nav: 'Method', type: 'concept', demo: 'demo-methode',
       title: 'What is a method?',
       blocks: [
         { k: 'short', md: `A method is something an object can **do** – a command it understands.` },
         { k: 'life', md: `🐕 A dog understands "Sit!". When you say it, the dog sits down. "Sit" is like a method: a command the dog knows and can carry out.` },
         { k: 'inApp', md: `Methods are listed in every card under **Methods**. Their names are green and end with brackets: \`essen()\` (eat), \`bewegen()\` (move), \`motorStarten()\` (start engine). With the **Run** button you call a method. The object then does something and answers in the **Output**. Some methods change the state while doing so – for example, \`motorStarten()\` starts the engine.` },
+        { k: 'memory', md: `The code of a method lives **once** in the {{Metaspace}}, with its class – not in every object. So a hundred cats share one single \`essen()\`.
+
+When you call a method, the JVM puts a new **frame** on top of the {{Stack}}. It holds \`this\` (the address of the object that is working right now), the parameters and the local variables. When the method is done, the frame is taken away again. In the **memory** window, after **Run** you briefly see the frame \`Katze.essen()\` above the frame of \`main()\`.
+
+How does the JVM know **which** \`essen()\` to use? It looks at the object in the {{Heap}}, checks which class it belongs to and picks the matching version there. This is called **dynamic dispatch** – more about it in [Polymorphism](#begriff-polymorphie).` },
         { k: 'remember', md: `Method = what an object can do. Calling it = "Do it now!"` },
         { k: 'code', md: `\`\`\`java
 katze1.essen();   // call the method
@@ -297,7 +377,7 @@ katze1.essen();   // call the method
       ]
     },
     {
-      id: 'begriff-instanziierung', group: 'begriffe', num: 'B5', nav: 'Instantiation & constructor', type: 'concept', demo: 'demo-instanziieren',
+      id: 'begriff-instanziierung', group: 'begriffe', num: 'B6', nav: 'Instantiation & constructor', type: 'concept', demo: 'demo-instanziieren',
       title: 'What does instantiation mean?',
       blocks: [
         { k: 'short', md: `To **instantiate** means to build a real object from a class. The finished object is called an **instance**.` },
@@ -305,6 +385,14 @@ katze1.essen();   // call the method
         { k: 'inApp', md: `Open the class card of **Tier** and click **Katze** under **Subclasses**. In the program this runs \`new Katze()\`. A new object appears: \`katze1\`. Click again and you get \`katze2\`. Both are cats – but two different objects.
 
 **The constructor:** while an object is being built, a special method runs automatically: the **constructor**. It fills the fields with starting values, for example \`name = "Katze"\` and \`anzahlBeine = 4\`. That's why the fields in the object card are already filled in – while in the class card of Tier they are still empty.` },
+        { k: 'memory', md: `\`Katze katze1 = new Katze();\` happens in four steps:
+
+1. \`new\` takes the blueprint \`Katze\` from the {{Metaspace}}.
+2. Space for **all** fields is reserved in the {{Heap}} – the ones inherited from Tier and the cat's own. At first they hold default values: \`0\`, \`false\` or \`null\`.
+3. The constructor runs – with its own frame on the {{Stack}} – and fills the fields with starting values.
+4. The address of the new object goes into the variable \`katze1\` on the {{Stack}}.
+
+In the **memory** window the new variable and the new object light up briefly after the click.` },
         { k: 'remember', md: `\`new\` + class = new object.` },
         { k: 'code', md: `\`\`\`java
 Katze katze1 = new Katze();  // instance no. 1
@@ -324,7 +412,7 @@ class Katze extends Tier {
       ]
     },
     {
-      id: 'begriff-abstrakte-klasse', group: 'begriffe', num: 'B6', nav: 'Abstract class', type: 'concept', demo: 'demo-abstrakt',
+      id: 'begriff-abstrakte-klasse', group: 'begriffe', num: 'B7', nav: 'Abstract class', type: 'concept', demo: 'demo-abstrakt',
       title: 'What is an abstract class?',
       blocks: [
         { k: 'short', md: `An abstract class is a blueprint that is **unfinished on purpose**. You can't build an object from it – only from its children.` },
@@ -332,6 +420,9 @@ class Katze extends Tier {
         { k: 'inApp', md: `\`Tier\` (animal), \`Transport\` and \`Figur\` (shape) are abstract. That's why their cards say \`abstract class\`. The \`new Tier()\` button tries to build an animal directly anyway – and the output reports an error: "Abstract classes cannot be instantiated."
 
 **Abstract methods:** a method with the purple {{abstract}} badge only has a name, but no content yet. With it the class says: "Every animal **must** be able to eat – but **how** is up to each child." The cat eats fish, the crocodile eats meat, the human eats pizza.` },
+        { k: 'memory', md: `\`Tier\` has its place in the {{Metaspace}} too: the children need its fields and its finished methods such as \`halten()\`. But in the {{Heap}} you will **never** find an object of class \`Tier\` – only cats, crocodiles and humans.
+
+For an abstract method like \`essen()\` the metaspace only holds the name, but no code. The children provide the code.` },
         { k: 'remember', md: `Abstract = just an idea, not finished yet. Only the children finish it.` },
         { k: 'code', md: `\`\`\`java
 abstract class Tier {                // "abstract" = unfinished on purpose
@@ -350,7 +441,7 @@ Tier tier = new Tier();   // ✗ error: Tier is abstract and cannot be instantia
       ]
     },
     {
-      id: 'begriff-abstraktion', group: 'begriffe', num: 'B7', nav: 'Abstraction', type: 'concept', pillar: 1, demo: 'demo-abstraktion',
+      id: 'begriff-abstraktion', group: 'begriffe', num: 'B8', nav: 'Abstraction', type: 'concept', pillar: 1, demo: 'demo-abstraktion',
       title: 'Abstraction',
       overline: 'Pillar 1 of 4',
       blocks: [
@@ -359,11 +450,14 @@ Tier tier = new Tier();   // ✗ error: Tier is abstract and cannot be instantia
         { k: 'inApp', md: `The class \`Transport\` only says the most important things about **all** vehicles: they have a top speed, wheels and an engine. They can start the engine and move. Whether it's a car, a plane or a train doesn't matter here. Anyone working with a vehicle only needs to know this.
 
 So an abstract class is a tool for abstraction: it collects what everyone has in common and leaves the details for later.` },
+        { k: 'memory', md: `A variable on the {{Stack}} may have a general type: \`Transport t = new Auto();\`. In the {{Heap}} there is still a completely normal car with all its fields.
+
+The variable's type is like a pair of **glasses**: through the "Transport" glasses you only see what all vehicles have in common. The object itself doesn't get any smaller. (In OOPlayground the variables always have the exact type, for example \`Auto auto1\`.)` },
         { k: 'remember', md: `Abstraction = What do they all have in common? The rest comes later.` }
       ]
     },
     {
-      id: 'begriff-vererbung', group: 'begriffe', num: 'B8', nav: 'Inheritance', type: 'concept', pillar: 2, demo: 'demo-vererbung',
+      id: 'begriff-vererbung', group: 'begriffe', num: 'B9', nav: 'Inheritance', type: 'concept', pillar: 2, demo: 'demo-vererbung',
       title: 'Inheritance',
       overline: 'Pillar 2 of 4',
       blocks: [
@@ -374,6 +468,9 @@ So an abstract class is a tool for abstraction: it collects what everyone has in
 - The field \`schnurrt\` (purrs) has {{own}} – only the cat has it.
 
 The parent is called the **superclass**, the children are called **subclasses**. In the class card the children are listed under **Subclasses**.` },
+        { k: 'memory', md: `In the {{Heap}} there is **no** extra Tier object inside the cat. \`katze1\` is **one single** object, and all fields are in it together: the five inherited from Tier and its own \`schnurrt\`. You can see this in the **memory** window: \`katze1\` is one box with six fields.
+
+In the {{Metaspace}} it's different: every class stands on its own there. \`Katze\` only lists \`schnurrt\` plus \`extends Tier\` – the other fields are listed with \`Tier\`. So the class Katze points to its parent class, and when building an object the JVM collects the fields from both.` },
         { k: 'remember', md: `Child = everything from the parents + something of its own.` },
         { k: 'code', md: `\`\`\`java
 class Katze extends Tier {   // "extends" = inherits from
@@ -388,12 +485,17 @@ class Katze extends Tier {   // "extends" = inherits from
       ]
     },
     {
-      id: 'begriff-ueberschreiben', group: 'begriffe', num: 'B9', nav: 'Overriding', type: 'concept', demo: 'demo-ueberschreiben',
+      id: 'begriff-ueberschreiben', group: 'begriffe', num: 'B10', nav: 'Overriding', type: 'concept', demo: 'demo-ueberschreiben',
       title: 'Overriding',
       blocks: [
         { k: 'short', md: `Overriding means the child class writes an inherited method **anew**, in its own way. The name stays the same.` },
         { k: 'life', md: `🥞 Your grandma has a pancake recipe. You inherited it – but you make them with chocolate. The recipe is still called "pancakes". Only your version is different.` },
         { k: 'inApp', md: `In the object card of \`katze1\`, \`essen()\` has the yellow {{overridden}} badge: the cat wrote its own version – it eats fish. The method \`halten()\` (stop), on the other hand, has {{inherited}}: the cat simply uses Tier's version without changing anything.` },
+        { k: 'memory', md: `In the {{Metaspace}} the class \`Krokodil\` has its **own** code for \`essen()\`. For \`halten()\` it has none – that exists only once, with \`Tier\`.
+
+Every class has a kind of table of contents of its methods, the **method table**. For the crocodile it says: \`essen()\` → Krokodil's code, \`halten()\` → Tier's code. So overriding means: in the child's table of contents, one of the parent's entries is replaced by its own.
+
+You can see this in the **memory** window on the classes: \`Katze\` lists \`essen()\` and \`bewegen()\`, but no \`halten()\`.` },
         { k: 'remember', md: `Overriding = same name, own way.` },
         { k: 'code', md: `\`\`\`java
 class Krokodil extends Tier {
@@ -407,13 +509,20 @@ class Krokodil extends Tier {
       ]
     },
     {
-      id: 'begriff-polymorphie', group: 'begriffe', num: 'B10', nav: 'Polymorphism', type: 'concept', pillar: 3, demo: 'demo-polymorphie',
+      id: 'begriff-polymorphie', group: 'begriffe', num: 'B11', nav: 'Polymorphism', type: 'concept', pillar: 3, demo: 'demo-polymorphie',
       title: 'Polymorphism',
       overline: 'Pillar 3 of 4',
       blocks: [
         { k: 'short', md: `Polymorphism means "many forms": you give many different objects **the same command** – and each one carries it out in **its own way**.` },
         { k: 'life', md: `🏫 The teacher says to the whole class: "Please come to the front!" One child walks, one hops, one rolls up in a wheelchair. The teacher doesn't have to explain to each one **how** to get to the front. Everyone knows that themselves.` },
         { k: 'inApp', md: `The **Move all** button tells every animal and vehicle: \`bewegen()\` (move). The cat walks on four paws, the crocodile crawls, the plane flies through the air. The program never asks: "Are you a cat? Are you a car?" It simply calls the same method on all of them. Each object knows by itself what to do – because each child has overridden \`bewegen()\`.` },
+        { k: 'memory', md: `This is where **dynamic dispatch** happens. In the loop, the variable \`tier\` on the {{Stack}} holds the address of three different objects, one after the other. At \`tier.bewegen()\` the JVM asks every time, **only at that moment**:
+
+1. Which object is at this address in the {{Heap}}?
+2. Which class does it belong to?
+3. Which version of \`bewegen()\` does this class have in the {{Metaspace}}?
+
+So the variable's type (\`Tier\`) doesn't decide **which** code runs – the object itself does. Try it in the **memory** window: hover over an object, and its class in the metaspace lights up. That's exactly where the JVM looks for the method.` },
         { k: 'remember', md: `Polymorphism = one command, many different answers.` },
         { k: 'code', md: `\`\`\`java
 Tier[] tiere = { new Katze(), new Krokodil(), new Mensch() };
@@ -428,7 +537,7 @@ for (Tier tier : tiere) {
       ]
     },
     {
-      id: 'begriff-kapselung', group: 'begriffe', num: 'B11', nav: 'Encapsulation', type: 'concept', pillar: 4, demo: 'demo-kapselung',
+      id: 'begriff-kapselung', group: 'begriffe', num: 'B12', nav: 'Encapsulation', type: 'concept', pillar: 4, demo: 'demo-kapselung',
       title: 'Encapsulation',
       overline: 'Pillar 4 of 4',
       blocks: [
@@ -439,6 +548,9 @@ for (Tier tier : tiere) {
 The shapes have a secret too: their rotation angle. It isn't shown in the card, and only the method \`drehen90()\` can change it.
 
 **Interface:** all of an object's public methods together are called its **interface**. They are its "buttons" to the outside world.` },
+        { k: 'memory', md: `In the {{Heap}} private fields sit in the object just like all the others. In the **memory** window you can see, for example, \`private #winkel = 90\` on the shapes – even though the angle is missing from the object card. The engine's private methods are listed quite normally in the {{Metaspace}} too, with their class.
+
+So encapsulation isn't a safe in memory, but a **rule of the language**: the compiler and the JVM simply don't let code from outside get at it.` },
         { k: 'remember', md: `\`public\` = for everyone. \`private\` = only for myself.` },
         { k: 'code', md: `\`\`\`java
 class Benzinmotor extends Motor {
@@ -455,7 +567,7 @@ motor.zuenden();   // ✗ forbidden – not reachable from outside
       ]
     },
     {
-      id: 'begriff-nachrichten', group: 'begriffe', num: 'B12', nav: 'Message passing', type: 'concept', demo: 'demo-nachrichten',
+      id: 'begriff-nachrichten', group: 'begriffe', num: 'B13', nav: 'Message passing', type: 'concept', demo: 'demo-nachrichten',
       title: 'Message passing – objects send each other messages',
       blocks: [
         { k: 'short', md: `Objects work together by sending each other **messages**. Sending a message means calling a method of another object. The answer is whatever the method gives back.` },
@@ -463,6 +575,17 @@ motor.zuenden();   // ✗ forbidden – not reachable from outside
         { k: 'inApp', md: `When you click **Run** next to \`motorStarten()\` on \`auto1\`, you send the car the message: "Start your engine!" But the car doesn't start the engine itself. It sends its engine a new message: \`starten()\`. The engine performs its secret steps and answers: "Engine started!" Then the car answers you: "Engine started successfully." That's why you see **two** answers in the output.
 
 **Move all** is message passing too: one message – \`bewegen()\` – goes to many objects at once.` },
+        { k: 'memory', md: `Every message is a method call – and every call puts a frame on the {{Stack}}. For \`auto1.motorStarten()\` the pile grows like this:
+
+\`\`\`text
+│ Benzinmotor.zuenden()    │  ← on top: what is happening right now
+│ Benzinmotor.starten()    │
+│ Auto.motorStarten()      │
+│ main()                   │
+└──────────────────────────┘
+\`\`\`
+
+When a method is done, its frame is taken away and its answer goes to the frame below. That's why the output shows the engine's answer first and then the car's. In the **memory** window OOPlayground only shows the frame of the message that **you** send.` },
         { k: 'remember', md: `Calling a method = sending a message. Return value = the answer.` },
         { k: 'code', md: `\`\`\`text
 You ──motorStarten()──▶ auto1 ──starten()──▶ Benzinmotor
@@ -472,7 +595,7 @@ You ◀─"Engine started successfully."─ auto1 ◀─"Engine started!"─ Ben
       ]
     },
     {
-      id: 'begriff-komposition', group: 'begriffe', num: 'B13', nav: 'Composition & delegation', type: 'concept', demo: 'demo-komposition',
+      id: 'begriff-komposition', group: 'begriffe', num: 'B14', nav: 'Composition & delegation', type: 'concept', demo: 'demo-komposition',
       title: 'Composition and delegation',
       blocks: [
         { k: 'short', md: `**Composition** means an object **is made of** other objects. **Delegation** means it hands a task over to one of those parts.` },
@@ -482,6 +605,9 @@ You ◀─"Engine started successfully."─ auto1 ◀─"Engine started!"─ Ben
 **Inheritance or composition?**
 - "**is a**" → inheritance: a cat **is an** animal.
 - "**has a**" → composition: a car **has an** engine. (A car isn't an engine, after all!)` },
+        { k: 'memory', md: `With composition there are **two** objects in the {{Heap}}: the car and its engine. The field \`motor\` of \`auto1\` only holds the engine's **address**. In the **memory** window the engine is its own box right below the car (\`auto1.motor\`). Hover over the address at the field \`motor\` – the engine and its class \`Benzinmotor\` light up.
+
+Compare this with inheritance: a cat is **one** object, with Tier's fields inside it. A car with an engine is **two** objects, connected by an address.` },
         { k: 'remember', md: `is a → inheritance. has a → composition.` },
         { k: 'code', md: `\`\`\`java
 class Auto extends Transport {           // a car IS A transport
@@ -500,7 +626,7 @@ class Auto extends Transport {           // a car IS A transport
       ]
     },
     {
-      id: 'begriff-wiederverwendung', group: 'begriffe', num: 'B14', nav: 'Reuse', type: 'concept', demo: 'demo-wiederverwendung',
+      id: 'begriff-wiederverwendung', group: 'begriffe', num: 'B15', nav: 'Reuse', type: 'concept', demo: 'demo-wiederverwendung',
       title: 'Reuse',
       blocks: [
         { k: 'short', md: `Reuse means writing code **once** and using it in **many** places.` },
@@ -508,11 +634,14 @@ class Auto extends Transport {           // a car IS A transport
         { k: 'inApp', md: `The method \`drehen90()\` (rotate by 90°) appears **only once** in the code – in the class \`Figur\` (shape). Dreieck (triangle), Kreis (circle) and Stern (star) inherit it and can all rotate. Nobody had to write the method three times. That's why \`drehen90()\` has the {{implemented}} badge in Figur's class card and {{inherited}} in the object cards.
 
 Reuse is one of the biggest advantages of inheritance: less code, fewer mistakes. And if you improve the method once, all shapes get better at the same time.` },
+        { k: 'memory', md: `\`drehen90()\` is in the {{Metaspace}} only **once**, with \`Figur\`. Dreieck, Kreis and Stern have no copy of their own – their method tables all point to the same code.
+
+The data, on the other hand, is separate: every shape has its own \`#winkel\` in the {{Heap}}. Code is shared, state is not.` },
         { k: 'remember', md: `Write once, use often.` }
       ]
     },
     {
-      id: 'begriff-null', group: 'begriffe', num: 'B15', nav: 'Reference & null', type: 'concept', demo: 'demo-null',
+      id: 'begriff-null', group: 'begriffe', num: 'B16', nav: 'Reference & null', type: 'concept', demo: 'demo-null',
       title: 'Reference and null',
       blocks: [
         { k: 'short', md: `A name like \`katze1\` is like a pointer to an object. It's called a **reference**. \`null\` means: "This name doesn't point to anything any more."` },
@@ -520,6 +649,9 @@ Reuse is one of the biggest advantages of inheritance: less code, fewer mistakes
         { k: 'inApp', md: `At the very bottom of every object card there's the \`katze1 = null\` button. One click – and the object is gone. **Delete all** does this for all objects at once.
 
 And the numbers? As long as there is still a cat, numbers aren't given out twice. Only when there are **no** cats left does counting start again at \`katze1\`.` },
+        { k: 'memory', md: `The variable \`katze1\` on the {{Stack}} only holds an address. \`katze1 = null\` deletes this address – at first the object in the {{Heap}} simply stays where it is. Once no variable and no field points to it any more, it is **unreachable**. Then the JVM's **garbage collector** removes it at some point and frees the space. The class \`Katze\` in the {{Metaspace}} stays – it's still needed.
+
+OOPlayground is quicker: after \`katze1 = null\` the variable on the stack and the object in the heap disappear at once.` },
         { k: 'remember', md: `Reference = the string to the object. \`null\` = no string any more.` }
       ]
     },
@@ -532,19 +664,19 @@ And the numbers? As long as there is still a cat, numbers aren't given out twice
 2. Choose the language in the top right: **EN** or **DE**.
 3. Are there objects already? Then click **\`[[Delete all]]\`**.
 4. In the output, click **\`[[Clear]]\`**.` },
-        { k: 'watch', md: `- Steps 3 and 4 are worth doing before each new demo. Then the names (\`katze1\`, \`auto1\` …) and the output match the examples exactly.
+        { k: 'watch', md: `- Steps 3 and 4 are worth doing before each new walkthrough. Then the names (\`katze1\`, \`auto1\` …) and the output match the examples exactly.
 - Did a card suddenly close? Just hover over the symbol again.` }
       ]
     },
     {
-      id: 'demo-abstraktion', group: 'vorfuehren', num: 'D1', nav: 'Show abstraction', type: 'demo',
-      title: 'Show abstraction',
+      id: 'demo-abstraktion', group: 'vorfuehren', num: 'D1', nav: 'Discover abstraction', type: 'demo',
+      title: 'Discover abstraction',
       blocks: [
-        { k: 'goal', md: `Show that a class describes only what things have **in common** – the "what", not the "how".` },
+        { k: 'goal', md: `Discover that a class describes only what things have **in common** – the "what", not the "how".` },
         { k: 'steps', md: `1. Hover over **Transport**. The \`abstract class Transport\` card opens.
-2. Read out the **fields**: \`name\`, \`kannFliegen\` (can fly), \`hoechstgeschwindigkeit\` (top speed), \`anzahlRaeder\` (number of wheels), \`motor\` (engine). Add: "**Every** vehicle has these – no matter which one."
-3. Show that almost all fields have **no value** yet. Only \`name\` has the placeholder \`"Unbenannt"\` (unnamed).
-4. Show the **methods**: \`motorStarten()\` and \`bewegen()\` have the {{abstract}} badge. Say: "Every vehicle can do this. But **how** isn't written here yet."
+2. Read the **fields**: \`name\`, \`kannFliegen\` (can fly), \`hoechstgeschwindigkeit\` (top speed), \`anzahlRaeder\` (number of wheels), \`motor\` (engine). **Every** vehicle has these – no matter which one.
+3. Notice that almost all fields have **no value** yet. Only \`name\` has the placeholder \`"Unbenannt"\` (unnamed).
+4. Look at the **methods**: \`motorStarten()\` and \`bewegen()\` have the {{abstract}} badge. That means: every vehicle can do this – but **how** isn't written here yet.
 5. Do the same briefly with **Tier** and with **Figur**.` },
         { k: 'output', md: `Nothing yet – you're only looking at the blueprints.` },
         { k: 'watch', md: `- The class says **what** exists, not exactly **how** it is.
@@ -553,13 +685,13 @@ And the numbers? As long as there is still a cat, numbers aren't given out twice
       related: [{ id: 'begriff-abstraktion', label: 'Abstraction' }, { id: 'begriff-abstrakte-klasse', label: 'Abstract class' }]
     },
     {
-      id: 'demo-abstrakt', group: 'vorfuehren', num: 'D2', nav: 'Show an abstract class', type: 'demo',
-      title: 'Show an abstract class',
+      id: 'demo-abstrakt', group: 'vorfuehren', num: 'D2', nav: 'Try an abstract class', type: 'demo',
+      title: 'Try an abstract class',
       blocks: [
-        { k: 'goal', md: `Show that you **can't** build an object from an abstract class.` },
+        { k: 'goal', md: `Try to build an object from an abstract class – and find out that you **can't**.` },
         { k: 'steps', md: `1. Hover over **Tier**.
-2. Point out the title \`abstract class Tier\`.
-3. Point out the badges: {{abstract}} on \`essen()\` and \`bewegen()\`, {{implemented}} on \`halten()\`.
+2. Read the title: \`abstract class Tier\`.
+3. Look at the badges: {{abstract}} on \`essen()\` and \`bewegen()\`, {{implemented}} on \`halten()\`.
 4. At the very bottom of the card, click **\`[[new Tier()]]\`**. (When you hover over it, it says: "Instantiate directly (forbidden)".)
 5. Look at the **Output**.
 6. If you like: try the same with \`new Transport()\` and \`new Figur()\`.` },
@@ -577,7 +709,7 @@ And the numbers? As long as there is still a cat, numbers aren't given out twice
       id: 'demo-instanziieren', group: 'vorfuehren', num: 'D3', nav: 'Create objects', type: 'demo',
       title: 'Create objects (class → object)',
       blocks: [
-        { k: 'goal', md: `Show how **many** objects are created from **one** class.` },
+        { k: 'goal', md: `See how **many** objects are created from **one** class.` },
         { k: 'steps', md: `1. Hover over **Tier**.
 2. Under **Subclasses**, hover over the **\`[[Katze]]\`** button. It says: "Instantiate".
 3. Click **\`[[Katze]]\`**. \`katze1\` appears under **Created objects**.
@@ -592,17 +724,18 @@ And the numbers? As long as there is still a cat, numbers aren't given out twice
 \`\`\`` },
         { k: 'watch', md: `- **One** class (\`Katze\`) – **three** objects. Each one has its own name.
 - Clicking **Katze** doesn't "initialise" the class – it builds a **new object**: \`new Katze()\`.
-- The fields are filled in straight away. The **constructor** did that while building.` }
+- The fields are filled in straight away. The **constructor** did that while building.
+- Open **memory** at the bottom left: the stack holds three variables, the heap three objects – but the class \`Katze\` exists in the metaspace only **once**.` }
       ],
       related: [{ id: 'begriff-objekt', label: 'Object' }, { id: 'begriff-klasse', label: 'Class' }, { id: 'begriff-instanziierung', label: 'Instantiation' }]
     },
     {
-      id: 'demo-zustand', group: 'vorfuehren', num: 'D4', nav: 'Show state', type: 'demo',
-      title: 'Show state',
+      id: 'demo-zustand', group: 'vorfuehren', num: 'D4', nav: 'Observe state', type: 'demo',
+      title: 'Observe state',
       blocks: [
-        { k: 'goal', md: `Show that every object has its **own state** and that methods can change it.` },
+        { k: 'goal', md: `Observe that every object has its **own state** and that methods can change it.` },
         { k: 'steps', md: `1. Hover over **Transport** and click **\`[[Auto]]\`** twice. Now there are \`auto1\` and \`auto2\`.
-2. Hover over \`auto1\`. In the card, hover over \`Benzinmotor\` (in the \`motor\` field). The engine card opens. Point out: \`laeuft = false\`.
+2. Hover over \`auto1\`. In the card, hover over \`Benzinmotor\` (in the \`motor\` field). The engine card opens. It says: \`laeuft = false\`.
 3. In the \`auto1\` card, click **\`[[Run]]\`** next to \`motorStarten()\`. The car in the picture starts up.
 4. Hover over \`auto1\`'s \`Benzinmotor\` again. Now it says: \`laeuft = true\`.
 5. Hover over \`auto2\` and then over its \`Benzinmotor\`. There it still says: \`laeuft = false\`.
@@ -619,7 +752,8 @@ And the numbers? As long as there is still a cat, numbers aren't given out twice
         { k: 'watch', md: `- Same class, **different** state: \`auto1\`'s engine is running, \`auto2\`'s isn't.
 - The method \`motorStarten()\` **changed** the state (\`false\` → \`true\`).
 - The second time, the car answers differently – it **remembers** its state.
-- After **Run**, the card is redrawn and the engine card closes. That's normal – just open it again.` }
+- After **Run**, the card is redrawn and the engine card closes. That's normal – just open it again.
+- In **memory**, \`laeuft\` is stored in the heap with the engine of \`auto1\`. The engine of \`auto2\` is a different box with its own value.` }
       ],
       related: [{ id: 'begriff-feld', label: 'Field & state' }, { id: 'begriff-objekt', label: 'Object' }]
     },
@@ -627,9 +761,9 @@ And the numbers? As long as there is still a cat, numbers aren't given out twice
       id: 'demo-methode', group: 'vorfuehren', num: 'D5', nav: 'Call a method', type: 'demo',
       title: 'Call a method',
       blocks: [
-        { k: 'goal', md: `Show how to give an object a command and what it answers.` },
+        { k: 'goal', md: `Give an object a command and read what it answers.` },
         { k: 'steps', md: `1. Create a cat: **Tier** → **\`[[Katze]]\`**. \`katze1\` appears.
-2. Hover over \`katze1\`. Point out under **Methods**: \`essen()\` (eat), \`bewegen()\` (move), \`halten()\` (stop).
+2. Hover over \`katze1\`. Under **Methods** you'll find: \`essen()\` (eat), \`bewegen()\` (move), \`halten()\` (stop).
 3. Click **\`[[Run]]\`** next to \`essen()\`. The cat in the picture eats.
 4. Click **\`[[Run]]\`** next to \`bewegen()\`. The cat walks.
 5. Click **\`[[Run]]\`** next to \`halten()\`. The cat stops.` },
@@ -649,13 +783,13 @@ And the numbers? As long as there is still a cat, numbers aren't given out twice
       related: [{ id: 'begriff-methode', label: 'Method' }, { id: 'begriff-nachrichten', label: 'Message passing' }]
     },
     {
-      id: 'demo-vererbung', group: 'vorfuehren', num: 'D6', nav: 'Show inheritance', type: 'demo',
-      title: 'Show inheritance',
+      id: 'demo-vererbung', group: 'vorfuehren', num: 'D6', nav: 'Discover inheritance', type: 'demo',
+      title: 'Discover inheritance',
       blocks: [
-        { k: 'goal', md: `Show that children get everything from their parents – plus something of their own.` },
-        { k: 'steps', md: `1. Hover over **Tier** and read out its fields: \`name\`, \`kannFliegen\` (can fly), \`anzahlBeine\` (number of legs), \`hatSchwanz\` (has a tail), \`kannGestreicheltWerden\` (can be petted).
+        { k: 'goal', md: `Discover that children get everything from their parents – plus something of their own.` },
+        { k: 'steps', md: `1. Hover over **Tier** and read its fields: \`name\`, \`kannFliegen\` (can fly), \`anzahlBeine\` (number of legs), \`hatSchwanz\` (has a tail), \`kannGestreicheltWerden\` (can be petted).
 2. Under **Subclasses**, click **\`[[Katze]]\`**, **\`[[Krokodil]]\`** and **\`[[Mensch]]\`** one after another.
-3. Hover over \`katze1\`. Show: Tier's five fields are there and marked {{inherited}}. At the very bottom is \`schnurrt = true\` (purrs) marked {{own}}.
+3. Hover over \`katze1\`. You'll see: Tier's five fields are there and marked {{inherited}}. At the very bottom is \`schnurrt = true\` (purrs) marked {{own}}.
 4. Hover over \`krokodil1\`. Its own field: \`anzahlZaehne = 66\` (number of teeth).
 5. Hover over \`mensch1\`. Its own field: \`beruf = "Student"\` (job).
 6. Hover over **Tier** once more: these own fields do **not** exist there.` },
@@ -666,18 +800,19 @@ And the numbers? As long as there is still a cat, numbers aren't given out twice
 \`\`\`` },
         { k: 'watch', md: `- The children did **not have to reinvent** Tier's fields – they inherited them.
 - Each child still has **something of its own**.
-- The inherited fields have different **values** in each child: the cat has 4 legs, the human 2.` }
+- The inherited fields have different **values** in each child: the cat has 4 legs, the human 2.
+- In **memory**, \`katze1\` is **one** box with all six fields. In the metaspace, on the other hand, \`Katze\` only lists \`schnurrt\` – the rest is listed with \`Tier\`.` }
       ],
       related: [{ id: 'begriff-vererbung', label: 'Inheritance' }]
     },
     {
-      id: 'demo-ueberschreiben', group: 'vorfuehren', num: 'D7', nav: 'Show overriding', type: 'demo',
-      title: 'Show overriding',
+      id: 'demo-ueberschreiben', group: 'vorfuehren', num: 'D7', nav: 'Try overriding', type: 'demo',
+      title: 'Try overriding',
       blocks: [
-        { k: 'goal', md: `Show that children can rewrite an inherited method in their own way – or simply take it over as it is.` },
-        { k: 'before', md: `**Before you start:** \`katze1\`, \`krokodil1\` and \`mensch1\` should exist (see [Show inheritance](#demo-vererbung)).` },
-        { k: 'steps', md: `1. Hover over **Tier**. Point out: \`essen()\` is {{abstract}}, \`halten()\` is {{implemented}}.
-2. Hover over \`katze1\`. Point out: \`essen()\` and \`bewegen()\` are {{overridden}}, \`halten()\` is {{inherited}}.
+        { k: 'goal', md: `Try out how children can rewrite an inherited method in their own way – or simply take it over as it is.` },
+        { k: 'before', md: `**Before you start:** \`katze1\`, \`krokodil1\` and \`mensch1\` should exist (see [Discover inheritance](#demo-vererbung)).` },
+        { k: 'steps', md: `1. Hover over **Tier**. You'll see: \`essen()\` is {{abstract}}, \`halten()\` is {{implemented}}.
+2. Hover over \`katze1\`. You'll see: \`essen()\` and \`bewegen()\` are {{overridden}}, \`halten()\` is {{inherited}}.
 3. Click **\`[[Run]]\`** next to \`essen()\` – first on \`katze1\`, then on \`krokodil1\`, then on \`mensch1\`.
 4. Click **\`[[Run]]\`** next to \`halten()\` – on \`katze1\` and on \`krokodil1\`.` },
         { k: 'output', md: `\`\`\`console
@@ -698,12 +833,12 @@ And the numbers? As long as there is still a cat, numbers aren't given out twice
       related: [{ id: 'begriff-ueberschreiben', label: 'Overriding' }, { id: 'begriff-vererbung', label: 'Inheritance' }]
     },
     {
-      id: 'demo-polymorphie', group: 'vorfuehren', num: 'D8', nav: 'Show polymorphism', type: 'demo',
-      title: 'Show polymorphism',
+      id: 'demo-polymorphie', group: 'vorfuehren', num: 'D8', nav: 'Experience polymorphism', type: 'demo',
+      title: 'Experience polymorphism',
       blocks: [
-        { k: 'goal', md: `Show that **one** command makes **different** objects do **different** things.` },
+        { k: 'goal', md: `Experience how **one** command makes **different** objects do **different** things.` },
         { k: 'steps', md: `1. Click **\`[[Delete all]]\`**, and **\`[[Clear]]\`** in the output.
-2. Create a shape: **Figur** → **\`[[Dreieck]]\`**. Point out: **Move all** is still grey – shapes can't move.
+2. Create a shape: **Figur** → **\`[[Dreieck]]\`**. Notice: **Move all** is still grey – shapes can't move.
 3. Create three animals: **Tier** → **\`[[Katze]]\`**, **\`[[Krokodil]]\`**, **\`[[Mensch]]\`**. Now **Move all** is active.
 4. Create three vehicles: **Transport** → **\`[[Auto]]\`**, **\`[[Flugzeug]]\`**, **\`[[Zug]]\`**.
 5. Click **\`[[Move all]]\`**. All animals and vehicles move at the same time – each one differently.` },
@@ -719,20 +854,21 @@ And the numbers? As long as there is still a cat, numbers aren't given out twice
         { k: 'watch', md: `- **One** command – **six** different answers.
 - The program never asks "Are you a cat?". It simply calls \`bewegen()\` on everyone. Each object knows by itself how to move.
 - \`dreieck1\` is missing from the list: shapes have no \`bewegen()\` method, so they aren't asked at all.
-- Polymorphism works because each child has **overridden** \`bewegen()\`.` }
+- Polymorphism works because each child has **overridden** \`bewegen()\`.
+- In **memory** you can see how it works: hover over an object – its class in the metaspace lights up. That's where the JVM looks up the matching \`bewegen()\` on every call (dynamic dispatch).` }
       ],
       related: [{ id: 'begriff-polymorphie', label: 'Polymorphism' }, { id: 'begriff-ueberschreiben', label: 'Overriding' }]
     },
     {
-      id: 'demo-kapselung', group: 'vorfuehren', num: 'D9', nav: 'Show encapsulation', type: 'demo',
-      title: 'Show encapsulation',
+      id: 'demo-kapselung', group: 'vorfuehren', num: 'D9', nav: 'Test encapsulation', type: 'demo',
+      title: 'Test encapsulation',
       blocks: [
-        { k: 'goal', md: `Show that the inside of the engine is secret and that you can only start it the allowed way.` },
+        { k: 'goal', md: `Test whether you can get at the inside of the engine – and find out: it's secret, and you can only start it the allowed way.` },
         { k: 'steps', md: `1. Create a car: **Transport** → **\`[[Auto]]\`**. \`auto1\` appears.
 2. Hover over \`auto1\` and then over \`Benzinmotor\`. The engine card \`class Benzinmotor extends Motor\` opens.
-3. Point out the methods: at the top \`public void starten()\` (start), below it three grey \`private\` methods: \`kraftstoffEinspritzen()\` (inject fuel), \`zuenden()\` (ignite), \`kolbenBewegen()\` (move pistons).
+3. Look at the methods: at the top \`public void starten()\` (start), below it three grey \`private\` methods: \`kraftstoffEinspritzen()\` (inject fuel), \`zuenden()\` (ignite), \`kolbenBewegen()\` (move pistons).
 4. Click **\`[[test]]\`** next to \`kraftstoffEinspritzen()\`. A red error appears in the output.
-5. Read out the hint on the card: "Only motorStarten() is called on the transport object."
+5. Read the hint on the card: "Only motorStarten() is called on the transport object."
 6. Click **\`[[Show implementation]]\`**. A list opens:
    1. \`kraftstoffEinspritzen()  →  Fuel is injected\`
    2. \`zuenden()  →  Spark ignites the mixture\`
@@ -754,10 +890,10 @@ And the numbers? As long as there is still a cat, numbers aren't given out twice
       related: [{ id: 'begriff-kapselung', label: 'Encapsulation' }]
     },
     {
-      id: 'demo-nachrichten', group: 'vorfuehren', num: 'D10', nav: 'Show message passing', type: 'demo',
-      title: 'Show message passing',
+      id: 'demo-nachrichten', group: 'vorfuehren', num: 'D10', nav: 'Follow message passing', type: 'demo',
+      title: 'Follow message passing',
       blocks: [
-        { k: 'goal', md: `Show how objects send each other messages to get a job done.` },
+        { k: 'goal', md: `Follow how objects send each other messages to get a job done.` },
         { k: 'steps', md: `1. Create a train: **Transport** → **\`[[Zug]]\`**. \`zug1\` appears.
 2. Hover over \`zug1\` and click **\`[[Run]]\`** next to \`motorStarten()\`.
 3. Read the output line by line:
@@ -790,11 +926,11 @@ You ──motorStarten()──▶ zug1 ──starten()──▶ Elektromotor
       related: [{ id: 'begriff-nachrichten', label: 'Message passing' }, { id: 'begriff-methode', label: 'Method' }, { id: 'begriff-komposition', label: 'Composition & delegation' }]
     },
     {
-      id: 'demo-komposition', group: 'vorfuehren', num: 'D11', nav: 'Show composition', type: 'demo',
-      title: 'Show composition',
+      id: 'demo-komposition', group: 'vorfuehren', num: 'D11', nav: 'Discover composition', type: 'demo',
+      title: 'Discover composition',
       blocks: [
-        { k: 'goal', md: `Show that a vehicle **has** an engine – as an object of its own.` },
-        { k: 'steps', md: `1. Hover over **Transport**. Point out the field \`Motor motor;\` – its type isn't a number or text but a **class**: \`Motor\`.
+        { k: 'goal', md: `Discover that a vehicle **has** an engine – as an object of its own.` },
+        { k: 'steps', md: `1. Hover over **Transport**. Look at the field \`Motor motor;\` – its type isn't a number or text but a **class**: \`Motor\`.
 2. Create **\`[[Auto]]\`**, **\`[[Flugzeug]]\`** and **\`[[Zug]]\`**.
 3. Hover over \`auto1\` and then over its \`motor\` field → engine card **Benzinmotor**: \`typ = "Benzin"\`, \`leistung = 150\` (hp).
 4. Hover over \`flugzeug1\` → **Turbofan**: \`leistung = 120\` (kN).
@@ -806,18 +942,19 @@ You ──motorStarten()──▶ zug1 ──starten()──▶ Elektromotor
 \`\`\`` },
         { k: 'watch', md: `- Each vehicle **has an** engine. But no vehicle **is an** engine – that's why this isn't inheritance but **composition**.
 - The engine is an **object of its own** with its own card, its own fields and its own methods.
-- All three vehicles start their engine with the same method \`motorStarten()\`. Each one **delegates** the work to its own engine – and each engine does it differently (see **Show implementation**).` }
+- All three vehicles start their engine with the same method \`motorStarten()\`. Each one **delegates** the work to its own engine – and each engine does it differently (see **Show implementation**).
+- In **memory** there are **two** objects in the heap for every vehicle: the vehicle and its engine. The field \`motor\` only holds the engine's address.` }
       ],
       related: [{ id: 'begriff-komposition', label: 'Composition & delegation' }, { id: 'begriff-nachrichten', label: 'Message passing' }]
     },
     {
-      id: 'demo-wiederverwendung', group: 'vorfuehren', num: 'D12', nav: 'Show reuse', type: 'demo',
-      title: 'Show reuse',
+      id: 'demo-wiederverwendung', group: 'vorfuehren', num: 'D12', nav: 'Try reuse', type: 'demo',
+      title: 'Try reuse',
       blocks: [
-        { k: 'goal', md: `Show that a method written only once is used by all the children.` },
-        { k: 'steps', md: `1. Hover over **Figur**. Point out: \`drehen90()\` has {{implemented}} – it's already finished, not abstract!
+        { k: 'goal', md: `Find out how a method written only once is used by all the children.` },
+        { k: 'steps', md: `1. Hover over **Figur**. Notice: \`drehen90()\` has {{implemented}} – it's already finished, not abstract!
 2. Create **\`[[Dreieck]]\`**, **\`[[Kreis]]\`** and **\`[[Stern]]\`**.
-3. Hover over \`dreieck1\`. Point out: \`drehen90()\` has {{inherited}}.
+3. Hover over \`dreieck1\`. Here \`drehen90()\` has {{inherited}}.
 4. Click **\`[[Run]]\`** next to \`drehen90()\` – on \`dreieck1\`, \`kreis1\` and \`stern1\`. The shapes rotate.
 5. Click **Run** on \`dreieck1\` three more times. The triangle turns all the way round.` },
         { k: 'output', md: `\`\`\`console
@@ -847,7 +984,7 @@ You ──motorStarten()──▶ zug1 ──starten()──▶ Elektromotor
       id: 'demo-null', group: 'vorfuehren', num: 'D13', nav: 'Delete objects (null)', type: 'demo',
       title: 'Delete objects with null',
       blocks: [
-        { k: 'goal', md: `Show what happens when a name no longer points to an object.` },
+        { k: 'goal', md: `See what happens when a name no longer points to an object.` },
         { k: 'steps', md: `1. Click **\`[[Delete all]]\`** and **\`[[Clear]]\`**.
 2. Create two cats: **Tier** → **\`[[Katze]]\`** twice. There are now \`katze1\` and \`katze2\`.
 3. Hover over \`katze1\` and click **\`[[katze1 = null]]\`** at the very bottom. \`katze1\` disappears, \`katze2\` stays.
@@ -866,9 +1003,39 @@ You ──motorStarten()──▶ zug1 ──starten()──▶ Elektromotor
 \`\`\`` },
         { k: 'watch', md: `- \`katze1 = null\` means: "The name \`katze1\` doesn't point to anything any more." After that the object can't be reached.
 - Deleting \`katze1\` does **not** affect \`katze2\` – every object is independent.
-- As long as a cat is still alive, no name is given out twice. Only when none are left does counting start again.` }
+- As long as a cat is still alive, no name is given out twice. Only when none are left does counting start again.
+- In **memory**, after \`katze1 = null\` the variable on the stack and the object in the heap are gone. The class \`Katze\` stays in the metaspace.` }
       ],
       related: [{ id: 'begriff-null', label: 'Reference & null' }]
+    },
+    {
+      id: 'demo-speicher', group: 'vorfuehren', num: 'D14', nav: 'Look into memory', type: 'demo',
+      title: 'Look into memory',
+      blocks: [
+        { k: 'goal', md: `Find out where variables, objects and classes are stored in the JVM's memory.` },
+        { k: 'steps', md: `1. Click **\`[[Delete all]]\`** and, in the output, **\`[[Clear]]\`**.
+2. Click the button with the memory icon at the bottom left. (When you hover over it, it says: "Take a look into memory".) You'll see: stack and heap are empty – but all classes are already in the metaspace.
+3. Close the window with **×** and create **Tier** → **\`[[Katze]]\`** and **Transport** → **\`[[Auto]]\`**.
+4. Open memory again. You'll see: the stack holds \`Katze katze1\` and \`Auto auto1\`. The heap holds **three** boxes: \`katze1\`, \`auto1\` and its \`Benzinmotor\`.
+5. On the stack, hover over the address of \`katze1\`. The variable, the object and the class \`Katze\` light up.
+6. In the heap, hover over the address at the field \`motor\` of \`auto1\`. Now the petrol engine and its class light up.
+7. Close the window and click **\`[[Run]]\`** next to \`motorStarten()\` on \`auto1\`. Open memory straight away: the frame \`Auto.motorStarten()\` is briefly on top of the stack, and the engine now shows \`laeuft = true\`.
+8. Close the window, click **\`[[katze1 = null]]\`** on \`katze1\` and open memory once more.` },
+        { k: 'output', md: `\`\`\`console
+> Object katze1 was created.
+> Object auto1 was created.
+> auto1.motorStarten()
+  Engine started!
+  Engine started successfully.
+> katze1 = null
+  Object katze1 was deleted.
+\`\`\`` },
+        { k: 'watch', md: `- The metaspace never changes: the classes are there before the first object is built, and they stay when all objects are gone.
+- A car with an engine is **two** objects in the heap, but only **one** variable on the stack. You can only reach the engine through the car.
+- The frame of \`motorStarten()\` only stays for about two seconds. Missed it? No problem – the field \`laeuft\` still shows that the method ran.
+- After \`katze1 = null\` the variable and the object are gone. The class \`Katze\` stays in the metaspace.` }
+      ],
+      related: [{ id: 'begriff-speicher', label: 'Memory (JVM)' }, { id: 'begriff-objekt', label: 'Object' }, { id: 'begriff-null', label: 'Reference & null' }]
     }
   ]
 };

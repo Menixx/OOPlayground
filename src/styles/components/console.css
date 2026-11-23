@@ -6,12 +6,5 @@
 .zeile.fehler { color: #fca5a5; }
 .zeile.ergebnis { color: #86efac; }
 
-/* Scrollbar der Konsole: wie in den Karten (ohne Hintergrund, dünner runder Slider), aber heller Slider auf dunklem Grund */
-.out::-webkit-scrollbar { width: 8px; height: 8px; background: transparent; }
-.out::-webkit-scrollbar-track { background: transparent; margin: 10px 0; }
-.out::-webkit-scrollbar-corner { background: transparent; }
-.out::-webkit-scrollbar-thumb { background: #94a3b8; border: 2px solid transparent; background-clip: padding-box; border-radius: 99px; }
-.out::-webkit-scrollbar-thumb:hover { background: #cbd5e1; background-clip: padding-box; }
-@supports not selector(::-webkit-scrollbar) {
-  .out { scrollbar-width: thin; scrollbar-color: #94a3b8 transparent; }
-}
+/* Scrollbar der Konsole: Standard aus base.css, aber heller Slider auf dunklem Grund */
+.out { --thumb: #94a3b8; --thumb-hover: #cbd5e1; }

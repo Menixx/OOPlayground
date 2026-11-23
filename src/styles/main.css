@@ -9,6 +9,7 @@
 @import './components/object-card.css';
 @import './components/engine-popover.css';
 @import './components/console.css';
+@import './components/memory.css';
 @import './responsive.css';
 
 /* Verspielte Schrift für die ganze Hauptseite; Code-Texte bleiben bei var(--mono) */

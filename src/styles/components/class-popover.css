@@ -19,16 +19,6 @@
 .erbe { display: grid; justify-items: center; gap: 2px; padding: 6px 10px; }
 .versuch { font-family: var(--mono); font-size: 12px; }
 
-/* Scrollbar der Karten: kein Hintergrund, nur ein dünner, runder Slider.
-   Track-Margin hält den Slider von den abgerundeten Ecken fern. */
-.pop::-webkit-scrollbar { width: 8px; height: 8px; background: transparent; }
-.pop::-webkit-scrollbar-track { background: transparent; margin: 10px 0; }
-.pop::-webkit-scrollbar-corner { background: transparent; }
-.pop::-webkit-scrollbar-thumb { background: var(--thumb); border: 2px solid transparent; background-clip: padding-box; border-radius: 99px; }
-.pop::-webkit-scrollbar-thumb:hover { background: var(--thumb-hover); background-clip: padding-box; }
-@supports not selector(::-webkit-scrollbar) {
-  .pop { scrollbar-width: thin; scrollbar-color: var(--thumb) transparent; }
-}
 
 /* Tooltip der „new Tier()“-Schaltfläche: linksbündig an der Schaltfläche, bleibt innerhalb der Karte */
 .pop .versuch[data-tip]:hover::after,

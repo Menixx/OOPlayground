@@ -1,4 +1,5 @@
 /* Abzeichen (Tags) der Karten – auch auf der Erklärungsseite benutzt */
 .tag { margin-left: auto; font: 600 11px var(--sans); padding: 1px 8px; border-radius: 99px; background: var(--btn); color: var(--muted); border: 1px solid var(--line-soft); }
 .tag.eigen { background: var(--tag-eigen-bg); color: var(--tag-eigen-text); border-color: var(--tag-eigen-line); } .tag.ueber { background: var(--tag-ueber-bg); color: var(--tag-ueber-text); border-color: var(--tag-ueber-line); }
+.tag.stack { background: var(--stack-bg); color: var(--stack); border-color: var(--stack-line); } .tag.heap { background: var(--heap-bg); color: var(--heap); border-color: var(--heap-line); } .tag.meta { background: var(--meta-bg); color: var(--meta); border-color: var(--meta-line); }
 .tag.abstract { background: var(--tag-abstract-bg); color: var(--tag-abstract-text); border-color: var(--tag-abstract-line); } .tag.impl { background: var(--tag-impl-bg); color: var(--tag-impl-text); border-color: var(--tag-impl-line); }

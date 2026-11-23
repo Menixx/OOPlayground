@@ -1,0 +1,110 @@
+/* Blick in den Speicher (Memory.js) – Farben der Bereiche: variables.css (--stack / --heap / --meta) */
+
+/* ---------- Schaltfläche unten links ---------- */
+.mem-btn {
+  --mem-btn-bg: var(--bg);
+  position: fixed; left: 16px; bottom: 16px; z-index: 900;
+  display: grid; place-items: center; width: 52px; height: 52px; padding: 0;
+  border-radius: 14px; color: var(--stack-strip); background: linear-gradient(var(--btn-a), var(--btn-b));
+  box-shadow: var(--shine), var(--shadow-2);
+}
+.mem-btn svg { width: 32px; height: 32px; }
+.mem-btn:hover:not(:disabled) { box-shadow: var(--shine), var(--shadow-3); }
+/* Tooltip rechts neben der Schaltfläche (am linken Rand wäre er sonst abgeschnitten) */
+.mem-btn[data-tip]:hover::after, .mem-btn[data-tip]:focus-visible::after {
+  left: calc(100% + 10px); bottom: 50%; transform: translateY(50%); font-size: 12px; padding: 4px 10px;
+}
+/* Demonstration: Statusleiste rückt neben die Schaltfläche */
+body:has(.mem-btn) .sync-badge { left: 80px; }
+
+/* ---------- Fenster ---------- */
+.mem-backdrop {
+  position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 24px;
+  background: rgba(2, 6, 23, .62); animation: mem-ein 180ms ease;
+}
+.mem {
+  position: relative; display: flex; flex-direction: column; gap: 6px;
+  width: min(1200px, 100%); height: min(760px, calc(100vh - 48px)); box-sizing: border-box;
+  padding: 22px 24px 24px; border-radius: 20px;
+  color: var(--text); background: var(--bg); border: 1px solid var(--line);
+  box-shadow: var(--shadow-3); font-family: var(--fun);
+  animation: mem-auf 220ms cubic-bezier(.2, .8, .2, 1);
+}
+.mem-zu {
+  position: absolute; top: 6px; right: 8px; display: grid; place-items: center; width: 48px; height: 48px;
+  border: 0; border-radius: 50%; background: transparent; color: var(--muted);
+  font: 400 34px/1 var(--sans); box-shadow: none;
+}
+.mem-zu:hover:not(:disabled), .mem-zu:focus-visible { background: transparent; color: var(--text); transform: none; box-shadow: none; }
+.mem .mem-titel { display: block; margin: 0; font: 700 20px/1.25 var(--fun); }
+.mem .mem-titel::before { content: none; display: none; } /* globale h2-Markierung */
+.mem-hinweis { margin: 0 48px 8px 0; color: var(--muted); font-size: 14px; }
+
+.mem-bereiche { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1.25fr 1.1fr; gap: 14px; }
+.mem-bereich {
+  display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+  border-radius: 14px; background: var(--b-bg); border: 1px solid var(--b-line);
+}
+.mem-stack { --b: var(--stack); --b-strip: var(--stack-strip); --b-bg: var(--stack-bg); --b-line: var(--stack-line); }
+.mem-heap  { --b: var(--heap);  --b-strip: var(--heap-strip);  --b-bg: var(--heap-bg);  --b-line: var(--heap-line); }
+.mem-meta  { --b: var(--meta);  --b-strip: var(--meta-strip);  --b-bg: var(--meta-bg);  --b-line: var(--meta-line); }
+.mem-kopf { padding: 10px 14px 10px 18px; border-left: 6px solid var(--b-strip); border-bottom: 1px solid var(--b-line); }
+.mem-kopf h3 { margin: 0; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--b); }
+.mem-kopf p { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+.mem-inhalt { flex: 1; min-height: 0; overflow: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; overscroll-behavior: contain; }
+.mem-leer { margin: 4px 2px; color: var(--muted); font-size: 13px; }
+
+/* Frames, Objekte, Klassen: weiße Karten im farbigen Bereich */
+.mem-frame, .mem-objekt, .mem-klassenkarte {
+  background: var(--bg); border: 1px solid var(--b-line);
+  border-radius: 10px; padding: 8px 10px; box-shadow: var(--shadow-1);
+  transition: box-shadow var(--t), outline-color var(--t);
+  outline: 2px solid transparent; outline-offset: 1px;
+}
+.mem-frame-kopf, .mem-objekt-kopf { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
+.mem-frame-kopf small, .mem-objekt-kopf small { color: var(--muted); font-size: 11px; }
+.mem-frame-kopf code, .mem-objekt-kopf code { font-size: 13px; }
+.mem-zeilen { list-style: none; margin: 6px 0 0; padding: 6px 0 0; border-top: 1px dashed var(--line-soft); display: grid; gap: 2px; }
+.mem-zeilen li { font-size: 12px; overflow-wrap: anywhere; }
+.mem-zeilen code { font-size: 12px; }
+.mem-zeilen li.privat, .mem-zeilen li.privat .feld { color: var(--muted); }
+.mem-adr { color: var(--heap); font-weight: 600; }
+
+/* Stack: Frames stapeln sich – der aktuelle Aufruf liegt oben */
+.mem-frame.aktiv { border-color: var(--methode); animation: mem-frame 300ms ease; }
+.mem-frame.aktiv .mem-frame-kopf code { color: var(--methode); font-weight: 600; }
+
+/* Referenz (Adresse) – zeigt in den Heap */
+.mem-ref {
+  display: inline-block; padding: 0 6px; border-radius: 6px; font: 600 12px var(--mono);
+  color: var(--heap); background: var(--heap-bg); border: 1px solid var(--heap-line); cursor: default;
+}
+.mem-ref.hell { background: var(--heap-strip); color: #fff; border-color: var(--heap-strip); }
+.mem-objekt.hell, .mem-klassenkarte.hell { outline-color: var(--b-strip); box-shadow: var(--shadow-3); }
+.mem-klasse { margin-left: auto; font: 600 11px var(--mono); color: var(--meta); cursor: default; }
+.mem-objekt { cursor: default; }
+
+/* Metaspace: Klassen nach Familie gruppiert – unveränderlich während das Programm läuft */
+.mem-gruppe { display: grid; gap: 6px; }
+.mem-gruppe + .mem-gruppe { padding-top: 10px; border-top: 1px solid var(--b-line); }
+.mem-klassenkarte { padding: 6px 10px; }
+.mem-klassenkarte .mem-zeilen { margin-top: 4px; padding-top: 4px; }
+
+/* Neu erzeugt: kurz aufleuchten */
+.mem-objekt.neu, .mem-zeilen li.neu { animation: mem-neu 1.4s ease; }
+@keyframes mem-neu { 0%, 30% { background: var(--b-bg); box-shadow: 0 0 0 3px var(--b-strip); } }
+.mem-stack .mem-zeilen li.neu { border-radius: 4px; }
+@keyframes mem-frame { from { opacity: 0; transform: translateY(-6px); } }
+@keyframes mem-ein { from { opacity: 0; } }
+@keyframes mem-auf { from { opacity: 0; transform: translateY(8px) scale(.98); } }
+
+/* Nur Computer-Version: auf schmalen Bildschirmen ausgeblendet */
+@media (max-width: 600px) {
+  .mem-btn, .mem-backdrop { display: none; }
+  body:has(.mem-btn) .sync-badge { left: 12px; }
+}
+@media (max-width: 900px) {
+  .mem-bereiche { grid-template-columns: 1fr; overflow: auto; }
+  .mem-bereich { min-height: 260px; }
+}
+@media print { .mem-btn, .mem-backdrop { display: none; } }

@@ -105,6 +105,9 @@ body.drawer-open { overflow: hidden; }
 .box-short { background: var(--panel); border-left: 4px solid var(--feld); border-radius: 0 12px 12px 0; font-size: 18px; }
 .box-goal { background: var(--panel); border-left: 4px solid var(--methode); border-radius: 0 12px 12px 0; }
 .box-remember { border: 2px dashed var(--line); border-radius: 12px; font-weight: 600; }
+/* „Im Speicher“: Leiste in den drei Farben der Speicherbereiche (Stack · Heap · Metaspace) */
+.block-memory { position: relative; padding: 14px 18px 14px 22px; background: var(--panel); border-radius: 0 12px 12px 0; }
+.block-memory::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(var(--stack-strip) 0 33.3%, var(--heap-strip) 33.3% 66.6%, var(--meta-strip) 66.6%); }
 .life-row { display: flex; gap: 14px; align-items: flex-start; }
 .life-icon { flex: none; display: grid; place-items: center; width: 42px; height: 42px; margin-top: 2px; border: 1px solid var(--line-soft); border-radius: 50%; background: var(--panel); font-size: 22px; line-height: 1; }
 .life-row > div { min-width: 0; }

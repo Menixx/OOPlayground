@@ -38,3 +38,16 @@ button:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
 :root.theme-wechsel-css, :root.theme-wechsel-css * { transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease, fill 300ms ease !important; }
 /* Dunkles Schema: Symbole der abstrakten Klassen sind schwarze Strichzeichnungen -> hell umkehren */
 :root[data-theme="dark"] img.icon[src*="abstrakt-"] { filter: invert(1) brightness(.85); }
+
+/* Scrollbars (Standard für alle Bereiche): kein Hintergrund, keine Pfeile, nur ein dünner, runder Slider.
+   Track-Margin hält den Slider von abgerundeten Ecken fern. Farben: --thumb / --thumb-hover (pro Bereich überschreibbar). */
+::-webkit-scrollbar { width: 8px; height: 8px; background: transparent; }
+::-webkit-scrollbar-track { background: transparent; margin: 10px 0; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+::-webkit-scrollbar-thumb { background: var(--thumb); border: 2px solid transparent; background-clip: padding-box; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--thumb-hover); background-clip: padding-box; }
+/* Standard-Eigenschaften nur ohne ::-webkit-scrollbar (Firefox) – in Chromium würden sie die Regeln oben ersetzen */
+@supports not selector(::-webkit-scrollbar) {
+  * { scrollbar-width: thin; scrollbar-color: var(--thumb) transparent; }
+}

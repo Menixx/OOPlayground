@@ -34,6 +34,10 @@
   --note-bg: #fffbeb; --note-line: #f59e0b;
   /* Konsole: in beiden Schemata dunkel */
   --console: #0b1220; --console-line: #020617; --console-lip: rgba(255,255,255,.8);
+  /* Speicherbereiche der JVM – Farben der Folie „Die Java Virtual Machine“ (Leiste + Fläche) */
+  --stack-strip: #0369a1; --stack-bg: #e0f2fe; --stack: #0369a1; --stack-line: #bae6fd;
+  --heap-strip: #d97706;  --heap-bg: #fef3c7;  --heap: #b45309;  --heap-line: #fcd34d;
+  --meta-strip: #7c3aed;  --meta-bg: #ede9fe;  --meta: #6d28d9;  --meta-line: #c4b5fd;
 
   --sans: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --fun: Quicksand, system-ui, -apple-system, 'Segoe UI', sans-serif; /* Hauptseite + Kopfleiste der Erklärung */
@@ -70,4 +74,7 @@
   --chip-bg: #172f55; --chip-hover-bg: #1e3a6a; --chip-text: #bfdbfe; --chip-line: #1e40af; --chip-hover-line: #3b82f6;
   --note-bg: #2f2410; --note-line: #f59e0b;
   --console: #060b16; --console-line: #020617; --console-lip: rgba(255,255,255,.05);
+  --stack-strip: #0284c7; --stack-bg: #0d2536; --stack: #7dd3fc; --stack-line: #164e6e;
+  --heap-strip: #d97706;  --heap-bg: #2e220c;  --heap: #fbbf24; --heap-line: #78450d;
+  --meta-strip: #7c3aed;  --meta-bg: #221a40;  --meta: #c4b5fd; --meta-line: #4c2f99;
 }

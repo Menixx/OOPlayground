@@ -10,7 +10,9 @@ const TAGS = {
   geerbt: '', inherited: '',
   eigen: 'eigen', own: 'eigen',
   'überschrieben': 'ueber', overridden: 'ueber',
-  abstract: 'abstract', implemented: 'impl'
+  abstract: 'abstract', implemented: 'impl',
+  // Speicherbereiche der JVM – Farben wie im Fenster „Speicher“ des OOPlayground
+  Stack: 'stack', Heap: 'heap', Metaspace: 'meta'
 };
 
 const chip = (text) => `<span class="ui-chip">${text}</span>`;
@@ -153,6 +155,7 @@ function begriffBlock({ k, md: text }) {
       return `<div class="block block-life">${h4(t('docs.life'))}<div class="life-row">${icon}<div>${md(m ? text.slice(m[0].length) : text)}</div></div></div>`;
     }
     case 'inApp': return `<div class="block">${h4(t('docs.inApp'))}${md(text)}</div>`;
+    case 'memory': return `<div class="block block-memory">${h4(t('docs.memory'))}${md(text)}</div>`;
     case 'remember': return `<div class="box box-remember">${h4(t('docs.remember'))}${md(text)}</div>`;
     case 'code': return `<details class="code-details"><summary>${h4(t('docs.code'))}</summary>${md(text)}</details>`;
     default: return md(text);

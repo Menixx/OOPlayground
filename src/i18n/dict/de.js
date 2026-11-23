@@ -32,7 +32,8 @@ export default {
   'docs.inApp': 'Im OOPlayground',
   'docs.remember': 'Merke',
   'docs.code': 'Ein bisschen Code (für Neugierige)',
-  'docs.showDemo': '▶ So zeigst du es',
+  'docs.memory': 'Im Speicher',
+  'docs.showDemo': '▶ Selbst ausprobieren',
   'docs.goal': 'Ziel',
   'docs.steps': 'Schritte',
   'docs.output': 'Das siehst du in der Ausgabe',
@@ -43,7 +44,7 @@ export default {
   'docs.pillar': 'Säule {n} von 4',
   'docs.part1': 'Teil 1: Die Oberfläche',
   'docs.part2': 'Teil 2: Die Begriffe',
-  'docs.part3': 'Teil 3: Vorführen – Schritt für Schritt',
+  'docs.part3': 'Teil 3: Ausprobieren – Schritt für Schritt',
   'docs.zoneHeader': 'Kopfzeile',
 
   // Arbeitsfläche & Konsole
@@ -141,6 +142,18 @@ export default {
   'auto.bewegen': 'Fährt auf der Straße',
   'flugzeug.bewegen': 'Fliegt durch die Luft',
   'zug.bewegen': 'Fährt auf Schienen',
+
+  // Blick in den Speicher (JVM)
+  'mem.tip': 'Einen Blick in den Speicher werfen',
+  'mem.titel': 'Speicher der JVM',
+  'mem.hinweis': 'So liegt dein Programm gerade im Speicher. Fahre über eine Adresse, um zu sehen, wohin sie zeigt.',
+  'mem.schliessen': 'Schließen',
+  'mem.stackText': 'Pro Methodenaufruf ein Frame: lokale Variablen, Parameter, Referenzen',
+  'mem.heapText': 'Alle Objekte mit ihren Feldern',
+  'mem.metaText': 'Beschreibung der Klassen: Felder, Methoden-Bytecode, static-Felder',
+  'mem.frame': 'Frame',
+  'mem.stackLeer': 'Noch keine lokalen Variablen.',
+  'mem.heapLeer': 'Noch keine Objekte. new Katze() legt hier ein Objekt an.',
 
   // Werte von String-Feldern (Schlüssel = gespeicherter Wert im Objekt)
   'value.Unbenannt': 'Unbenannt',
