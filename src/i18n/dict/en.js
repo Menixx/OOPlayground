@@ -10,6 +10,7 @@ export default {
   'theme.system': 'Theme: follows the system – click for light',
   'header.docs': 'Guide',
   'header.docsTip': 'Open the guide in a new tab',
+  'header.docsTipDemo': 'Open the guide', // Demonstration: gleicher Tab
   'header.menu': 'Menu',
   'section.classes': 'Abstract classes',
   'section.objects': 'Created objects',
@@ -116,6 +117,12 @@ export default {
   'sync.qrCode': 'Room code',
   'sync.qrOeffnen': 'Show QR code for the remote',
   'sync.schliessen': 'Close',
+  'sync.gesperrt': 'locked',
+  'sync.gesperrtTitel': 'Mouse and keyboard are locked – the screen only follows the remote',
+  'sync.sperreAn': 'The screen only follows the remote. Mouse and keyboard are locked.',
+  'sync.sperreAus': 'Mouse and keyboard are unlocked. Changes made here do not reach the remote.',
+  'sync.entsperren': 'Unlock screen',
+  'sync.sperren': 'Lock screen',
 
   'figur.drehen': '{name} was rotated by 90° (now {winkel}°).',
   'tier.halten': '{name} stops.',

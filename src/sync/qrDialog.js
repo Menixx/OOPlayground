@@ -25,7 +25,7 @@ function qrSvg(text) {
 }
 
 let backdrop = null;
-let daten = null;      // { url, raum }
+let daten = null;      // { url, raum, gesperrt, umschalten }
 let vorherFokus = null;
 
 export const qrOffen = () => Boolean(backdrop);
@@ -39,7 +39,11 @@ function zeichnen() {
     el('p', { class: 'sync-qr-hinweis' }, t('sync.qrHinweis')),
     el('div', { class: 'sync-qr-bild' }, qrSvg(daten.url)),
     el('div', { class: 'sync-qr-zeile' }, el('span', { class: 'sync-qr-label' }, t('sync.qrLink')), el('code', { class: 'sync-qr-url' }, daten.url)),
-    el('div', { class: 'sync-qr-zeile' }, el('span', { class: 'sync-qr-label' }, t('sync.qrCode')), el('b', { class: 'sync-qr-raum' }, daten.raum)));
+    el('div', { class: 'sync-qr-zeile' }, el('span', { class: 'sync-qr-label' }, t('sync.qrCode')), el('b', { class: 'sync-qr-raum' }, daten.raum)),
+    daten.umschalten && el('div', { class: 'sync-qr-sperre' },
+      el('p', {}, t(daten.gesperrt ? 'sync.sperreAn' : 'sync.sperreAus')),
+      el('button', { type: 'button', class: 'sync-qr-sperrknopf', onclick: daten.umschalten },
+        t(daten.gesperrt ? 'sync.entsperren' : 'sync.sperren'))));
   backdrop.replaceChildren(box);
   return zu;
 }
@@ -49,14 +53,17 @@ function taste(e) {
   if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); schliesseQr(); return; }
   if (e.key === 'Tab') { // Fokus bleibt im Fenster
     const f = [...backdrop.querySelectorAll('button')];
-    if (f.length === 1) { e.preventDefault(); f[0].focus(); }
+    const i = f.indexOf(document.activeElement);
+    e.preventDefault();
+    f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length]?.focus();
   }
 }
 
 /** Fenster öffnen bzw. (wenn schon offen) mit neuen Daten aktualisieren. */
-export function zeigeQr({ url, raum }) {
+export function zeigeQr({ url, raum, gesperrt = false, umschalten = null }) {
   const neu = !backdrop;
-  daten = { url, raum };
+  const fokusSperre = document.activeElement?.classList?.contains('sync-qr-sperrknopf');
+  daten = { url, raum, gesperrt, umschalten };
   if (neu) {
     vorherFokus = document.activeElement;
     backdrop = el('div', { class: 'sync-qr-backdrop', 'data-kein-schliessen': '' });
@@ -66,6 +73,7 @@ export function zeigeQr({ url, raum }) {
   }
   const zu = zeichnen();
   if (neu) zu.focus({ preventScroll: true });
+  else if (fokusSperre) backdrop.querySelector('.sync-qr-sperrknopf')?.focus({ preventScroll: true }); // Fokus bleibt nach dem Umschalten
 }
 
 export function schliesseQr() {

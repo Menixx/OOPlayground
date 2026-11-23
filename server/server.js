@@ -212,6 +212,7 @@ function nachricht(ws, text) {
   let msg;
   try { msg = JSON.parse(text); } catch { return; }
   if (msg.type === 'hello') { hello(ws, msg); return; }
+  if (msg.type === 'ping') { schicke(ws, { type: 'pong' }); return; } // Herzschlag des Clients (sync.js)
   const r = ws.raum;
   if (!r) return;
   switch (msg.type) {

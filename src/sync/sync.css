@@ -59,6 +59,17 @@
 .sync-qr-label { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted, #4b5568); }
 .sync-qr-url { font: 13px/1.4 var(--mono, monospace); overflow-wrap: anywhere; user-select: all; }
 .sync-qr-raum { font: 700 30px/1.1 var(--mono, monospace); letter-spacing: .18em; user-select: all; }
+.sync-qr-sperre { display: grid; justify-items: center; gap: 8px; width: 100%; padding-top: 14px; border-top: 1px solid var(--line-soft, #d5dde9); text-align: center; }
+.sync-qr-sperre p { margin: 0; font-size: 13px; color: var(--muted, #4b5568); }
+.sync-qr-sperrknopf { font: 600 14px var(--fun, system-ui, sans-serif); padding: 8px 18px; }
+
+/* Gesperrter Bildschirm: Maus löst nichts aus (kein Hover, keine Klicks) – nur Statusleiste und QR-Fenster.
+   Mausrad scrollt die Seite weiter (Ziel ist dann die Seite selbst). Nachgespielte Aktionen (element.click()) wirken trotzdem. */
+:root.sync-gesperrt body * { pointer-events: none !important; }
+:root.sync-gesperrt .sync-badge, :root.sync-gesperrt .sync-badge *,
+:root.sync-gesperrt .sync-qr-backdrop, :root.sync-gesperrt .sync-qr-backdrop * { pointer-events: auto !important; }
+.sync-schloss { white-space: nowrap; }
+
 @keyframes sync-qr-ein { from { opacity: 0; } }
 @keyframes sync-qr-auf { from { opacity: 0; transform: translateY(8px) scale(.97); } }
 @media (prefers-reduced-motion: reduce) { .sync-qr-backdrop, .sync-qr { animation: none; } }

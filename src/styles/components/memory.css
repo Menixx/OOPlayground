@@ -14,8 +14,8 @@
 .mem-btn[data-tip]:hover::after, .mem-btn[data-tip]:focus-visible::after {
   left: calc(100% + 10px); bottom: 50%; transform: translateY(50%); font-size: 12px; padding: 4px 10px;
 }
-/* Demonstration: Statusleiste rückt neben die Schaltfläche */
-body:has(.mem-btn) .sync-badge { left: 80px; }
+/* Demonstration: Schaltfläche steht über der Statusleiste (Höhe der Leiste: --sync-badge-h, gesetzt in sync.js) */
+body:has(.sync-badge) .mem-btn { left: 12px; bottom: calc(12px + var(--sync-badge-h, 32px) + 10px); }
 
 /* ---------- Fenster ---------- */
 .mem-backdrop {
@@ -101,7 +101,6 @@ body:has(.mem-btn) .sync-badge { left: 80px; }
 /* Nur Computer-Version: auf schmalen Bildschirmen ausgeblendet */
 @media (max-width: 600px) {
   .mem-btn, .mem-backdrop { display: none; }
-  body:has(.mem-btn) .sync-badge { left: 12px; }
 }
 @media (max-width: 900px) {
   .mem-bereiche { grid-template-columns: 1fr; overflow: auto; }

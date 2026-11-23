@@ -12,13 +12,13 @@
 //   aufklappen {ziel, offen}        – <details data-sync> (Menügruppen, Code-Blöcke der Erklärung)
 //   scroll {ziel, x, breite}        – waagerechtes Scrollen eines Bereichs mit data-sync (Objekte im Arbeitsbereich);
 //                                     Bildschirm: x · (eigene Fensterbreite / breite des Pults)
-//   seite {i, anteil}               – senkrechtes Scrollen der Erklärung: Anker-Element i (bzw. -1 = vor dem ersten,
-//                                     -2 = ganz unten) und wie weit es schon unter der Kopfleiste durchgelaufen ist
+//   seite {i, anteil}               – senkrechtes Scrollen der Seite (Playground und Erklärung): Anker-Element i (bzw. -1 = vor
+//                                     dem ersten, -2 = ganz unten) und wie weit es schon unter der Kopfleiste durchgelaufen ist
 //   navigate {hash} · thema {modus} · sprache {sprache}
 import './sync.css';
 import { bus } from '../services/EventBus.js';
 import { manager, KLASSEN } from '../services/ObjectManager.js';
-import { t, getSprache, setSprache, SPRACHEN } from '../i18n/i18n.js';
+import { t, getSprache, setSprache, SPRACHEN, bindAttr } from '../i18n/i18n.js';
 import { getModus, setModus, MODI } from '../services/Theme.js';
 import { popoverNach, offenePopovers, allePopoversSchliessen } from '../components/popover.js';
 import { konsolenVerlauf, konsoleSetzen } from '../components/Console/Console.js';
@@ -69,10 +69,45 @@ const finde = (ziel) => document.querySelector(`[data-sync="${CSS.escape(ziel)}"
 const status = { verbunden: false, pult: false, bildschirm: false, aktiv: false, abgelehnt: false, fehler: null, pultUrls: [], info: '' };
 const badge = el('div', { class: 'sync-badge', role: 'status' });
 document.body.append(badge);
+// Höhe der Leiste als CSS-Variable: die Speicher-Schaltfläche (memory.css) steht genau darüber
+new ResizeObserver(() => document.documentElement.style.setProperty('--sync-badge-h', `${badge.offsetHeight}px`)).observe(badge);
 
 /** Link, mit dem das Telefon als Pult in diesen Raum kommt (LAN-Adresse vom Server, sonst die eigene Adresse). */
 const pultLink = () => status.pultUrls[0] ?? `${location.origin}${BASIS}?rolle=pult&raum=${RAUM}`;
-const qrZeigen = () => { if (RAUM) zeigeQr({ url: pultLink(), raum: RAUM }); };
+const qrZeigen = () => { if (RAUM) zeigeQr({ url: pultLink(), raum: RAUM, gesperrt, umschalten: () => sperreSetzen(!gesperrt) }); };
+
+// ---------- Sperre des Bildschirms ----------
+// Sobald ein Pult (neu) dazukommt und sein Zustand übernommen ist, folgt der Bildschirm nur noch dem Pult:
+// Maus und Tastatur lösen nichts aus (kein Hover, keine Klicks) – sonst entstünden Karten oder Objekte, die das Pult
+// nicht kennt. Bedienbar bleiben nur die Statusleiste und ihr Fenster; dort lässt sich die Sperre aufheben.
+// Die Aufhebung gilt, bis sich das nächste Mal ein Pult anmeldet.
+let gesperrt = false;
+let sperrenBeimSnapshot = true; // nächster Snapshot sperrt (Start bzw. Pult neu angemeldet)
+function sperreSetzen(an) {
+  gesperrt = an;
+  document.documentElement.classList.toggle('sync-gesperrt', an);
+  if (an && !document.activeElement?.closest?.('.sync-badge, .sync-qr-backdrop')) document.activeElement?.blur?.();
+  zeichneStatus();
+  if (qrOffen()) qrZeigen();
+}
+if (ROLLE === 'bildschirm') {
+  // Tastatur: nichts auslösen (Tab, Enter, Escape …) – außer im QR-Fenster, das eigene Tasten hat
+  window.addEventListener('keydown', (e) => {
+    if (!gesperrt || qrOffen() || e.target.closest?.('.sync-badge')) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  }, true);
+  // Maus: pointer-events (sync.css) verhindert Hover und Klicks auf Elemente – ein Klick landet dann aber auf der
+  // Seite selbst und würde z. B. offene Karten schließen (popover.js). Echte Klicks hier abfangen;
+  // nachgespielte Klicks des Pults (element.click(), isTrusted = false) gehen durch.
+  for (const typ of ['click', 'dblclick', 'auxclick', 'contextmenu', 'pointerdown', 'mousedown', 'mouseup']) {
+    window.addEventListener(typ, (e) => {
+      if (!gesperrt || !e.isTrusted || e.target.closest?.('.sync-badge, .sync-qr-backdrop')) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }, true);
+  }
+}
 let qrGezeigt = false; // beim Start einmal automatisch öffnen
 
 // Bildschirm: Klick (oder Enter/Leertaste) auf die Statusleiste öffnet den QR-Code
@@ -111,6 +146,7 @@ function zeichneStatus() {
   const punkt = el('span', { class: 'sync-dot' });
   const kopf = [punkt, el('b', {}, t(`sync.${ROLLE}`))];
   if (RAUM && !status.fehler) kopf.push(' · ', el('span', { class: 'sync-raum' }, t('sync.raum', { raum: RAUM })));
+  if (gesperrt) kopf.push(' · ', el('span', { class: 'sync-schloss', title: t('sync.gesperrtTitel') }, `🔒 ${t('sync.gesperrt')}`));
   let text, zustand, extra = null;
   if (!RAUM || status.fehler === 'raum') {
     text = t(RAUM ? 'sync.raumUngueltig' : 'sync.raumFehlt'); zustand = 'warten'; extra = raumFormular();
@@ -138,6 +174,45 @@ let verzoegerung = 1000;
 let wiederholung = null;
 let verlassen = false; // Seite wird verlassen (pagehide) – nicht neu verbinden
 
+// Herzschlag: Ein gesperrtes Telefon friert die Seite ein, und das Betriebssystem kappt die Verbindung oft still.
+// Nach dem Entsperren meldet der Browser die tote Verbindung erst nach vielen Sekunden als geschlossen – bzw. ein im
+// Hintergrund begonnener Verbindungsaufbau hängt. Deshalb prüft der Client selbst: ping an den Server, Antwort
+// (pong oder irgendeine Nachricht) innerhalb der Frist – sonst sofort eine neue Verbindung.
+const PING_MS = 5000;          // regelmäßiger ping, solange verbunden
+const PONG_FRIST = 3000;       // so lange auf Antwort warten
+const PONG_FRIST_WACH = 1500;  // nach dem Entsperren / Zurückkehren: schneller entscheiden
+const AUFBAU_FRIST = 4000;     // Verbindungsaufbau, der länger dauert, gilt als hängend
+let pingTimer = null;
+let pongFrist = null;
+let aufbauFrist = null;
+
+function herzschlag(frist = PONG_FRIST) {
+  // Verborgen: Timer werden gedrosselt bzw. eingefroren – eine Frist würde beim Aufwachen fälschlich ablaufen
+  if (ws?.readyState !== WebSocket.OPEN || document.visibilityState === 'hidden') return;
+  if (pongFrist) { if (frist >= PONG_FRIST) return; clearTimeout(pongFrist); } // kürzere Frist ersetzt die laufende
+  const sock = ws;
+  senden({ type: 'ping' });
+  pongFrist = setTimeout(() => { pongFrist = null; if (ws === sock) neuVerbinden(); }, frist);
+}
+
+function timerStoppen() {
+  clearInterval(pingTimer); pingTimer = null;
+  clearTimeout(pongFrist); pongFrist = null;
+  clearTimeout(aufbauFrist); aufbauFrist = null;
+}
+
+/** Verbindung gilt als tot: verwerfen und ohne Wartezeit neu aufbauen. */
+function neuVerbinden() {
+  if (verlassen || status.ersetzt) return;
+  const alt = ws;
+  ws = null; // onclose der alten Verbindung wird dadurch ignoriert
+  timerStoppen();
+  try { alt?.close(4000, 'herzschlag'); } catch { /* schon zu */ }
+  if (status.verbunden) { status.verbunden = false; beimTrennen(); }
+  verzoegerung = 1000;
+  verbinden();
+}
+
 function senden(nachricht) {
   if (ws?.readyState === WebSocket.OPEN) { ws.send(JSON.stringify(nachricht)); return true; }
   return false;
@@ -153,19 +228,28 @@ function verbinden() {
   clearTimeout(wiederholung);
   wiederholung = null;
   const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  timerStoppen();
   const sock = new WebSocket(`${proto}//${location.host}/ws?rolle=${ROLLE}`);
+  sock.begonnen = Date.now();
   ws = sock;
   status.info = '';
   zeichneStatus();
+  aufbauFrist = setTimeout(() => { if (ws === sock && sock.readyState === WebSocket.CONNECTING) neuVerbinden(); }, AUFBAU_FRIST);
   sock.onopen = () => {
+    if (ws !== sock) return;
+    clearTimeout(aufbauFrist); aufbauFrist = null;
     verzoegerung = 1000;
     status.verbunden = true;
     anmelden();
     zeichneStatus();
+    pingTimer = setInterval(() => herzschlag(), PING_MS);
   };
   sock.onmessage = (m) => {
+    if (ws !== sock) return;
+    clearTimeout(pongFrist); pongFrist = null; // jede Nachricht zeigt: die Verbindung lebt
     let msg;
     try { msg = JSON.parse(m.data); } catch { return; }
+    if (msg.type === 'pong') return;
     if (msg.type === 'status') {
       const warPult = status.pult;
       Object.assign(status, {
@@ -173,6 +257,7 @@ function verbinden() {
         abgelehnt: Boolean(msg.abgelehnt), fehler: msg.fehler ?? null, pultUrls: msg.pultUrls ?? status.pultUrls
       });
       zeichneStatus();
+      if (ROLLE === 'bildschirm' && !warPult && status.pult) sperrenBeimSnapshot = true;
       if (ROLLE === 'bildschirm' && !msg.fehler) {
         // Beim Start ohne Pult: QR-Code zeigen; sobald ein Pult kommt, schließt er sich von selbst
         if (!qrGezeigt) { qrGezeigt = true; if (!status.pult) qrZeigen(); }
@@ -184,6 +269,7 @@ function verbinden() {
   };
   sock.onclose = (e) => {
     if (ws !== sock) return;
+    timerStoppen();
     if (verlassen) { status.verbunden = false; beimTrennen(); return; }
     status.verbunden = false;
     beimTrennen();
@@ -199,13 +285,21 @@ function verbinden() {
 // Telefon entsperrt / Tab wieder sichtbar: sofort neu verbinden bzw. sich als aktives Pult melden
 // (mehrere Pult-Tabs: Playground + Erklärung – der Bildschirm folgt dem, der zuletzt benutzt wurde)
 function wiederAktiv() {
-  if (document.visibilityState !== 'visible' || status.ersetzt) return;
-  if (ws?.readyState === WebSocket.OPEN) { if (ROLLE === 'pult' && !status.aktiv) anmelden(); }
-  else if (ws?.readyState !== WebSocket.CONNECTING) { verzoegerung = 1000; verbinden(); }
+  if (document.visibilityState !== 'visible' || status.ersetzt || verlassen) return;
+  if (ws?.readyState === WebSocket.OPEN) {
+    herzschlag(PONG_FRIST_WACH); // lebt die Verbindung nach dem Schlaf noch? Sonst in 1,5 s neu verbinden
+    if (ROLLE === 'pult' && !status.aktiv) anmelden();
+  } else if (ws?.readyState === WebSocket.CONNECTING) {
+    // Aufbau hängt (z. B. im Hintergrund begonnen, während das Telefon schlief): neu beginnen
+    if (Date.now() - ws.begonnen > 1000) neuVerbinden();
+  } else { verzoegerung = 1000; verbinden(); }
 }
 document.addEventListener('visibilitychange', () => {
   // Verborgen: Pult meldet sich ab (der Bildschirm zeigt „warte auf Pult“); sichtbar: wieder anmelden
-  if (document.visibilityState === 'hidden') { if (ROLLE === 'pult') senden({ type: 'pause' }); }
+  if (document.visibilityState === 'hidden') {
+    clearTimeout(pongFrist); pongFrist = null; // siehe herzschlag(): beim Aufwachen neu prüfen
+    if (ROLLE === 'pult') senden({ type: 'pause' });
+  }
   else wiederAktiv();
 });
 // Tab wird geschlossen oder verlassen: Verbindung sofort sauber schließen
@@ -213,9 +307,11 @@ window.addEventListener('pagehide', () => {
   if (ROLLE === 'pult') senden({ type: 'pause' });
   verlassen = true;
   clearTimeout(wiederholung);
+  timerStoppen();
   ws?.close(1000, 'pagehide');
 });
 window.addEventListener('focus', wiederAktiv);
+window.addEventListener('online', wiederAktiv); // Netz wieder da (z. B. WLAN nach dem Aufwachen)
 window.addEventListener('pageshow', (e) => { if (e.persisted) { verlassen = false; wiederAktiv(); } }); // aus dem Back-Forward-Cache
 
 // ---------- Pult ----------
@@ -236,7 +332,8 @@ function zustand() {
     breite: innerWidth,
     details: Object.fromEntries(alle('details[data-sync]').map((d) => [d.dataset.sync, d.open]))
   };
-  if (ROUTE === 'Docs') return { route: ROUTE, hash: aktuellerHash(), objects: [], counters: {}, ui: { ...ui, seite: seitenPosition() } };
+  ui.seite = seitenPosition();
+  if (ROUTE === 'Docs') return { route: ROUTE, hash: aktuellerHash(), objects: [], counters: {}, ui };
   return { route: ROUTE, hash: '', ...manager.exportieren(), konsole: konsolenVerlauf(), ui };
 }
 
@@ -291,13 +388,12 @@ if (ROLLE === 'pult') {
     const d = e.target.closest?.('summary')?.parentElement;
     if (d?.matches('details[data-sync]')) ereignis({ kind: 'aufklappen', ziel: d.dataset.sync, offen: !d.open });
   }, true);
-  // Senkrechtes Scrollen der Erklärung: höchstens ein Ereignis je Bild
-  if (ROUTE === 'Docs') {
-    let seiteBild = 0;
-    window.addEventListener('scroll', () => {
-      seiteBild ||= requestAnimationFrame(() => { seiteBild = 0; ereignis({ kind: 'seite', ...seitenPosition() }); });
-    }, { passive: true });
-  }
+  // Senkrechtes Scrollen der Seite (Erklärung und Playground – z. B. wenn der Laptop-Bildschirm zu niedrig ist):
+  // höchstens ein Ereignis je Bild
+  let seiteBild = 0;
+  window.addEventListener('scroll', () => {
+    seiteBild ||= requestAnimationFrame(() => { seiteBild = 0; ereignis({ kind: 'seite', ...seitenPosition() }); });
+  }, { passive: true });
 
   // Waagerechtes Scrollen (scroll steigt nicht auf – daher Capture); höchstens ein Ereignis je Bild
   const scrollOffen = new Map(); // ziel -> Element
@@ -349,11 +445,14 @@ function element(ziel) {
   return e;
 }
 
-// ---------- Scrollen der Erklärung ----------
+// ---------- Senkrechtes Scrollen der Seite ----------
 // Telefon und Laptop brechen den Text verschieden um – die Seite ist auf dem Telefon viel länger. Deshalb kein
-// Verhältnis der Höhen, sondern ein Anker: das Text-Element, das gerade unter der Kopfleiste steht, und der Anteil,
-// um den es schon durchgelaufen ist (bis zum nächsten Element). Beide Seiten zeigen so dieselbe Textstelle oben.
-const ANKER = '#inhalt :is(h2, h3, h4, p, pre, ul, ol, table, details, figure, blockquote, hr, img)';
+// Verhältnis der Höhen, sondern ein Anker: das Element, das gerade unter der Kopfleiste steht, und der Anteil,
+// um den es schon durchgelaufen ist (bis zum nächsten Element). Beide Seiten zeigen so dieselbe Stelle oben.
+// Playground: die Abschnitte und ihre Teile (Kopfzeile = vor dem ersten Anker).
+const ANKER = ROUTE === 'Docs'
+  ? '#inhalt :is(h2, h3, h4, p, pre, ul, ol, table, details, figure, blockquote, hr, img)'
+  : 'main :is(section, h2, #class-panel, .bar, .hint, .grid, .out)';
 
 /** Unterkante der festen Kopfleiste – die Lesekante (eigene Höhe je Gerät). */
 const lesekante = () => Math.max(0, document.getElementById('topbar')?.getBoundingClientRect().bottom ?? 0);
@@ -464,9 +563,7 @@ async function anwenden(ev) {
     case 'eingabe': eingeben(element(ev.ziel), ev.wert ?? ''); return {};
     case 'aufklappen': element(ev.ziel).open = Boolean(ev.offen); return {};
     case 'scroll': return { scroll: scrollen(element(ev.ziel), ev.x, ev.breite) };
-    case 'seite':
-      if (ROUTE !== 'Docs') throw new Error('route');
-      return { scroll: seiteSetzen(ev) };
+    case 'seite': return { scroll: seiteSetzen(ev) };
     case 'thema': setModus(ev.modus); return { modus: getModus() };
     case 'sprache': await spracheUebernehmen(ev.sprache); return { sprache: getSprache() };
     case 'navigate':
@@ -494,6 +591,7 @@ async function snapshotAnwenden(s, snapSeq) {
       const b = finde(ziel);
       if (b && b.getAttribute('aria-expanded') !== 'true') b.click();
     }
+    if (ui.seite) versuch(() => seiteSetzen(ui.seite));
   } else {
     // Suche und Auf-/Zuklappen wie beim Pult, danach die genaue Scrollposition (hängt von den Höhen ab)
     for (const [ziel, wert] of Object.entries(ui.eingaben ?? {})) { const f = finde(ziel); if (f) eingeben(f, wert); }
@@ -504,6 +602,7 @@ async function snapshotAnwenden(s, snapSeq) {
     else if (s.hash) versuch(() => springeZu(s.hash));
     else window.scrollTo({ top: 0, behavior: 'instant' });
   }
+  if (sperrenBeimSnapshot) { sperrenBeimSnapshot = false; sperreSetzen(true); }
   console.info(`[sync] Zustand vom Pult übernommen (seq ${snapSeq}, ${s.objects?.length ?? 0} Objekt(e)).`);
 }
 
@@ -531,6 +630,14 @@ function beimTrennen() {
 
 // ---------- Links innerhalb der Demonstration ----------
 // index.html / docs.html -> /demonstration/ bzw. /demonstration/Docs, die Rolle bleibt erhalten.
+// Auf der normalen Seite öffnen diese Links einen neuen Tab; in der Demonstration bleibt alles im selben Tab –
+// so steuert das Pult (wie der Bildschirm) immer genau eine Seite.
+const istSeitenLink = (a) => /\/(index|docs)\.html$/i.test(new URL(a.href, location.href).pathname);
+for (const a of document.querySelectorAll('a[target="_blank"][href]')) {
+  if (!istSeitenLink(a)) continue;
+  a.removeAttribute('target');
+  if (a.classList.contains('docs-link')) { bindAttr(a, 'title', 'header.docsTipDemo'); bindAttr(a, 'aria-label', 'header.docsTipDemo'); }
+}
 document.addEventListener('click', (e) => {
   const a = e.target.closest?.('a[href]');
   if (!a) return;
@@ -542,6 +649,7 @@ document.addEventListener('click', (e) => {
   u.searchParams.set('rolle', ROLLE);
   if (RAUM) u.searchParams.set('raum', RAUM);
   a.href = u.href;
+  a.removeAttribute('target'); // auch Links, die erst später entstanden sind
 }, true);
 
 window.ooSync = { rolle: ROLLE, get seq() { return ROLLE === 'pult' ? seq : letzte; }, fehlerTest };

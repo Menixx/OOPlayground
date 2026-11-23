@@ -11,6 +11,7 @@ export default {
   'theme.system': 'Farbschema: wie im System – Klick: hell',
   'header.docs': 'Erklärung',
   'header.docsTip': 'Erklärung in neuem Tab öffnen',
+  'header.docsTipDemo': 'Erklärung öffnen', // Demonstration: gleicher Tab
   'header.menu': 'Menü',
   'section.classes': 'Abstrakte Klassen',
   'section.objects': 'Erstellte Objekte',
@@ -123,6 +124,12 @@ export default {
   'sync.qrCode': 'Raumcode',
   'sync.qrOeffnen': 'QR-Code für das Pult anzeigen',
   'sync.schliessen': 'Schließen',
+  'sync.gesperrt': 'gesperrt',
+  'sync.gesperrtTitel': 'Maus und Tastatur sind gesperrt – der Bildschirm folgt nur dem Pult',
+  'sync.sperreAn': 'Der Bildschirm folgt nur dem Pult. Maus und Tastatur sind gesperrt.',
+  'sync.sperreAus': 'Maus und Tastatur sind frei. Was du hier änderst, kommt nicht auf dem Pult an.',
+  'sync.entsperren': 'Bildschirm entsperren',
+  'sync.sperren': 'Bildschirm sperren',
 
   // Terminal: Rückgaben der Methoden
   'figur.drehen': '{name} wurde um 90° gedreht (jetzt {winkel}°).',
