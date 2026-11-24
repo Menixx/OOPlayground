@@ -6,15 +6,17 @@ import { Figur } from '../models/abstract/Figur.js';
 import { Katze } from '../models/animals/Katze.js';
 import { Krokodil } from '../models/animals/Krokodil.js';
 import { Mensch } from '../models/animals/Mensch.js';
+import { Eule } from '../models/animals/Eule.js';
 import { Auto } from '../models/transport/Auto.js';
 import { Flugzeug } from '../models/transport/Flugzeug.js';
 import { Zug } from '../models/transport/Zug.js';
 import { Dreieck } from '../models/figures/Dreieck.js';
 import { Kreis } from '../models/figures/Kreis.js';
 import { Stern } from '../models/figures/Stern.js';
+import { EWIG } from '../models/parameter.js';
 
 export const KLASSEN = [
-  { name: 'Tier', cls: Tier, kinder: [['Katze', Katze], ['Krokodil', Krokodil], ['Mensch', Mensch]] },
+  { name: 'Tier', cls: Tier, kinder: [['Katze', Katze], ['Krokodil', Krokodil], ['Mensch', Mensch], ['Eule', Eule]] },
   { name: 'Transport', cls: Transport, kinder: [['Auto', Auto], ['Flugzeug', Flugzeug], ['Zug', Zug]] },
   { name: 'Figur', cls: Figur, kinder: [['Dreieck', Dreieck], ['Kreis', Kreis], ['Stern', Stern]] }
 ];
@@ -24,11 +26,59 @@ export const klassenName = (cls) => NAMEN.get(cls) ?? cls.name;
 
 const log = (typ, text) => bus.emit('log', { typ, text });
 
+/** Beschreibung einer öffentlichen Methode: { name, abstrakt, parameter: [[typ, name, standard]] } oder null. */
+export function methodenInfo(cls, methode) {
+  const m = Object.getPrototypeOf(cls).methoden?.find(([n]) => n === methode);
+  return m ? { name: m[0], abstrakt: m[1], parameter: m[2] ?? [] } : null;
+}
+/** Argument als Java-Literal: Strings in Anführungszeichen. */
+export const argText = (v) => (typeof v === 'string' ? `"${v}"` : String(v));
+/** Aufruf als Code, z. B. katze1.essen("ewig") */
+export const aufrufText = (id, methode, args = []) => `${id}.${methode}(${args.map(argText).join(', ')})`;
+
+/** Wie lange ein Aufruf läuft (ms); null = ewig, 0 = sofort fertig.
+ *  dauer: Sekunden oder "ewig" · anzahl: Wiederholungen × Zyklus · sonst ein Zyklus (falls die Klasse einen hat). */
+function laufzeit(obj, info, args) {
+  const zyklus = obj.constructor.zyklen?.[info.name];
+  const i = info.parameter.findIndex(([, n]) => n === 'dauer');
+  if (i >= 0) return args[i] === EWIG ? null : args[i] * 1000;
+  const k = info.parameter.findIndex(([, n]) => n === 'anzahl');
+  if (k >= 0 && zyklus) return args[k] * zyklus * 1000;
+  return zyklus ? zyklus * 1000 : 0;
+}
+
 export class ObjectManager {
   #objekte = new Map(); // id -> echte JS-Instanz
   #zaehler = {};
+  #laeufe = new Map(); // id -> { methode, args, start, ende (ms-Zeitstempel oder null = ewig), timer }
 
   get alle() { return [...this.#objekte].map(([id, obj]) => ({ id, obj })); }
+  /** Laufende Methodenaufrufe (ihr Frame liegt im Stack), der neueste zuerst. */
+  get laeufe() {
+    return [...this.#laeufe].map(([id, l]) => ({ id, methode: l.methode, args: l.args, start: l.start, ende: l.ende }))
+      .sort((a, b) => b.start - a.start);
+  }
+
+  /** Lauf eines Objekts beenden. grund: 'fertig' | 'halten' | 'ersetzt' | 'geloescht' */
+  #beenden(id, grund) {
+    const l = this.#laeufe.get(id);
+    if (!l) return;
+    clearTimeout(l.timer);
+    this.#laeufe.delete(id);
+    if (grund === 'fertig') log('info', t('log.finished', { aufruf: aufrufText(id, l.methode, l.args) }));
+    bus.emit('beendet', { id, methode: l.methode, grund });
+  }
+
+  /** Neuen Lauf beginnen (ein Objekt kann immer nur eine Methode ausführen – ein neuer Aufruf ersetzt den alten). */
+  #starten(id, methode, args, ms) {
+    this.#beenden(id, 'ersetzt');
+    if (ms === 0) return;
+    const start = Date.now();
+    const lauf = { methode, args, start, ende: ms == null ? null : start + ms, timer: 0 };
+    if (ms != null) lauf.timer = setTimeout(() => this.#beenden(id, 'fertig'), ms);
+    this.#laeufe.set(id, lauf);
+  }
+
   get kannBewegen() { return this.alle.some(({ obj }) => obj instanceof Tier || obj instanceof Transport); }
 
   erstellen(cls) {
@@ -51,18 +101,23 @@ export class ObjectManager {
     try { new cls(); } catch (e) { log('fehler', e.message); }
   }
 
-  /** Ruft eine öffentliche Methode auf. Gibt das Ergebnis zurück oder wirft den Fehler weiter
-   *  (der Sync-Bridge baut daraus seinen ack); protokolliert wird beides wie bisher. */
-  aufrufen(id, methode) {
+  /** Ruft eine öffentliche Methode mit Argumenten auf (fehlende Argumente = Standardwerte).
+   *  Gibt das Ergebnis zurück oder wirft den Fehler weiter (der Sync-Bridge baut daraus seinen ack);
+   *  protokolliert wird beides. Läuft die Methode eine Zeit lang, bleibt ihr Frame bis zum Ende im Stack. */
+  aufrufen(id, methode, args = []) {
     const obj = this.#objekte.get(id);
-    log('befehl', `${id}.${methode}()`);
+    const info = obj && methodenInfo(obj.constructor, methode);
+    const werte = info ? info.parameter.map(([, , std], i) => args[i] ?? std) : args;
+    log('befehl', aufrufText(id, methode, werte));
     try {
       if (!obj) throw new Error(t('error.noObject', { id }));
-      const erlaubt = Object.getPrototypeOf(obj.constructor).methoden?.some(([n]) => n === methode);
-      if (!erlaubt || typeof obj[methode] !== 'function') throw new Error(t('error.noMethod', { methode }));
-      const ergebnis = obj[methode]();
+      if (!info || typeof obj[methode] !== 'function') throw new Error(t('error.noMethod', { methode }));
+      const ergebnis = obj[methode](...werte);   // prüft die Argumente (wirft bei ungültigen Werten)
       log('ergebnis', ergebnis);
-      bus.emit('called', { id, methode, ergebnis });   // Animation anstoßen (und Pult: Ereignis senden)
+      if (methode === 'halten') this.#beenden(id, 'halten');
+      const ms = methode === 'halten' ? 0 : laufzeit(obj, info, werte);
+      this.#starten(id, methode, werte, ms);
+      bus.emit('called', { id, methode, args: werte, ergebnis, dauerMs: ms }); // Animation anstoßen (und Pult: Ereignis senden)
       return ergebnis;
     } catch (e) {
       log('fehler', e.message);
@@ -79,9 +134,10 @@ export class ObjectManager {
     this.alle
       .filter(({ obj }) => obj instanceof Tier || obj instanceof Transport)
       .forEach(({ id, obj }) => {
-        const ergebnis = obj.bewegen();
+        const ergebnis = obj.bewegen();                // Standardwert: dauer = "ewig"
         log('ergebnis', `${id}: ${ergebnis}.`);
-        bus.emit('called', { id, methode: 'bewegen', ergebnis, teil: true }); // Teil von „Alle bewegen“
+        this.#starten(id, 'bewegen', [EWIG], null);
+        bus.emit('called', { id, methode: 'bewegen', args: [EWIG], ergebnis, dauerMs: null, teil: true }); // Teil von „Alle bewegen“
       });
   }
 
@@ -90,6 +146,7 @@ export class ObjectManager {
     const obj = this.#objekte.get(id);
     if (!obj) return;
     bus.emit('aktion', { kind: 'deleted', id });
+    this.#beenden(id, 'geloescht');
     this.#objekte.delete(id);
     // Gibt es keine Instanz dieser Klasse mehr, beginnt die Nummerierung wieder bei 1
     const key = klassenName(obj.constructor).toLowerCase();
@@ -103,6 +160,7 @@ export class ObjectManager {
   alleLoeschen({ still = false } = {}) {
     if (!this.#objekte.size) return;
     const ids = [...this.#objekte.keys()];
+    ids.forEach((id) => this.#beenden(id, 'geloescht'));
     this.#objekte.clear();
     this.#zaehler = {};                      // alle Nummern beginnen wieder bei 1
     if (!still) {

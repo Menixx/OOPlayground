@@ -1,4 +1,5 @@
 import { t, tWert } from '../../i18n/i18n.js';
+import { EWIG } from '../parameter.js';
 export class Transport {
   static felder = [
     ['name', 'String', '"Unbenannt"'],
@@ -7,7 +8,12 @@ export class Transport {
     ['anzahlRaeder', 'int'],
     ['motor', 'Motor']
   ];
-static methoden = [['motorStarten', true], ['bewegen', true], ['halten', false]];
+// [name, abstrakt?, parameter: [typ, name, standardwert]] – T = generischer Typ (Zahl oder String)
+  static methoden = [
+    ['motorStarten', true, []],
+    ['bewegen', true, [['T', 'dauer', EWIG]]],
+    ['halten', false, []]
+  ];
   constructor() {
     if (new.target === Transport) throw new Error(t('error.abstract'));
     this.name = "Unbenannt";
@@ -17,7 +23,7 @@ static methoden = [['motorStarten', true], ['bewegen', true], ['halten', false]]
     this.motor = undefined;
   }
   motorStarten() { throw new Error(t('error.notImplemented', { methode: 'motorStarten' })); }
-  bewegen() { throw new Error(t('error.notImplemented', { methode: 'bewegen' })); }
+  bewegen(dauer = EWIG) { throw new Error(t('error.notImplemented', { methode: 'bewegen' })); }
   halten() {
     if (this.motor?.laeuft) {
       this.motor.stoppen();               // Delegation an das Motor-Objekt

@@ -1,12 +1,13 @@
 // Blick in den Speicher der JVM: Schaltfläche unten links (SSD-Symbol) öffnet ein Fenster mit
 // drei Bereichen – Stack, Heap und Metaspace (Farben wie auf der Folie „Die Java Virtual Machine“).
 //  - Stack:     Frame von main() mit einer lokalen Variable (Referenz) je Objekt;
-//               ein Methodenaufruf legt kurz einen eigenen Frame obendrauf (mit this).
+//               jeder laufende Methodenaufruf legt einen eigenen Frame obendrauf (this + Parameter).
+//               Er bleibt, solange die Methode läuft – bei dauer = "ewig" bis halten() oder bis das Objekt gelöscht wird.
 //  - Heap:      jedes Objekt mit seinen Feldern; ein Motor ist ein eigenes Objekt, auf das das Feld zeigt.
 //  - Metaspace: Beschreibung aller Klassen – sie stehen von Anfang an fest (Klassen ändern sich nicht).
-import { el, L, javaLiteral } from '../../utils/dom.js';
+import { el, L, javaLiteral, parameterListe } from '../../utils/dom.js';
 import { bus } from '../../services/EventBus.js';
-import { manager, KLASSEN, klassenName } from '../../services/ObjectManager.js';
+import { manager, KLASSEN, klassenName, methodenInfo, argText } from '../../services/ObjectManager.js';
 import { t } from '../../i18n/i18n.js';
 import { Figur } from '../../models/abstract/Figur.js';
 import { Motor } from '../../models/engines/Motor.js';
@@ -16,7 +17,7 @@ import { Turbofan } from '../../models/engines/Turbofan.js';
 
 const AUSBLENDEN = 180; // ms, muss zu .mem-schliesst in memory.css passen
 const WENIG_BEWEGUNG = matchMedia('(prefers-reduced-motion: reduce)');
-const AUFRUF_DAUER = 2400; // ms, so lange bleibt der Frame eines Methodenaufrufs sichtbar
+const AUFRUF_DAUER = 600; // ms: eine Methode, die sofort fertig ist (z. B. halten()), blitzt nur kurz im Stack auf
 
 const SSD_SVG = `<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
   <rect x="4" y="6" width="24" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/>
@@ -48,9 +49,9 @@ function eigeneFelder(cls) {
 function eigeneMethoden(cls) {
   if (cls === Motor) return [['starten', true], ['stoppen', false]];
   if (MOTOREN.includes(cls)) return [['starten', false], ...cls.privateMethoden.map((n) => [n, false, true])];
-  if (Object.hasOwn(cls, 'methoden')) return cls.methoden.map(([n, abstrakt]) => [n, abstrakt]);
+  if (Object.hasOwn(cls, 'methoden')) return cls.methoden.map(([n, abstrakt, p]) => [n, abstrakt, false, p]);
   const eltern = Object.getPrototypeOf(cls);
-  return (eltern.methoden ?? []).filter(([n]) => Object.hasOwn(cls.prototype, n)).map(([n]) => [n, false]);
+  return (eltern.methoden ?? []).filter(([n]) => Object.hasOwn(cls.prototype, n)).map(([n, , p]) => [n, false, false, p]);
 }
 const GRUPPEN = [
   ...KLASSEN.map((g) => [g.cls, ...g.kinder.map(([, c]) => c)]),
@@ -69,8 +70,8 @@ function feldTypen(obj) {
 // ---------- Zustand ----------
 let backdrop = null;
 let vorherFokus = null;
-let aufruf = null;      // { id, methode } – gerade laufender Methodenaufruf (eigener Frame im Stack)
-let aufrufTimer = 0;
+let kurz = null;        // { id, methode, args, start } – Methode ohne Laufzeit (halten() …): Frame kurz sichtbar
+let kurzTimer = 0;
 let neu = null;         // id des zuletzt erzeugten Objekts (kurz hervorgehoben)
 let neuTimer = 0;
 let knopf = null;
@@ -88,17 +89,26 @@ function bereich(art, titelText, beschreibung, inhalt) {
     el('div', { class: 'mem-inhalt' }, inhalt));
 }
 
+/** Frame eines Methodenaufrufs: this und die Parameter mit ihren Werten (lokale Variablen der Methode). */
+function aufrufFrame({ id, methode, args }, objekte) {
+  const o = objekte.find((x) => x.id === id);
+  if (!o) return null;
+  const k = klassenName(o.obj.constructor);
+  const parameter = methodenInfo(o.obj.constructor, methode)?.parameter ?? [];
+  return el('div', { class: 'mem-frame aktiv', 'data-mem': `frame:${id}` },
+    el('div', { class: 'mem-frame-kopf' }, el('code', {}, `${k}.${methode}`, parameterListe(parameter)), el('small', { i18n: 'mem.frame' })),
+    el('ul', { class: 'mem-zeilen' },
+      el('li', {}, el('code', {}, el('span', { class: 'typ' }, k), ' ', el('span', { class: 'mod' }, 'this'), ' = '), ref(o.adr)),
+      parameter.map(([typ, n], i) => el('li', {},
+        el('code', {}, el('span', { class: 'typ' }, typ), ' ', el('span', { class: 'feld' }, n), ' = ', argText(args[i]))))));
+}
+
 function stack(objekte) {
-  const frames = [];
-  if (aufruf) {
-    const o = objekte.find((x) => x.id === aufruf.id);
-    if (o) {
-      frames.push(el('div', { class: 'mem-frame aktiv', 'data-mem': 'frame:aufruf' },
-        el('div', { class: 'mem-frame-kopf' }, el('code', {}, `${klassenName(o.obj.constructor)}.${aufruf.methode}()`), el('small', { i18n: 'mem.frame' })),
-        el('ul', { class: 'mem-zeilen' },
-          el('li', {}, el('code', {}, el('span', { class: 'typ' }, klassenName(o.obj.constructor)), ' ', el('span', { class: 'mod' }, 'this'), ' = '), ref(o.adr)))));
-    }
-  }
+  // Laufende Methoden (neueste oben) und ggf. der kurze Frame einer sofort fertigen Methode
+  const aufrufe = [...manager.laeufe];
+  if (kurz && !aufrufe.some((a) => a.id === kurz.id)) aufrufe.push(kurz);
+  aufrufe.sort((a, b) => b.start - a.start);
+  const frames = aufrufe.map((a) => aufrufFrame(a, objekte)).filter(Boolean);
   const variablen = objekte.map(({ id, obj, adr }) => el('li', { class: id === neu ? 'neu' : null },
     el('code', {}, el('span', { class: 'typ' }, klassenName(obj.constructor)), ' ', el('span', { class: 'feld' }, id), ' = '), ref(adr)));
   frames.push(el('div', { class: 'mem-frame', 'data-mem': 'frame:main' },
@@ -141,9 +151,9 @@ function metaspace() {
     const eltern = Object.getPrototypeOf(cls);
     const felder = eigeneFelder(cls).map(([f, typ, privat]) => el('li', { class: privat ? 'privat' : null },
       el('code', {}, privat && [el('span', { class: 'mod' }, 'private'), ' '], el('span', { class: 'typ' }, typ), ' ', el('span', { class: 'feld' }, f))));
-    const methoden = eigeneMethoden(cls).map(([m, abstrakt, privat]) => el('li', { class: privat ? 'privat' : null },
+    const methoden = eigeneMethoden(cls).map(([m, abstrakt, privat, parameter]) => el('li', { class: privat ? 'privat' : null },
       el('code', {}, abstrakt && [el('span', { class: 'mod' }, 'abstract'), ' '], privat && [el('span', { class: 'mod' }, 'private'), ' '],
-        el('span', { class: abstrakt ? 'abstrakt' : privat ? 'privat' : 'methode' }, `${m}()`))));
+        el('span', { class: abstrakt ? 'abstrakt' : privat ? 'privat' : 'methode' }, m), parameterListe(parameter))));
     return el('div', { class: 'mem-klassenkarte', 'data-klasse': name(cls), 'data-mem': `cls:${name(cls)}` },
       el('div', { class: 'mem-objekt-kopf' },
         el('code', {}, istAbstrakt(cls) && [el('span', { class: 'mod' }, 'abstract'), ' '], el('span', { class: 'mod' }, 'class'), ' ', el('b', {}, name(cls)),
@@ -340,14 +350,17 @@ export function mountMemory() {
     clearTimeout(neuTimer);
     neuTimer = setTimeout(() => { neu = null; zeichnen(); }, 1600);
   });
-  bus.on('called', ({ id, methode, teil }) => {
-    if (teil) return; // „Alle bewegen“: viele Aufrufe auf einmal – kein einzelner Frame
-    aufruf = { id, methode };
-    clearTimeout(aufrufTimer);
-    aufrufTimer = setTimeout(() => { aufruf = null; zeichnen(); }, AUFRUF_DAUER);
+  bus.on('called', ({ id, methode, args = [], dauerMs }) => {
+    // Läuft die Methode eine Zeit lang, kommt ihr Frame aus manager.laeufe – bis 'beendet'
+    if (dauerMs === 0) {
+      kurz = { id, methode, args, start: Date.now() };
+      clearTimeout(kurzTimer);
+      kurzTimer = setTimeout(() => { kurz = null; zeichnen(); }, AUFRUF_DAUER);
+    } else if (kurz?.id === id) kurz = null;
     zeichnen();
   });
+  bus.on('beendet', () => zeichnen());
   bus.on('changed', () => zeichnen());
-  bus.on('deleted', ({ ids }) => { if (aufruf && ids.includes(aufruf.id)) aufruf = null; zeichnen(); });
+  bus.on('deleted', ({ ids }) => { if (kurz && ids.includes(kurz.id)) kurz = null; zeichnen(); });
   bus.on('sprache', () => zeichnen());
 }

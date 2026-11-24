@@ -1,7 +1,9 @@
 import { t } from '../../i18n/i18n.js';
 import { Benzinmotor } from '../engines/Benzinmotor.js';
 import { Transport } from '../abstract/Transport.js';
+import { EWIG, dauerPruefen } from '../parameter.js';
 export class Auto extends Transport {
+  static zyklen = { motorStarten: 2.5 }; // Sekunden: die Startanimation läuft genau einmal
   static eigeneFelder = [['anzahlTueren', 'int']];
   constructor() {
     super();
@@ -16,5 +18,5 @@ export class Auto extends Transport {
     if (this.motor.laeuft) return t('transport.motorLaeuft');
     return `${this.motor.starten()}\n${t('transport.motorErfolg')}`;
   }
-  bewegen() { return t('auto.bewegen'); }
+  bewegen(dauer = EWIG) { dauerPruefen(dauer); return t('auto.bewegen'); }
 }

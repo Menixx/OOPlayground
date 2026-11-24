@@ -2,7 +2,7 @@ import { klassenName } from './services/ObjectManager.js';
 // Dateinamen (ohne Endung) der Icons in public/icons/. Unterstützt: .png, .svg, .webp
 export const ICON_FILES = {
   Tier: 'abstrakt-tier', Transport: 'abstrakt-transport', Figur: 'abstrakt-figur',
-  Katze: 'tier-katze', Krokodil: 'tier-krokodil', Mensch: 'tier-mensch',
+  Katze: 'tier-katze', Krokodil: 'tier-krokodil', Mensch: 'tier-mensch', Eule: 'tier-eule',
   Auto: 'transport-auto', Flugzeug: 'transport-flugzeug', Zug: 'transport-zug',
   Dreieck: 'figur-dreieck', Kreis: 'figur-kreis', Stern: 'figur-stern',
   Benzinmotor: 'motor-benzin', Turbofan: 'motor-turbofan', Elektromotor: 'motor-elektro'

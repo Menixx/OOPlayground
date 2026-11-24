@@ -72,7 +72,7 @@ OOPlayground remembers your language. If you switch it there, it also switches o
       blocks: [
         { k: 'md', md: `Here you see three symbols: **Tier** (animal), **Transport** and **Figur** (shape). Each symbol is an **abstract class** – a blueprint that is unfinished on purpose.
 
-- **Tier** describes everything animals have in common. Its children: Katze (cat), Krokodil (crocodile), Mensch (human).
+- **Tier** describes everything animals have in common. Its children: Katze (cat), Krokodil (crocodile), Mensch (human), Eule (owl).
 - **Transport** describes everything vehicles have in common. Its children: Auto (car), Flugzeug (plane), Zug (train).
 - **Figur** describes everything geometric shapes have in common. Its children: Dreieck (triangle), Kreis (circle), Stern (star).
 
@@ -204,7 +204,7 @@ OOPlayground runs in JavaScript. The window shows how the same program would sit
 
 | Column | What's in it? |
 |---|---|
-| {{Stack}} | The frame \`main(String[] args)\` with one variable for each object, for example \`Katze katze1 = @1159cc2d\`. When you click **Run**, that method's frame sits on top for about two seconds, for example \`Katze.essen()\` with \`this\`. |
+| {{Stack}} | The frame \`main(String[] args)\` with one variable for each object, for example \`Katze katze1 = @1159cc2d\`. When you click **Run**, that method's frame sits on top, for example \`Katze.essen(T dauer)\` with \`this\` and \`dauer\`. It stays as long as the method runs – with \`"ewig"\` (forever) until you call \`halten()\` or delete the object. |
 | {{Heap}} | Every object as a box: class, address, name and all fields with their values. An engine is a box of its own, for example \`auto1.motor\`. |
 | {{Metaspace}} | All classes with \`extends\`, their own fields and methods. They are there before you build the first object, and they never change. |
 
@@ -420,7 +420,7 @@ class Katze extends Tier {
         { k: 'inApp', md: `\`Tier\` (animal), \`Transport\` and \`Figur\` (shape) are abstract. That's why their cards say \`abstract class\`. The \`new Tier()\` button tries to build an animal directly anyway – and the output reports an error: "Abstract classes cannot be instantiated."
 
 **Abstract methods:** a method with the purple {{abstract}} badge only has a name, but no content yet. With it the class says: "Every animal **must** be able to eat – but **how** is up to each child." The cat eats fish, the crocodile eats meat, the human eats pizza.` },
-        { k: 'memory', md: `\`Tier\` has its place in the {{Metaspace}} too: the children need its fields and its finished methods such as \`halten()\`. But in the {{Heap}} you will **never** find an object of class \`Tier\` – only cats, crocodiles and humans.
+        { k: 'memory', md: `\`Tier\` has its place in the {{Metaspace}} too: the children need its fields and its finished methods such as \`halten()\`. But in the {{Heap}} you will **never** find an object of class \`Tier\` – only cats, crocodiles, humans and owls.
 
 For an abstract method like \`essen()\` the metaspace only holds the name, but no code. The children provide the code.` },
         { k: 'remember', md: `Abstract = just an idea, not finished yet. Only the children finish it.` },
@@ -495,7 +495,7 @@ class Katze extends Tier {   // "extends" = inherits from
 
 Every class has a kind of table of contents of its methods, the **method table**. For the crocodile it says: \`essen()\` → Krokodil's code, \`halten()\` → Tier's code. So overriding means: in the child's table of contents, one of the parent's entries is replaced by its own.
 
-You can see this in the **memory** window on the classes: \`Katze\` lists \`essen()\` and \`bewegen()\`, but no \`halten()\`.` },
+You can see this in the **memory** window on the classes: \`Katze\` lists \`essen()\`, \`bewegen()\` and \`lautGeben()\`, but no \`halten()\`.` },
         { k: 'remember', md: `Overriding = same name, own way.` },
         { k: 'code', md: `\`\`\`java
 class Krokodil extends Tier {
@@ -691,7 +691,7 @@ OOPlayground is quicker: after \`katze1 = null\` the variable on the stack and t
         { k: 'goal', md: `Try to build an object from an abstract class – and find out that you **can't**.` },
         { k: 'steps', md: `1. Hover over **Tier**.
 2. Read the title: \`abstract class Tier\`.
-3. Look at the badges: {{abstract}} on \`essen()\` and \`bewegen()\`, {{implemented}} on \`halten()\`.
+3. Look at the badges: {{abstract}} on \`essen()\`, \`bewegen()\` and \`lautGeben()\`, {{implemented}} on \`halten()\`.
 4. At the very bottom of the card, click **\`[[new Tier()]]\`**. (When you hover over it, it says: "Instantiate directly (forbidden)".)
 5. Look at the **Output**.
 6. If you like: try the same with \`new Transport()\` and \`new Figur()\`.` },
@@ -763,7 +763,7 @@ OOPlayground is quicker: after \`katze1 = null\` the variable on the stack and t
       blocks: [
         { k: 'goal', md: `Give an object a command and read what it answers.` },
         { k: 'steps', md: `1. Create a cat: **Tier** → **\`[[Katze]]\`**. \`katze1\` appears.
-2. Hover over \`katze1\`. Under **Methods** you'll find: \`essen()\` (eat), \`bewegen()\` (move), \`halten()\` (stop).
+2. Hover over \`katze1\`. Under **Methods** you'll find: \`essen()\` (eat), \`bewegen()\` (move), \`lautGeben()\` (make a sound), \`halten()\` (stop).
 3. Click **\`[[Run]]\`** next to \`essen()\`. The cat in the picture eats.
 4. Click **\`[[Run]]\`** next to \`bewegen()\`. The cat walks.
 5. Click **\`[[Run]]\`** next to \`halten()\`. The cat stops.` },
@@ -812,7 +812,7 @@ OOPlayground is quicker: after \`katze1 = null\` the variable on the stack and t
         { k: 'goal', md: `Try out how children can rewrite an inherited method in their own way – or simply take it over as it is.` },
         { k: 'before', md: `**Before you start:** \`katze1\`, \`krokodil1\` and \`mensch1\` should exist (see [Discover inheritance](#demo-vererbung)).` },
         { k: 'steps', md: `1. Hover over **Tier**. You'll see: \`essen()\` is {{abstract}}, \`halten()\` is {{implemented}}.
-2. Hover over \`katze1\`. You'll see: \`essen()\` and \`bewegen()\` are {{overridden}}, \`halten()\` is {{inherited}}.
+2. Hover over \`katze1\`. You'll see: \`essen()\`, \`bewegen()\` and \`lautGeben()\` are {{overridden}}, \`halten()\` is {{inherited}}.
 3. Click **\`[[Run]]\`** next to \`essen()\` – first on \`katze1\`, then on \`krokodil1\`, then on \`mensch1\`.
 4. Click **\`[[Run]]\`** next to \`halten()\` – on \`katze1\` and on \`krokodil1\`.` },
         { k: 'output', md: `\`\`\`console
@@ -1032,7 +1032,7 @@ You ──motorStarten()──▶ zug1 ──starten()──▶ Elektromotor
 \`\`\`` },
         { k: 'watch', md: `- The metaspace never changes: the classes are there before the first object is built, and they stay when all objects are gone.
 - A car with an engine is **two** objects in the heap, but only **one** variable on the stack. You can only reach the engine through the car.
-- The frame of \`motorStarten()\` only stays for about two seconds. Missed it? No problem – the field \`laeuft\` still shows that the method ran.
+- The frame of \`motorStarten()\` only stays while the start animation plays once (about two seconds). Missed it? No problem – the field \`laeuft\` still shows that the method ran.
 - After \`katze1 = null\` the variable and the object are gone. The class \`Katze\` stays in the metaspace.` }
       ],
       related: [{ id: 'begriff-speicher', label: 'Memory (JVM)' }, { id: 'begriff-objekt', label: 'Object' }, { id: 'begriff-null', label: 'Reference & null' }]

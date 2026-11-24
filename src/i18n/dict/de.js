@@ -60,6 +60,8 @@ export default {
   'card.subclasses': 'Erben',
   'card.run': 'Ausführen',
   'tip.run': 'Ausführen',
+  'tip.dauer': 'Dauer in Sekunden (z. B. 5) oder "ewig" – läuft bis halten()',
+  'tip.anzahl': 'Wie oft? Ganze Zahl ab 1',
   'tip.instantiate': 'Instanziieren',
   'tip.instantiateDirect': 'Direkt instanziieren (verboten)',
   'tag.geerbt': 'geerbt',
@@ -87,6 +89,7 @@ export default {
   // Terminal: Protokoll
   'log.created': 'Objekt {id} wurde erstellt.',
   'log.deleted': 'Objekt {id} wurde gelöscht.',
+  'log.finished': '{aufruf} ist fertig.',
   'log.deletedAll': '{n} Objekt(e) wurden gelöscht.',
 
   // Terminal: Fehler
@@ -96,6 +99,8 @@ export default {
   'error.noObject': 'Objekt {id} existiert nicht.',
   'error.noMethod': 'Methode {methode}() nicht gefunden.',
   'error.unknownClass': 'Unbekannte Klasse: {liste}',
+  'error.dauer': 'IllegalArgumentException: dauer muss eine positive Zahl (Sekunden) oder "ewig" sein – erhalten: {wert}',
+  'error.anzahl': 'IllegalArgumentException: anzahl muss eine ganze Zahl ab 1 sein – erhalten: {wert}',
 
   // Demonstration: Synchronisation Pult -> Bildschirm
   'sync.pult': 'Pult',
@@ -146,6 +151,16 @@ export default {
   'krokodil.bewegen': 'Kriecht',
   'mensch.essen': 'Der Mensch isst eine Pizza.',
   'mensch.bewegen': 'Geht auf zwei Beinen',
+  'eule.essen': 'Die Eule frisst einen Wurm.',
+  'eule.bewegen': 'Fliegt lautlos durch die Nacht',
+  'katze.lautGeben': 'Die Katze miaut: „{laut}“',
+  'katze.laut': 'Miau!',
+  'krokodil.lautGeben': 'Das Krokodil faucht: „{laut}“',
+  'krokodil.laut': 'Hhhhss!',
+  'mensch.lautGeben': 'Der Mensch sagt: „{laut}“',
+  'mensch.laut': 'Hallo!',
+  'eule.lautGeben': 'Die Eule ruft: „{laut}“',
+  'eule.laut': 'Uhu!',
   'auto.bewegen': 'Fährt auf der Straße',
   'flugzeug.bewegen': 'Fliegt durch die Luft',
   'zug.bewegen': 'Fährt auf Schienen',
@@ -167,6 +182,7 @@ export default {
   'value.Katze': 'Katze',
   'value.Krokodil': 'Krokodil',
   'value.Mensch': 'Mensch',
+  'value.Eule': 'Eule',
   'value.Student': 'Student',
   'value.Auto': 'Auto',
   'value.Flugzeug': 'Flugzeug',

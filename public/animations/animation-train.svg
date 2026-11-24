@@ -96,13 +96,13 @@
       animation: engineStartVibrate 0.12s ease-in-out infinite alternate;
     }
     .state-start .spark-1 {
-      animation: sparkFlashA 1.1s ease-out infinite 0s;
+      animation: sparkFlashA 1.1s ease-out 0s 1 both;
     }
     .state-start .spark-2 {
-      animation: sparkFlashB 1.1s ease-out infinite 0.35s;
+      animation: sparkFlashB 1.1s ease-out 0.35s 1 both;
     }
     .state-start .spark-3 {
-      animation: sparkFlashC 1.1s ease-out infinite 0.7s;
+      animation: sparkFlashC 1.1s ease-out 0.7s 1 both;
     }
 
     @keyframes sparkFlashA {

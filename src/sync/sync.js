@@ -5,7 +5,7 @@
 //   und antwortet mit „ack“. Er sendet nie eigene Ereignisse – so entstehen keine Echo-Schleifen.
 //
 // Ereignisse (event.kind):
-//   created {cls} · called {id, methode} · versucht {cls} · deleted {id} · deletedAll · movedAll
+//   created {cls} · called {id, methode, args} · versucht {cls} · deleted {id} · deletedAll · movedAll
 //   popover {key, offen}            – Karte geöffnet/geschlossen (Klasse, Objekt, Motor)
 //   klick {ziel}                    – Knopf mit data-sync (Ausgabe leeren, Motor-Knöpfe, „Nach oben“ …)
 //   eingabe {ziel, wert}            – Eingabefeld mit data-sync (Suche der Erklärung)
@@ -377,7 +377,7 @@ function pultEmpfang(msg) {
 if (ROLLE === 'pult') {
   // Fachliche Aktionen (ObjectManager)
   bus.on('created', ({ id, obj }) => ereignis({ kind: 'created', cls: obj.constructor.name }, { id }));
-  bus.on('called', ({ id, methode, ergebnis, teil }) => { if (!teil) ereignis({ kind: 'called', id, methode }, { ergebnis }); });
+  bus.on('called', ({ id, methode, args, ergebnis, teil }) => { if (!teil) ereignis({ kind: 'called', id, methode, args }, { ergebnis }); });
   bus.on('aktion', (a) => ereignis(a)); // versucht / deleted / deletedAll / movedAll
   // Oberfläche
   bus.on('popover', ({ key, offen: auf }) => ereignis({ kind: 'popover', key, offen: auf }));
@@ -543,7 +543,7 @@ async function anwenden(ev) {
     }
     case 'called':
       nurPlayground();
-      return { ergebnis: manager.aufrufen(ev.id, ev.methode), sprache: getSprache() };
+      return { ergebnis: manager.aufrufen(ev.id, ev.methode, ev.args ?? []), sprache: getSprache() };
     case 'versucht': {
       nurPlayground();
       const g = KLASSEN.find((k) => k.name === ev.cls);

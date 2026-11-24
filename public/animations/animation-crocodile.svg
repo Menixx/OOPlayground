@@ -143,6 +143,73 @@
       50%      { transform: translateY(0px) rotate(0.8deg); }
       75%      { transform: translateY(-1.5px) rotate(0deg); }
     }
+    /* ==========================================================================
+       3. АНІМАЦІЯ ШИПІННЯ (.state-hiss, метод lautGeben())
+       Цикл 2.4 секунди: паща широко розкривається -> тремтіння і шипіння -> закривається
+       ========================================================================== */
+    #hiss-group { opacity: 0; }
+    .state-hiss #upper-jaw {
+      animation: upperJawHiss 2.4s ease-in-out infinite;
+    }
+    .state-hiss #lower-jaw {
+      animation: lowerJawHiss 2.4s ease-in-out infinite;
+    }
+    .state-hiss #mouth-interior {
+      animation: mouthInteriorHiss 2.4s ease-in-out infinite;
+    }
+    .state-hiss #croc-body-group {
+      animation: bodyHiss 2.4s linear infinite;
+    }
+    .state-hiss #hiss-group {
+      animation: hissVisible 2.4s ease-in-out infinite;
+    }
+    .state-hiss .hiss-line {
+      animation: hissFlow 0.4s linear infinite;
+    }
+
+    @keyframes upperJawHiss {
+      0%, 6%    { transform: rotate(0deg); }
+      20%, 72%  { transform: rotate(-26deg) translateX(1px); } /* Паща навстіж */
+      88%, 100% { transform: rotate(0deg); }
+    }
+    @keyframes lowerJawHiss {
+      0%, 6%    { transform: rotate(0deg); }
+      20%, 72%  { transform: rotate(18deg) translateX(1px); }
+      88%, 100% { transform: rotate(0deg); }
+    }
+    @keyframes mouthInteriorHiss {
+      0%, 8%    { opacity: 0; }
+      18%, 74%  { opacity: 1; }
+      86%, 100% { opacity: 0; }
+    }
+    /* Тіло трохи піднімається і дрібно тремтить, поки крокодил шипить */
+    @keyframes bodyHiss {
+      0%, 14%   { transform: translate(0px, 0px) rotate(0deg); }
+      20%       { transform: translate(0px, -1px) rotate(-1.5deg); }
+      24%      { transform: translate(0.6px, -1px) rotate(-1.5deg); }
+      28%      { transform: translate(-0.6px, -1px) rotate(-1.5deg); }
+      32%      { transform: translate(0.6px, -1px) rotate(-1.5deg); }
+      36%      { transform: translate(-0.6px, -1px) rotate(-1.5deg); }
+      40%      { transform: translate(0.6px, -1px) rotate(-1.5deg); }
+      44%      { transform: translate(-0.6px, -1px) rotate(-1.5deg); }
+      48%      { transform: translate(0.6px, -1px) rotate(-1.5deg); }
+      52%      { transform: translate(-0.6px, -1px) rotate(-1.5deg); }
+      56%      { transform: translate(0.6px, -1px) rotate(-1.5deg); }
+      60%      { transform: translate(-0.6px, -1px) rotate(-1.5deg); }
+      64%      { transform: translate(0.6px, -1px) rotate(-1.5deg); }
+      72%       { transform: translate(0px, -1px) rotate(-1.5deg); }
+      86%, 100% { transform: translate(0px, 0px) rotate(0deg); }
+    }
+    @keyframes hissVisible {
+      0%, 18%   { opacity: 0; }
+      26%, 68%  { opacity: 1; }
+      78%, 100% { opacity: 0; }
+    }
+    /* Штрихи повітря біжать від пащі назовні */
+    @keyframes hissFlow {
+      from { stroke-dashoffset: 10; }
+      to   { stroke-dashoffset: 0; }
+    }
   </style>
 
   <!-- ШМАТОК М'ЯСА -->
@@ -251,6 +318,13 @@
       <ellipse cx="95" cy="58" rx="1.6" ry="3.2" fill="#1B1B1B" />
       <circle cx="93.8" cy="56.5" r="1" fill="#FFFFFF" />
     </g>
+  </g>
+
+  <!-- ШИПІННЯ: штрихи повітря перед пащею (видно лише при .state-hiss) -->
+  <g id="hiss-group" fill="none" stroke="#38BDF8" stroke-width="2.2" stroke-linecap="round">
+    <path class="hiss-line" d="M 131 60 L 153 52" stroke-dasharray="6 4" />
+    <path class="hiss-line" d="M 133 69 L 157 67" stroke-dasharray="6 4" />
+    <path class="hiss-line" d="M 131 79 L 153 84" stroke-dasharray="6 4" />
   </g>
 
   <!-- БЛИЖНЯ ЗАДНЯ ЛАПА -->

@@ -9,8 +9,8 @@ export function buildClassPopover(g) {
     el('ul', { class: 'rows' }, g.cls.felder.map(([n, t, d]) =>
       el('li', {}, deklaration(t, n, d && (/^".*"$/.test(d) ? javaLiteral(d.slice(1, -1), t) : el('code', {}, d)))))),
     el('h4', { i18n: 'card.methods' }),
-    el('ul', { class: 'rows' }, g.cls.methoden.map(([n, abs]) =>
-      el('li', {}, abs ? signatur(['public', 'abstract'], 'void', n, 'abstrakt', ';') : signatur(['public'], 'void', n, 'methode', ' { … }'),
+    el('ul', { class: 'rows' }, g.cls.methoden.map(([n, abs, p]) =>
+      el('li', {}, abs ? signatur(['public', 'abstract'], 'void', n, 'abstrakt', ';', p) : signatur(['public'], 'void', n, 'methode', ' { … }', p),
         el('span', { class: `tag ${abs ? 'abstract' : 'impl'}`, i18n: abs ? 'tag.abstract' : 'tag.impl' })))),
     el('h4', { i18n: 'card.subclasses' }),
     el('div', { class: 'erben' }, g.kinder.map(([n, c]) =>

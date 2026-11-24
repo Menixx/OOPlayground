@@ -13,7 +13,7 @@ export const el = (tag, props = {}, ...kids) => {
     else if (istMarke(v)) bindAttr(e, k, v.key, v.params);
     else if (v !== false && v != null) e.setAttribute(k, v === true ? '' : v);
   }
-  e.append(...kids.flat().filter((x) => x != null && x !== false)
+  e.append(...kids.flat(Infinity).filter((x) => x != null && x !== false)
     .map((x) => (istMarke(x) ? bindText(document.createElement('span'), x.key, x.params) : x)));
   if (i18n) bindText(e, i18n, i18nParams);
   return e;
@@ -37,8 +37,16 @@ export const deklaration = (typ, name, wert = null, kommentar = null) => el('spa
   el('span', { class: 'typ' }, typ), ' ', el('span', { class: 'feld' }, name),
   wert != null && [' = ', wert], ';',
   kommentar && el('span', { class: 'kommentar' }, ` // ${kommentar}`));
-/** Java-Methodensignatur, z. B. „public abstract void essen();“.
- *  mods: Modifikatoren, klasse: Farbe des Namens (methode/abstrakt/privat), ende: ';' oder ' { … }' oder ''. */
-export const signatur = (mods, typ, name, klasse = 'methode', ende = '') => el('span', { class: 'dekl' },
+/** Parameterliste „(T dauer)“; ein generischer Parameter T macht die Methode generisch („<T> void …“).
+ *  eingabe(i): optionales Eingabefeld für das Argument, steht direkt hinter dem Namen („T dauer = [5]“). */
+export const parameterListe = (parameter = [], eingabe = null) => ['(', parameter.flatMap(([typ, n], i) =>
+  [i > 0 && ', ', el('span', { class: 'typ' }, typ), ' ', el('span', { class: 'param' }, n), eingabe && [' = ', eingabe(i)]]), ')'];
+const generisch = (parameter = []) => parameter.some(([typ]) => typ === 'T');
+
+/** Java-Methodensignatur, z. B. „public abstract <T> void essen(T dauer);“.
+ *  mods: Modifikatoren, klasse: Farbe des Namens (methode/abstrakt/privat), ende: ';' oder ' { … }' oder '',
+ *  parameter: [[typ, name, standard]], eingabe(i): Eingabefeld je Parameter (Objektkarte). */
+export const signatur = (mods, typ, name, klasse = 'methode', ende = '', parameter = [], eingabe = null) => el('span', { class: 'dekl' },
   mods.length > 0 && [el('span', { class: 'mod' }, mods.join(' ')), ' '],
-  el('span', { class: 'typ' }, typ), ' ', el('span', { class: klasse }, `${name}()`), ende);
+  generisch(parameter) && [el('span', { class: 'typ' }, '<T>'), ' '],
+  el('span', { class: 'typ' }, typ), ' ', el('span', { class: klasse }, name), parameterListe(parameter, eingabe), ende);

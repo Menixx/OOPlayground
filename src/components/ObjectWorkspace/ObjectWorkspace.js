@@ -34,6 +34,12 @@ bus.on('called', ({ id, methode }) => {
   if (methode === 'halten') a.halt(); else a.play(methode);
 });
 
+// Methode ist fertig (Dauer abgelaufen, Wiederholungen gespielt, halten() oder gelöscht) -> Ruhezustand.
+// „ersetzt“: gleich folgt die Animation des neuen Aufrufs.
+bus.on('beendet', ({ id, grund }) => {
+  if (grund !== 'ersetzt') items.get(id)?.anim?.halt();
+});
+
 bus.on('deleted', ({ ids }) => {
   ids.forEach((id) => {
     const i = items.get(id);

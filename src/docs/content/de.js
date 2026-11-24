@@ -70,7 +70,7 @@ Die Sprache merkt sich der OOPlayground. Wechselst du sie hier, wechselt sie auc
       blocks: [
         { k: 'md', md: `Hier siehst du drei Symbole: **Tier**, **Transport** und **Figur**. Jedes Symbol ist eine **abstrakte Klasse** – ein Bauplan, der absichtlich noch nicht fertig ist.
 
-- **Tier** beschreibt alles, was Tiere gemeinsam haben. Seine Kinder: Katze, Krokodil, Mensch.
+- **Tier** beschreibt alles, was Tiere gemeinsam haben. Seine Kinder: Katze, Krokodil, Mensch, Eule.
 - **Transport** beschreibt alles, was Fahrzeuge gemeinsam haben. Seine Kinder: Auto, Flugzeug, Zug.
 - **Figur** beschreibt alles, was geometrische Figuren gemeinsam haben. Ihre Kinder: Dreieck, Kreis, Stern.
 
@@ -202,7 +202,7 @@ Der OOPlayground läuft in JavaScript. Das Fenster zeigt, wie dasselbe Programm 
 
 | Spalte | Was steht darin? |
 |---|---|
-| {{Stack}} | Der Frame \`main(String[] args)\` mit einer Variable für jedes Objekt, zum Beispiel \`Katze katze1 = @1159cc2d\`. Klickst du auf **Ausführen**, liegt für etwa zwei Sekunden der Frame dieser Methode obendrauf, zum Beispiel \`Katze.essen()\` mit \`this\`. |
+| {{Stack}} | Der Frame \`main(String[] args)\` mit einer Variable für jedes Objekt, zum Beispiel \`Katze katze1 = @1159cc2d\`. Klickst du auf **Ausführen**, liegt der Frame dieser Methode obendrauf, zum Beispiel \`Katze.essen(T dauer)\` mit \`this\` und \`dauer\`. Er bleibt, solange die Methode läuft – bei \`"ewig"\` so lange, bis du \`halten()\` aufrufst oder das Objekt löschst. |
 | {{Heap}} | Jedes Objekt als Kasten: Klasse, Adresse, Name und alle Felder mit ihren Werten. Ein Motor ist ein eigener Kasten, zum Beispiel \`auto1.motor\`. |
 | {{Metaspace}} | Alle Klassen mit \`extends\`, ihren eigenen Feldern und Methoden. Sie sind schon da, bevor du das erste Objekt baust, und ändern sich nie. |
 
@@ -418,7 +418,7 @@ class Katze extends Tier {
         { k: 'inApp', md: `\`Tier\`, \`Transport\` und \`Figur\` sind abstrakt. Darum steht auf ihrer Karte \`abstract class\`. Der Knopf \`new Tier()\` versucht trotzdem, ein Tier direkt zu bauen – und die Ausgabe meldet einen Fehler: „Abstrakte Klassen können nicht instanziiert werden."
 
 **Abstrakte Methoden:** Eine Methode mit dem lila Abzeichen {{abstract}} hat nur einen Namen, aber noch keinen Inhalt. Die Klasse sagt damit: „Jedes Tier **muss** fressen können – aber **wie**, das entscheidet jedes Kind selbst." Die Katze frisst Fisch, das Krokodil frisst Fleisch, der Mensch isst Pizza.` },
-        { k: 'memory', md: `Auch \`Tier\` hat seinen Platz im {{Metaspace}}: Die Kinder brauchen ja seine Felder und seine fertigen Methoden wie \`halten()\`. Aber im {{Heap}} findest du **nie** ein Objekt der Klasse \`Tier\` – nur Katzen, Krokodile und Menschen.
+        { k: 'memory', md: `Auch \`Tier\` hat seinen Platz im {{Metaspace}}: Die Kinder brauchen ja seine Felder und seine fertigen Methoden wie \`halten()\`. Aber im {{Heap}} findest du **nie** ein Objekt der Klasse \`Tier\` – nur Katzen, Krokodile, Menschen und Eulen.
 
 Bei einer abstrakten Methode wie \`essen()\` steht im Metaspace nur der Name, aber kein Code. Den Code liefern erst die Kinder.` },
         { k: 'remember', md: `Abstrakt = nur eine Idee, noch nicht fertig. Erst die Kinder machen sie fertig.` },
@@ -493,7 +493,7 @@ class Katze extends Tier {   // "extends" = erbt von
 
 Jede Klasse hat eine Art Inhaltsverzeichnis ihrer Methoden, die **Methodentabelle**. Beim Krokodil steht darin: \`essen()\` → Code von Krokodil, \`halten()\` → Code von Tier. Überschreiben heißt also: Im Inhaltsverzeichnis des Kindes wird ein Eintrag der Eltern durch einen eigenen ersetzt.
 
-Im Fenster **Speicher** siehst du das an den Klassen: Bei \`Katze\` stehen \`essen()\` und \`bewegen()\`, aber kein \`halten()\`.` },
+Im Fenster **Speicher** siehst du das an den Klassen: Bei \`Katze\` stehen \`essen()\`, \`bewegen()\` und \`lautGeben()\`, aber kein \`halten()\`.` },
         { k: 'remember', md: `Überschreiben = gleicher Name, eigene Art.` },
         { k: 'code', md: `\`\`\`java
 class Krokodil extends Tier {
@@ -689,7 +689,7 @@ Im OOPlayground geht es schneller: Nach \`katze1 = null\` verschwinden die Varia
         { k: 'goal', md: `Du probierst, aus einer abstrakten Klasse ein Objekt zu bauen – und merkst, dass es **nicht** geht.` },
         { k: 'steps', md: `1. Fahre über **Tier**.
 2. Lies den Titel: \`abstract class Tier\`.
-3. Schau dir die Abzeichen an: {{abstract}} bei \`essen()\` und \`bewegen()\`, {{implemented}} bei \`halten()\`.
+3. Schau dir die Abzeichen an: {{abstract}} bei \`essen()\`, \`bewegen()\` und \`lautGeben()\`, {{implemented}} bei \`halten()\`.
 4. Klick ganz unten in der Karte auf **\`[[new Tier()]]\`**. (Wenn du darüberfährst, steht da: „Direkt instanziieren (verboten)".)
 5. Schau in die **Ausgabe**.
 6. Wenn du magst: Probier dasselbe mit \`new Transport()\` und \`new Figur()\`.` },
@@ -761,7 +761,7 @@ Im OOPlayground geht es schneller: Nach \`katze1 = null\` verschwinden die Varia
       blocks: [
         { k: 'goal', md: `Du gibst einem Objekt einen Befehl und liest, was es antwortet.` },
         { k: 'steps', md: `1. Erstelle eine Katze: **Tier** → **\`[[Katze]]\`**. Es erscheint \`katze1\`.
-2. Fahre über \`katze1\`. Unter **Methoden** stehen: \`essen()\`, \`bewegen()\`, \`halten()\`.
+2. Fahre über \`katze1\`. Unter **Methoden** stehen: \`essen()\`, \`bewegen()\`, \`lautGeben()\`, \`halten()\`.
 3. Klick neben \`essen()\` auf **\`[[Ausführen]]\`**. Die Katze im Bild frisst.
 4. Klick neben \`bewegen()\` auf **\`[[Ausführen]]\`**. Die Katze läuft.
 5. Klick neben \`halten()\` auf **\`[[Ausführen]]\`**. Die Katze bleibt stehen.` },
@@ -810,7 +810,7 @@ Im OOPlayground geht es schneller: Nach \`katze1 = null\` verschwinden die Varia
         { k: 'goal', md: `Du probierst aus, dass Kinder eine geerbte Methode auf ihre eigene Art neu schreiben können – oder sie einfach so übernehmen.` },
         { k: 'before', md: `**Vorher:** \`katze1\`, \`krokodil1\` und \`mensch1\` sollten da sein (siehe [Vererbung entdecken](#demo-vererbung)).` },
         { k: 'steps', md: `1. Fahre über **Tier**. Du siehst: \`essen()\` ist {{abstract}}, \`halten()\` ist {{implemented}}.
-2. Fahre über \`katze1\`. Du siehst: \`essen()\` und \`bewegen()\` haben {{überschrieben}}, \`halten()\` hat {{geerbt}}.
+2. Fahre über \`katze1\`. Du siehst: \`essen()\`, \`bewegen()\` und \`lautGeben()\` haben {{überschrieben}}, \`halten()\` hat {{geerbt}}.
 3. Klick neben \`essen()\` auf **\`[[Ausführen]]\`** – zuerst bei \`katze1\`, dann bei \`krokodil1\`, dann bei \`mensch1\`.
 4. Klick neben \`halten()\` auf **\`[[Ausführen]]\`** – bei \`katze1\` und bei \`krokodil1\`.` },
         { k: 'output', md: `\`\`\`console
@@ -1030,7 +1030,7 @@ Du ──motorStarten()──▶ zug1 ──starten()──▶ Elektromotor
 \`\`\`` },
         { k: 'watch', md: `- Der Metaspace ändert sich nie: Die Klassen sind da, bevor das erste Objekt gebaut wird, und bleiben, wenn alle Objekte weg sind.
 - Ein Auto mit Motor sind **zwei** Objekte im Heap, aber nur **eine** Variable im Stack. An den Motor kommt man nur über das Auto.
-- Der Frame von \`motorStarten()\` bleibt nur etwa zwei Sekunden. Verpasst? Kein Problem – das Feld \`laeuft\` zeigt trotzdem, dass die Methode gelaufen ist.
+- Der Frame von \`motorStarten()\` bleibt nur, solange die Startanimation einmal abläuft (etwa zwei Sekunden). Verpasst? Kein Problem – das Feld \`laeuft\` zeigt trotzdem, dass die Methode gelaufen ist.
 - Nach \`katze1 = null\` sind Variable und Objekt weg. Die Klasse \`Katze\` bleibt im Metaspace.` }
       ],
       related: [{ id: 'begriff-speicher', label: 'Speicher (JVM)' }, { id: 'begriff-objekt', label: 'Objekt' }, { id: 'begriff-null', label: 'Referenz & null' }]

@@ -1,0 +1,325 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240" class="owl-icon">
+  <style>
+    .owl-icon * {
+      transform-box: fill-box;
+    }
+
+    /* Base hidden state for dynamic elements */
+    .worm-group, .grab-foot, .owl-eyes-happy, .sound-waves, .sound-waves-left {
+      opacity: 0;
+    }
+    .beak-bottom { transform-origin: center top; }
+    .beak-top    { transform-origin: center bottom; }
+    .owl-body-group { transform-origin: 50% 88%; }
+    .owl-belly   { transform-origin: 50% 40%; }
+    .wing-left   { transform-origin: 85% 20%; }
+    .wing-right  { transform-origin: 15% 20%; }
+    .ground-shadow { transform-origin: center; }
+
+    /* =========================================
+       STATE 1: EATING (.state-eat) — essen(), loop 3.2s
+       The worm crawls up, the owl grabs it with its foot, lifts it to the beak,
+       bites twice, squints happily, and puts the foot back down.
+       ========================================= */
+    .owl-icon.state-eat .worm-group   { animation: owl-worm-path 3.2s ease-in-out infinite; }
+    .owl-icon.state-eat .worm-b       { animation: owl-bite-1 3.2s steps(1) infinite; }
+    .owl-icon.state-eat .worm-a       { animation: owl-bite-2 3.2s steps(1) infinite; }
+    .owl-icon.state-eat .foot-left    { animation: owl-foot-away 3.2s steps(1) infinite; }
+    .owl-icon.state-eat .grab-foot    { animation: owl-foot-lift 3.2s ease-in-out infinite; }
+    .owl-icon.state-eat .owl-body-group { animation: owl-lean 3.2s ease-in-out infinite; }
+    .owl-icon.state-eat .owl-face     { animation: owl-look-down 3.2s ease-in-out infinite; }
+    .owl-icon.state-eat .beak-bottom  { animation: owl-chomp 3.2s ease-in-out infinite; }
+    .owl-icon.state-eat .owl-eyes-open  { animation: owl-eyes-rest 3.2s steps(1) infinite; }
+    .owl-icon.state-eat .owl-eyes-happy { animation: owl-eyes-happy 3.2s steps(1) infinite; }
+
+    @keyframes owl-worm-path {
+      0%        { opacity: 0; transform: translate(-20px, 0px); }
+      6%        { opacity: 1; transform: translate(-14px, 0px); }
+      20%, 26%  { opacity: 1; transform: translate(30px, 0px); }   /* under the foot */
+      38%, 66%  { opacity: 1; transform: translate(34px, -66px); } /* at the beak */
+      78%, 100% { opacity: 1; transform: translate(30px, 0px); }
+    }
+    @keyframes owl-bite-1 {
+      0%, 43%   { opacity: 1; }
+      44%, 100% { opacity: 0; }
+    }
+    @keyframes owl-bite-2 {
+      0%, 55%   { opacity: 1; }
+      56%, 100% { opacity: 0; }
+    }
+    /* The foot in the drawing hides while its copy in front of the belly holds the worm */
+    @keyframes owl-foot-away {
+      0%, 23%   { opacity: 1; }
+      24%, 77%  { opacity: 0; }
+      78%, 100% { opacity: 1; }
+    }
+    @keyframes owl-foot-lift {
+      0%, 23%   { opacity: 0; transform: translate(0px, 0px); }
+      24%, 26%  { opacity: 1; transform: translate(0px, 0px); }
+      38%, 66%  { opacity: 1; transform: translate(4px, -66px); }
+      77%       { opacity: 1; transform: translate(0px, 0px); }
+      78%, 100% { opacity: 0; transform: translate(0px, 0px); }
+    }
+    @keyframes owl-lean {
+      0%, 28%   { transform: translateY(0px) scaleY(1); }
+      38%, 66%  { transform: translateY(6px) scaleY(0.97); }
+      78%, 100% { transform: translateY(0px) scaleY(1); }
+    }
+    @keyframes owl-look-down {
+      0%, 28%   { transform: translateY(0px); }
+      38%       { transform: translateY(8px); }
+      43%       { transform: translateY(11px); }  /* bite 1 */
+      48%       { transform: translateY(8px); }
+      55%       { transform: translateY(11px); }  /* bite 2 */
+      60%, 66%  { transform: translateY(8px); }
+      78%, 100% { transform: translateY(0px); }
+    }
+    @keyframes owl-chomp {
+      0%, 38%   { transform: translateY(0px) scaleY(1); }
+      41%       { transform: translateY(4px) scaleY(1.3); }
+      44%       { transform: translateY(0px) scaleY(1); }
+      53%       { transform: translateY(4px) scaleY(1.3); }
+      56%, 100% { transform: translateY(0px) scaleY(1); }
+    }
+    @keyframes owl-eyes-rest {
+      0%, 43%   { opacity: 1; }
+      44%, 79%  { opacity: 0; }
+      80%, 100% { opacity: 1; }
+    }
+    @keyframes owl-eyes-happy {
+      0%, 43%   { opacity: 0; }
+      44%, 79%  { opacity: 1; }
+      80%, 100% { opacity: 0; }
+    }
+
+    /* =========================================
+       STATE 2: FLYING (.state-fly) — bewegen(), loop 2.4s
+       Crouch -> take off -> hover with flapping wings -> land
+       ========================================= */
+    .owl-icon.state-fly .owl-body-group { animation: owl-hover 2.4s ease-in-out infinite; }
+    .owl-icon.state-fly .wing-left      { animation: owl-flap-left 2.4s ease-in-out infinite; }
+    .owl-icon.state-fly .wing-right     { animation: owl-flap-right 2.4s ease-in-out infinite; }
+    .owl-icon.state-fly .ground-shadow  { animation: owl-shadow 2.4s ease-in-out infinite; }
+
+    @keyframes owl-hover {
+      0%        { transform: translateY(0px) scaleY(1); }
+      8%        { transform: translateY(4px) scaleY(0.94); }   /* crouch */
+      18%       { transform: translateY(-22px) scaleY(1.03); } /* take off */
+      30%       { transform: translateY(-17px) scaleY(1); }
+      42%       { transform: translateY(-25px) scaleY(1); }
+      54%       { transform: translateY(-17px) scaleY(1); }
+      66%       { transform: translateY(-25px) scaleY(1); }
+      78%       { transform: translateY(-20px) scaleY(1); }
+      88%       { transform: translateY(2px) scaleY(0.95); }   /* land */
+      94%       { transform: translateY(0px) scaleY(1.02); }
+      100%      { transform: translateY(0px) scaleY(1); }
+    }
+    @keyframes owl-flap-left {
+      0%, 12%   { transform: rotate(0deg); }
+      16%       { transform: rotate(55deg); }
+      21%       { transform: rotate(8deg); }
+      26%       { transform: rotate(55deg); }
+      31%       { transform: rotate(8deg); }
+      36%       { transform: rotate(55deg); }
+      41%       { transform: rotate(8deg); }
+      46%       { transform: rotate(55deg); }
+      51%       { transform: rotate(8deg); }
+      56%       { transform: rotate(55deg); }
+      61%       { transform: rotate(8deg); }
+      66%       { transform: rotate(55deg); }
+      71%       { transform: rotate(8deg); }
+      76%       { transform: rotate(55deg); }
+      81%       { transform: rotate(8deg); }
+      87%, 100% { transform: rotate(0deg); }
+    }
+    @keyframes owl-flap-right {
+      0%, 12%   { transform: rotate(0deg); }
+      16%       { transform: rotate(-55deg); }
+      21%       { transform: rotate(-8deg); }
+      26%       { transform: rotate(-55deg); }
+      31%       { transform: rotate(-8deg); }
+      36%       { transform: rotate(-55deg); }
+      41%       { transform: rotate(-8deg); }
+      46%       { transform: rotate(-55deg); }
+      51%       { transform: rotate(-8deg); }
+      56%       { transform: rotate(-55deg); }
+      61%       { transform: rotate(-8deg); }
+      66%       { transform: rotate(-55deg); }
+      71%       { transform: rotate(-8deg); }
+      76%       { transform: rotate(-55deg); }
+      81%       { transform: rotate(-8deg); }
+      87%, 100% { transform: rotate(0deg); }
+    }
+    @keyframes owl-shadow {
+      0%, 10%   { transform: scaleX(1); opacity: 0.22; }
+      18%, 82%  { transform: scaleX(0.72); opacity: 0.12; }
+      92%, 100% { transform: scaleX(1); opacity: 0.22; }
+    }
+
+    /* =========================================
+       STATE 3: HOOTING (.state-hoot) — lautGeben(), one "Uhu!" = 1.6s
+       Breathe in -> belly puffs up, beak opens, sound waves on both sides -> breathe out
+       ========================================= */
+    .owl-icon.state-hoot .owl-body-group { animation: owl-hoot-body 1.6s ease-in-out infinite; }
+    .owl-icon.state-hoot .owl-belly      { animation: owl-hoot-puff 1.6s ease-in-out infinite; }
+    .owl-icon.state-hoot .owl-face       { animation: owl-hoot-face 1.6s ease-in-out infinite; }
+    .owl-icon.state-hoot .beak-bottom    { animation: owl-beak-open 1.6s ease-in-out infinite; }
+    .owl-icon.state-hoot .beak-top       { animation: owl-beak-lift 1.6s ease-in-out infinite; }
+    .owl-icon.state-hoot .sound-waves,
+    .owl-icon.state-hoot .sound-waves-left { opacity: 1; }
+    .owl-icon.state-hoot .sound-waves .wave      { animation: owl-wave-right 1.6s ease-out infinite both; }
+    .owl-icon.state-hoot .sound-waves-left .wave { animation: owl-wave-left 1.6s ease-out infinite both; }
+    .owl-icon.state-hoot .wave-2 { animation-delay: 0.12s; }
+
+    @keyframes owl-hoot-body {
+      0%, 100% { transform: scale(1, 1); }
+      22%      { transform: scale(1.03, 0.97); }  /* breathe in */
+      42%, 68% { transform: scale(0.98, 1.04); }  /* "Uhu!" */
+    }
+    @keyframes owl-hoot-puff {
+      0%, 18%, 90%, 100% { transform: scale(1, 1); }
+      40%, 68% { transform: scale(1.1, 1.07); }
+    }
+    @keyframes owl-hoot-face {
+      0%, 26%, 86%, 100% { transform: translateY(0px); }
+      40%, 70% { transform: translateY(-3px); }
+    }
+    @keyframes owl-beak-open {
+      0%, 30%, 80%, 100% { transform: translateY(0px) scaleY(1); }
+      38%, 70% { transform: translateY(6px) scaleY(1.55); }
+    }
+    @keyframes owl-beak-lift {
+      0%, 30%, 80%, 100% { transform: translateY(0px); }
+      38%, 70% { transform: translateY(-2px); }
+    }
+    @keyframes owl-wave-right {
+      0%, 34%   { opacity: 0; transform: translateX(-4px) scale(0.7); }
+      46%       { opacity: 1; transform: translateX(2px) scale(1); }
+      72%       { opacity: 0.8; transform: translateX(8px) scale(1.08); }
+      84%, 100% { opacity: 0; transform: translateX(12px) scale(1.12); }
+    }
+    @keyframes owl-wave-left {
+      0%, 34%   { opacity: 0; transform: translateX(4px) scale(0.7); }
+      46%       { opacity: 1; transform: translateX(-2px) scale(1); }
+      72%       { opacity: 0.8; transform: translateX(-8px) scale(1.08); }
+      84%, 100% { opacity: 0; transform: translateX(-12px) scale(1.12); }
+    }
+  </style>
+
+  <!-- Ground shadow -->
+  <ellipse class="ground-shadow" cx="120" cy="212" rx="48" ry="8" fill="#1F2937" opacity="0.22" />
+
+  <!-- Main Owl Body Group -->
+  <g class="owl-body-group">
+    <!-- Feet -->
+    <g class="feet">
+      <!-- Left foot -->
+      <g class="foot-left">
+        <rect x="94" y="196" width="8" height="14" rx="4" fill="#F59E0B" />
+        <rect x="103" y="196" width="8" height="14" rx="4" fill="#F59E0B" />
+      </g>
+      <!-- Right foot -->
+      <rect x="129" y="196" width="8" height="14" rx="4" fill="#F59E0B" />
+      <rect x="138" y="196" width="8" height="14" rx="4" fill="#F59E0B" />
+    </g>
+
+    <!-- Left Wing -->
+    <g class="wing-left">
+      <path d="M 68 122 C 44 128, 38 158, 56 174 C 66 182, 74 172, 74 156 Z" fill="#46A302" />
+      <path d="M 66 130 C 50 135, 46 156, 58 168 C 64 173, 69 166, 69 154 Z" fill="#58CC02" />
+    </g>
+
+    <!-- Right Wing -->
+    <g class="wing-right">
+      <path d="M 172 122 C 196 128, 202 158, 184 174 C 174 182, 166 172, 166 156 Z" fill="#46A302" />
+      <path d="M 174 130 C 190 135, 194 156, 182 168 C 176 173, 171 166, 171 154 Z" fill="#58CC02" />
+    </g>
+
+    <!-- Torso & Head Base -->
+    <path d="M 76 62 L 66 44 L 88 52 C 108 46, 132 46, 152 52 L 174 44 L 164 62
+             C 178 78, 182 104, 178 138 C 174 176, 156 198, 120 198
+             C 84 198, 66 176, 62 138 C 58 104, 62 78, 76 62 Z"
+          fill="#58CC02" />
+
+    <!-- Belly Patch with Feather Chevrons -->
+    <g class="owl-belly">
+      <path d="M 84 134 C 84 114, 156 114, 156 134 C 156 172, 142 190, 120 190 C 98 190, 84 172, 84 134 Z"
+            fill="#89E219" />
+      <path d="M 102 142 Q 108 148 114 142" fill="none" stroke="#58CC02" stroke-width="3.5" stroke-linecap="round" />
+      <path d="M 126 142 Q 132 148 138 142" fill="none" stroke="#58CC02" stroke-width="3.5" stroke-linecap="round" />
+      <path d="M 114 158 Q 120 164 126 158" fill="none" stroke="#58CC02" stroke-width="3.5" stroke-linecap="round" />
+    </g>
+
+    <!-- Face: moves when the owl looks down or hoots -->
+    <g class="owl-face">
+      <!-- Eye Mask / Face Plate -->
+      <circle cx="96" cy="94" r="27" fill="#89E219" />
+      <circle cx="144" cy="94" r="27" fill="#89E219" />
+      <rect x="96" y="72" width="48" height="44" fill="#89E219" />
+
+      <g class="owl-eyes-open">
+        <!-- Eyes (Sclera) -->
+        <circle cx="96" cy="94" r="21" fill="#FFFFFF" />
+        <circle cx="144" cy="94" r="21" fill="#FFFFFF" />
+
+        <!-- Pupils -->
+        <circle cx="99" cy="94" r="10.5" fill="#1F2937" />
+        <circle cx="141" cy="94" r="10.5" fill="#1F2937" />
+
+        <!-- Eye Highlights -->
+        <circle cx="95" cy="89" r="3.8" fill="#FFFFFF" />
+        <circle cx="137" cy="89" r="3.8" fill="#FFFFFF" />
+      </g>
+
+      <!-- Happy squinting eyes (while eating) -->
+      <g class="owl-eyes-happy" fill="none" stroke="#1F2937" stroke-width="5" stroke-linecap="round">
+        <path d="M 80 99 Q 96 80 112 99" />
+        <path d="M 128 99 Q 144 80 160 99" />
+      </g>
+
+      <!-- Beak (Split into Top and Bottom for animation) -->
+      <g class="beak">
+        <!-- Bottom Beak -->
+        <path class="beak-bottom" d="M 111 111 L 129 111 L 120 124 Z" fill="#D97706" />
+        <!-- Top Beak -->
+        <path class="beak-top" d="M 109 109 Q 120 103 131 109 L 120 119 Z" fill="#F59E0B" />
+      </g>
+    </g>
+  </g>
+
+  <!-- Worm (drawn in front of the owl so it stays visible when lifted to the beak); a = tail half, b = head half (bitten first) -->
+  <g class="worm-group">
+    <g class="worm-a">
+      <path d="M 46 208 C 50 202, 56 202, 60 207"
+            fill="none" stroke="#F472B6" stroke-width="6.5" stroke-linecap="round" />
+      <path d="M 46 208 C 50 202, 56 202, 60 207"
+            fill="none" stroke="#FBCFE8" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 6" />
+    </g>
+    <g class="worm-b">
+      <path d="M 60 207 C 64 212, 70 212, 74 206 C 77 202, 81 203, 83 207"
+            fill="none" stroke="#F472B6" stroke-width="6.5" stroke-linecap="round" />
+      <path d="M 60 207 C 64 212, 70 212, 74 206 C 77 202, 81 203, 83 207"
+            fill="none" stroke="#FBCFE8" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 6" />
+      <!-- Worm eye -->
+      <circle cx="82" cy="205.5" r="1.3" fill="#1F2937" />
+    </g>
+  </g>
+
+  <!-- Copy of the left foot in front of the belly: holds the worm while eating -->
+  <g class="grab-foot">
+    <rect x="94" y="196" width="8" height="14" rx="4" fill="#F59E0B" />
+    <rect x="103" y="196" width="8" height="14" rx="4" fill="#F59E0B" />
+  </g>
+
+  <!-- Sound Waves for Hooting State (right and left of the head) -->
+  <g class="sound-waves" transform="translate(176, 100)">
+    <path class="wave wave-1" d="M 4 -8 Q 14 0 4 8" fill="none" stroke="#38BDF8" stroke-width="3.5" stroke-linecap="round" />
+    <path class="wave wave-2" d="M 12 -14 Q 26 0 12 14" fill="none" stroke="#38BDF8" stroke-width="3.5" stroke-linecap="round" />
+    <circle class="wave wave-2" cx="26" cy="-12" r="2.5" fill="#38BDF8" />
+  </g>
+  <g class="sound-waves-left" transform="translate(64, 100)">
+    <path class="wave wave-1" d="M -4 -8 Q -14 0 -4 8" fill="none" stroke="#38BDF8" stroke-width="3.5" stroke-linecap="round" />
+    <path class="wave wave-2" d="M -12 -14 Q -26 0 -12 14" fill="none" stroke="#38BDF8" stroke-width="3.5" stroke-linecap="round" />
+    <circle class="wave wave-2" cx="-26" cy="-12" r="2.5" fill="#38BDF8" />
+  </g>
+</svg>

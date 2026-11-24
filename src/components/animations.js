@@ -5,9 +5,10 @@ const BASIS = `${import.meta.env.BASE_URL}animations/`;
 
 // Methode -> CSS-Klasse am Wurzel-<svg> (die Klassen stehen im <style> der SVG-Datei)
 export const ANIMATIONEN = {
-  Katze:    { datei: 'animation-cat',       methoden: { essen: 'state-eat',   bewegen: 'state-walk' } },
-  Krokodil: { datei: 'animation-crocodile', methoden: { essen: 'state-eat',   bewegen: 'state-crawl' } },
-  Mensch:   { datei: 'animation-man',       methoden: { essen: 'state-pizza', bewegen: 'state-walk' }, smil: 'state-pizza' },
+  Katze:    { datei: 'animation-cat',       methoden: { essen: 'state-eat',   bewegen: 'state-walk',  lautGeben: 'state-meow' } },
+  Krokodil: { datei: 'animation-crocodile', methoden: { essen: 'state-eat',   bewegen: 'state-crawl', lautGeben: 'state-hiss' } },
+  Mensch:   { datei: 'animation-man',       methoden: { essen: 'state-pizza', bewegen: 'state-walk',  lautGeben: 'state-talk' }, smil: 'state-pizza' },
+  Eule:     { datei: 'animation-owl',       methoden: { essen: 'state-eat',   bewegen: 'state-fly',   lautGeben: 'state-hoot' } },
   Auto:     { datei: 'animation-car',       methoden: { motorStarten: 'state-start', bewegen: 'state-drive' } },
   Flugzeug: { datei: 'animation-plane',     methoden: { motorStarten: 'state-start', bewegen: 'state-fly' } },
   Zug:      { datei: 'animation-train',     methoden: { motorStarten: 'state-start', bewegen: 'state-drive' } }
@@ -29,7 +30,9 @@ function parse(text) {
   const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
   if (doc.querySelector('parsererror')) throw new Error('SVG nicht lesbar');
   const svg = document.importNode(doc.documentElement, true);
-  ['id', 'width', 'height', 'class'].forEach((a) => svg.removeAttribute(a)); // class: z. B. state-pizza im Mensch-SVG -> Ruhezustand
+  ['id', 'width', 'height'].forEach((a) => svg.removeAttribute(a));
+  // Zustandsklassen (z. B. state-pizza im Mensch-SVG) entfernen -> Ruhezustand; andere Klassen (z. B. owl-icon) tragen die Styles
+  svg.classList.remove(...[...svg.classList].filter((c) => c.startsWith('state-')));
   svg.setAttribute('aria-hidden', 'true');
   return svg;
 }

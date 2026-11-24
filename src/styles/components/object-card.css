@@ -5,3 +5,8 @@
 .loeschen { color: var(--del-text); font-weight: 600; border-color: var(--del-line); background: linear-gradient(var(--btn-a), var(--del-b)); }
 .loeschen:hover:not(:disabled) { background: linear-gradient(var(--btn-a), var(--del-hover-b)); }
 .pop .loeschen { display: block; margin-top: 12px; font: 600 12px var(--mono); }
+/* Argumente direkt in der Signatur: „essen(T dauer = [5])“ – das Feld wächst mit dem Text (ObjectCard.js) */
+.arg { box-sizing: content-box; min-width: 2ch; padding: 0 4px; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 5px; text-align: center; }
+.arg:hover { border-color: var(--methode); }
+.arg:focus-visible { outline: 2px solid var(--methode); outline-offset: 1px; }
+.zeilen-ende { display: inline-flex; align-items: center; margin-left: auto; }

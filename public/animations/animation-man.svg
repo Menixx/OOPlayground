@@ -207,6 +207,80 @@
 
     /* Початковий стан без анімацій (.state-idle) */
     #pizza-slice, #pizza-bitten, #mouth-bite { opacity: 0; }
+    /* ================= 3. АНІМАЦІЯ РОЗМОВИ (.state-talk, метод lautGeben()) =================
+       Цикл 2.4 секунди: людина махає лівою рукою, говорить (рот відкривається і закривається),
+       збоку від голови з'являється хмаринка «Hi!» */
+    #talk-bubble { opacity: 0; }
+    svg.state-talk #left-upper-arm {
+      transform-origin: 46px 51px;
+      animation: talkUpperArm 2.4s ease-in-out infinite;
+    }
+    svg.state-talk #left-forearm {
+      transform-origin: 42px 64px;
+      animation: talkForearmWave 2.4s ease-in-out infinite;
+    }
+    svg.state-talk #head-group {
+      transform-origin: 64px 36px;
+      animation: talkHeadNod 2.4s ease-in-out infinite;
+    }
+    svg.state-talk #mouth-smile {
+      animation: talkMouthSmile 2.4s steps(1, end) infinite;
+    }
+    svg.state-talk #mouth-bite {
+      animation: talkMouthOpen 2.4s steps(1, end) infinite;
+    }
+    svg.state-talk #talk-bubble {
+      transform-box: fill-box;
+      transform-origin: 0% 100%;
+      animation: talkBubble 2.4s ease-out infinite;
+    }
+
+    /* Рука піднімається вгору-вбік і тримається, поки передпліччя махає */
+    @keyframes talkUpperArm {
+      0%, 4%    { transform: rotate(0deg); }
+      18%, 78%  { transform: rotate(140deg); }
+      94%, 100% { transform: rotate(0deg); }
+    }
+    @keyframes talkForearmWave {
+      0%, 18%   { transform: rotate(0deg); }
+      26%       { transform: rotate(-22deg); }
+      34%       { transform: rotate(18deg); }
+      42%       { transform: rotate(-22deg); }
+      50%       { transform: rotate(18deg); }
+      58%       { transform: rotate(-22deg); }
+      66%       { transform: rotate(18deg); }
+      78%, 100% { transform: rotate(0deg); }
+    }
+    @keyframes talkHeadNod {
+      0%, 16%, 84%, 100% { transform: rotate(0deg); }
+      30%, 58% { transform: rotate(-3deg); }
+      44%, 72% { transform: rotate(3deg); }
+    }
+    /* Губи: відкрито / закрито по черзі, наче людина вимовляє «Hal-lo!» */
+    @keyframes talkMouthSmile {
+      0%, 19.9%   { opacity: 1; }
+      20%, 29.9%  { opacity: 0; }
+      30%, 34.9%  { opacity: 1; }
+      35%, 46.9%  { opacity: 0; }
+      47%, 51.9%  { opacity: 1; }
+      52%, 61.9%  { opacity: 0; }
+      62%, 100%   { opacity: 1; }
+    }
+    @keyframes talkMouthOpen {
+      0%, 19.9%   { opacity: 0; }
+      20%, 29.9%  { opacity: 1; }
+      30%, 34.9%  { opacity: 0; }
+      35%, 46.9%  { opacity: 1; }
+      47%, 51.9%  { opacity: 0; }
+      52%, 61.9%  { opacity: 1; }
+      62%, 100%   { opacity: 0; }
+    }
+    @keyframes talkBubble {
+      0%, 16%   { opacity: 0; transform: scale(0.4); }
+      26%       { opacity: 1; transform: scale(1.08); }
+      32%, 74%  { opacity: 1; transform: scale(1); }
+      86%, 100% { opacity: 0; transform: scale(0.9); }
+    }
   </style>
 
   <g id="person-root">
@@ -319,5 +393,11 @@
       <path d="M 83 45 L 88 55 L 81 58" fill="none" stroke="#1565C0" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
     </g>
 
+  </g>
+
+  <!-- Хмаринка репліки (видно лише при .state-talk) -->
+  <g id="talk-bubble">
+    <path d="M 88 2 L 120 2 C 124 2, 126 4, 126 8 L 126 18 C 126 22, 124 24, 120 24 L 92 24 L 84 30 L 86 24 C 84 23.5, 82 21.5, 82 18 L 82 8 C 82 4, 84 2, 88 2 Z" fill="#FFFFFF" stroke="#38BDF8" stroke-width="2" stroke-linejoin="round" />
+    <text x="104" y="17.5" text-anchor="middle" font-family="system-ui, 'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0284C7">Hi!</text>
   </g>
 </svg>

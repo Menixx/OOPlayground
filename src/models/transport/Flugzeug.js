@@ -1,7 +1,9 @@
 import { t } from '../../i18n/i18n.js';
 import { Turbofan } from '../engines/Turbofan.js';
 import { Transport } from '../abstract/Transport.js';
+import { EWIG, dauerPruefen } from '../parameter.js';
 export class Flugzeug extends Transport {
+  static zyklen = { motorStarten: 2 }; // Sekunden: die Startanimation läuft genau einmal
   static eigeneFelder = [['spannweite', 'double']];
   constructor() {
     super();
@@ -16,5 +18,5 @@ export class Flugzeug extends Transport {
     if (this.motor.laeuft) return t('transport.motorLaeuft');
     return `${this.motor.starten()}\n${t('transport.motorErfolg')}`;
   }
-  bewegen() { return t('flugzeug.bewegen'); }
+  bewegen(dauer = EWIG) { dauerPruefen(dauer); return t('flugzeug.bewegen'); }
 }

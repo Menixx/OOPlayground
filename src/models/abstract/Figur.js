@@ -4,7 +4,7 @@ export class Figur {
     ['name', 'String', '"Unbenannt"'],
     ['anzahlEcken', 'int']
   ];
-  static methoden = [['drehen90', false]];
+  static methoden = [['drehen90', false, []]];
   #winkel = 0; // gekapselt: nur über drehen90() änderbar
   constructor() {
     if (new.target === Figur) throw new Error(t('error.abstract'));
