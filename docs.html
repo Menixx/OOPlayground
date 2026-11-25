@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>OOPlayground – Erklärung</title>
+  <!-- Favicon: Browser nehmen das letzte passende <link>; WebP (kleiner) bevorzugt, PNG als Rückfall -->
+  <link rel="icon" type="image/png" href="./icons/favicon.png" />
+  <link rel="icon" type="image/webp" href="./icons/favicon.webp" />
   <script>
     // Farbschema vor dem ersten Zeichnen setzen (kein helles Aufblitzen) – Logik wie in src/services/Theme.js
     try { var m = localStorage.getItem('ooplayground.theme'); } catch (e) {}
