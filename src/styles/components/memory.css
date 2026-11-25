@@ -3,7 +3,7 @@
 /* ---------- Schaltfläche unten links ---------- */
 .mem-btn {
   --mem-btn-bg: var(--bg);
-  position: fixed; left: 16px; bottom: 16px; z-index: 900;
+  position: fixed; left: 16px; bottom: 16px; z-index: 60; /* unter dem Hintergrund des Kopfzeilen-Menüs (70), über den Karten (20) */
   display: grid; place-items: center; width: 52px; height: 52px; padding: 0;
   border-radius: 14px; color: var(--stack-strip); background: linear-gradient(var(--btn-a), var(--btn-b));
   box-shadow: var(--shine), var(--shadow-2);
