@@ -2,6 +2,7 @@ import { el, L } from '../../utils/dom.js';
 import { langToggle } from '../LangToggle/LangToggle.js';
 import { themeToggle } from '../ThemeToggle/ThemeToggle.js';
 import { headerMenu } from '../HeaderMenu/HeaderMenu.js';
+import { tonSchalter } from '../TonSchalter/TonSchalter.js';
 
 const SVG = 'http://www.w3.org/2000/svg';
 
@@ -26,5 +27,5 @@ function docsLink() {
 }
 
 export function mountHeader(root) {
-  root.append(el('h1', {}, 'OOPlayground'), ...headerMenu(themeToggle(), langToggle(), docsLink()), el('p', { i18n: 'header.subtitle' }));
+  root.append(el('h1', {}, 'OOPlayground'), ...headerMenu(themeToggle(), langToggle(), docsLink(), tonSchalter()), el('p', { i18n: 'header.subtitle' }));
 }

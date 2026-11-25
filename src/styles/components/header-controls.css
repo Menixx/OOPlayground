@@ -82,3 +82,35 @@
 @media (max-width: 600px) and (prefers-reduced-motion: reduce) {
   .head-menu > *, .head-menu-backdrop, .head-menu-icon { transition: none !important; }
 }
+
+/* Ton an/aus (TonSchalter.js): runder Knopf. Desktop/Tablet unten rechts im Fenster (Gegenstück zum Speicher-Knopf
+   unten links); mobil steht er im Menü der Kopfzeile ganz unten rechts. Durchgestrichen = stumm (Voreinstellung). */
+.head-menu > .ton-btn {
+  position: fixed; right: 16px; bottom: 16px; z-index: 900;
+  display: grid; place-items: center; width: 52px; height: 52px; padding: 0; border-radius: 50%;
+  color: var(--muted); background: linear-gradient(var(--btn-a), var(--btn-b)); box-shadow: var(--shine), var(--shadow-2);
+}
+.ton-btn svg { width: 26px; height: 26px; }
+.ton-btn .ton-aus { display: none; }
+.ton-btn.stumm .ton-aus { display: inline; }
+.ton-btn.stumm .ton-wellen { display: none; }
+.head-menu > .ton-btn:not(.stumm) { color: var(--methode); }
+.head-menu > .ton-btn:hover:not(:disabled) { box-shadow: var(--shine), var(--shadow-3); }
+/* Tooltip links neben dem Knopf (am rechten Rand wäre er sonst abgeschnitten) */
+.head-menu > .ton-btn[data-tip]:hover::after, .head-menu > .ton-btn[data-tip]:focus-visible::after {
+  left: auto; right: calc(100% + 10px); bottom: 50%; transform: translateY(50%); font-size: 12px; padding: 4px 10px;
+}
+@media print { .ton-btn { display: none; } }
+
+@media (max-width: 600px) {
+  /* Im Menü: wie der Farbschema-Knopf, eigene Zeile ganz unten rechts */
+  .head-menu > .ton-btn {
+    position: static; grid-column: 1 / -1; width: 29px; height: 29px;
+    border: 1px solid rgba(255,255,255,.18); background: #1e293b; color: #e2e8f0; box-shadow: 0 6px 16px rgba(0,0,0,.35);
+  }
+  .head-menu > .ton-btn:not(.stumm) { color: #4ade80; }
+  .head-menu > .ton-btn:hover:not(:disabled) { background: #334155; box-shadow: 0 6px 16px rgba(0,0,0,.35); }
+  .ton-btn svg { width: 17px; height: 17px; }
+  .head-menu.open > :nth-child(4) { transition-delay: 150ms; }
+  .head-menu > .ton-btn[data-tip]:hover::after, .head-menu > .ton-btn[data-tip]:focus-visible::after { content: none; }
+}

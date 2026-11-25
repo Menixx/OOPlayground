@@ -47,7 +47,7 @@ Diese Seite hat drei Teile:
         { k: 'zones' },
         { k: 'md', md: `So spielst du: Du schaust dir einen Bauplan an, baust daraus Objekte, gibst den Objekten Befehle – und liest in der Ausgabe, was sie antworten.
 
-Und wenn du wissen willst, was dabei im Inneren passiert: Unten links öffnet ein kleiner Knopf den [Speicher](#ui-speicher).` }
+Und wenn du wissen willst, was dabei im Inneren passiert: Unten links öffnet ein kleiner Knopf den [Speicher](#ui-speicher). Unten rechts schaltet ein runder Knopf mit Lautsprecher den **Ton** ein und aus (mehr dazu bei [Erstellte Objekte](#ui-objekte)).` }
       ],
       related: [{ id: 'begriff-klasse', label: 'Klasse' }, { id: 'begriff-objekt', label: 'Objekt' }]
     },
@@ -61,7 +61,9 @@ Und wenn du wissen willst, was dabei im Inneren passiert: Unten links öffnet ei
 - **Den runden Knopf für das Farbschema** – ein Klick wechselt der Reihe nach: ☀ hell, ☾ dunkel und 🖥 wie im System (dann folgt die Seite der Einstellung deines Computers).
 - **Den Sprachschalter \`[[EN | DE]]\`** – er wechselt alle Texte zwischen Englisch und Deutsch. Die Namen der Klassen und Objekte (zum Beispiel \`Katze\` oder \`auto1\`) bleiben immer deutsch. Sie sind nämlich Namen im Programmcode – und Code übersetzt man nicht.
 
-Die Sprache merkt sich der OOPlayground. Wechselst du sie hier, wechselt sie auch auf dieser Erklärungsseite.` }
+Die Sprache merkt sich der OOPlayground. Wechselst du sie hier, wechselt sie auch auf dieser Erklärungsseite.
+
+**Auf dem Handy** sind diese Knöpfe hinter dem Menüknopf (drei Punkte) versteckt. Dort steht ganz unten rechts auch der **Ton-Knopf**, der auf größeren Bildschirmen unten rechts im Fenster liegt.` }
       ]
     },
     {
@@ -90,6 +92,11 @@ Fahr mit der Maus über ein Symbol. Dann öffnet sich die **Klassenkarte** mit a
 - {{abstract}} – Diese Fähigkeit gibt es, aber **wie** sie funktioniert, steht hier noch nicht. Das muss jedes Kind selbst festlegen. Beispiel: \`essen()\`.
 - {{implemented}} – Diese Fähigkeit ist schon fertig und funktioniert für alle Kinder gleich. Beispiel: \`halten()\` bei Tier oder \`drehen90()\` bei Figur.
 
+In den Klammern stehen die **Parameter** – was man der Methode beim Aufruf mitgeben kann:
+- \`essen(T dauer)\` und \`bewegen(T dauer)\` – wie lange, in Sekunden (zum Beispiel \`5\`) oder \`"ewig"\`. \`T\` ist ein **generischer Typ**: Er steht hier für eine Zahl **oder** einen Text. Darum steht vor der Methode \`<T>\`.
+- \`lautGeben(int anzahl)\` – wie oft das Tier einen Laut von sich gibt.
+- \`motorStarten()\`, \`halten()\` und \`drehen90()\` haben keine Parameter.
+
 **3. Erben** – Die Kinder dieser Klasse, als Knöpfe: zum Beispiel \`[[Katze]]\`, \`[[Krokodil]]\`, \`[[Mensch]]\`. Wenn du darüberfährst, steht da **Instanziieren**. Ein Klick baut ein neues Objekt. Es erscheint unter **Erstellte Objekte**.
 
 **4. Der Knopf \`[[new Tier()]]\`** – Er versucht, direkt aus der abstrakten Klasse ein Objekt zu bauen. Darüber steht: **Direkt instanziieren (verboten)**. Und tatsächlich: Es klappt nicht, in der Ausgabe erscheint ein Fehler. Das ist Absicht!
@@ -108,7 +115,11 @@ Fahr mit der Maus über ein Symbol. Dann öffnet sich die **Klassenkarte** mit a
 
 **Die Namen zählen mit:** Baust du drei Katzen, heißen sie \`katze1\`, \`katze2\` und \`katze3\`. So kann man sie gut auseinanderhalten.
 
-**Bewegung:** Wenn du einem Tier oder Fahrzeug einen Befehl gibst, bewegt sich sein Bild – die Katze frisst, das Auto fährt los. Figuren drehen sich, wenn du \`drehen90()\` ausführst.
+**Bewegung:** Wenn du einem Tier oder Fahrzeug einen Befehl gibst, bewegt sich sein Bild – die Katze frisst, das Auto fährt los. Figuren drehen sich, wenn du \`drehen90()\` ausführst. Wie lange das Bild sich bewegt, hängt vom Aufruf ab: \`essen(5)\` dauert fünf Sekunden, \`essen("ewig")\` so lange, bis du \`halten()\` aufrufst. \`motorStarten()\` spielt seine Animation genau einmal.
+
+**Ton:** Bei \`lautGeben()\` ist das Tier auch zu hören – die Katze miaut, das Krokodil knurrt, die Eule ruft. Der **Mensch** spricht jedes Mal in einer **zufälligen Sprache**, und in der Ausgabe steht, welche es war, zum Beispiel \`Der Mensch spricht Ukrainisch.\` Mit \`lautGeben(3)\` hörst du den Laut dreimal.
+
+Am Anfang ist der Ton **aus**: Der runde Knopf unten rechts zeigt einen durchgestrichenen Lautsprecher. Ein Klick schaltet den Ton ein, noch ein Klick wieder aus. Ist der Ton aus, bewegt sich das Bild trotzdem und die Ausgabe schreibt mit – nur zu hören ist nichts. Jede Tondatei wird erst geladen, wenn sie zum ersten Mal gebraucht wird.
 
 Oben im Bereich gibt es zwei Knöpfe:
 - **\`[[Alle bewegen]]\`** – sagt allen Tieren und Fahrzeugen gleichzeitig: „Beweg dich!" Jedes bewegt sich auf seine eigene Art. Der Knopf ist erst aktiv, wenn es mindestens ein Tier oder Fahrzeug gibt. Figuren machen nicht mit – sie haben keine Methode \`bewegen()\`.
@@ -133,6 +144,8 @@ Ist der Bereich leer, steht dort ein kleiner Hinweis, wie du dein erstes Objekt 
 - {{geerbt}} – Die Methode kommt unverändert von den Eltern. Beispiel: \`halten()\`.
 
 Neben jeder Methode gibt es den Knopf **\`[[Ausführen]]\`**. Ein Klick ruft die Methode wirklich auf. Die Antwort erscheint in der **Ausgabe**.
+
+**Argumente eintragen:** Hat eine Methode einen Parameter, steht in ihrer Zeile ein kleines Eingabefeld – direkt in den Klammern, zum Beispiel \`essen(T dauer = "ewig")\` oder \`lautGeben(int anzahl = 1)\`. Darin steht schon ein **Standardwert**. Du kannst ihn ändern, zum Beispiel in \`5\`, und dann auf **Ausführen** klicken oder Enter drücken. Bei \`dauer\` geht eine Zahl (Sekunden) oder \`"ewig"\`, bei \`anzahl\` eine ganze Zahl ab 1. Ein falscher Wert führt zu einem Fehler in der Ausgabe – so wie in Java eine \`IllegalArgumentException\`.
 
 **Der Knopf \`[[katze1 = null]]\`** ganz unten löscht dieses eine Objekt.
 
@@ -174,7 +187,7 @@ Oben auf der Karte steht zum Beispiel \`class Benzinmotor extends Motor\`. Das h
       blocks: [
         { k: 'md', md: `Die Ausgabe ist das **Tagebuch des Programms**. Hier steht alles, was passiert. Es gibt drei Arten von Zeilen:
 
-- **Zeilen mit \`>\` am Anfang** – Was gemacht wurde. Zum Beispiel ein Befehl wie \`> katze1.essen()\` oder eine Meldung wie \`> Objekt katze1 wurde erstellt.\`
+- **Zeilen mit \`>\` am Anfang** – Was gemacht wurde. Zum Beispiel ein Befehl wie \`> katze1.essen("ewig")\` oder eine Meldung wie \`> Objekt katze1 wurde erstellt.\` Ein Befehl zeigt auch seine Argumente. Läuft eine Methode eine Zeit lang, meldet sie sich am Ende noch einmal: \`> katze1.essen(5) ist fertig.\`
 - **Eingerückte Zeilen** – Die Antwort des Objekts. Zum Beispiel \`Die Katze frisst Fisch.\`
 - **Rote Zeilen** – Ein Fehler. Etwas war nicht erlaubt, zum Beispiel ein Objekt aus einer abstrakten Klasse zu bauen.
 
@@ -182,7 +195,7 @@ So sieht das aus:
 
 \`\`\`console
 > Objekt katze1 wurde erstellt.
-> katze1.essen()
+> katze1.essen("ewig")
   Die Katze frisst Fisch.
 > new Tier()
 !! Abstrakte Klassen können nicht instanziiert werden.
@@ -767,9 +780,9 @@ Im OOPlayground geht es schneller: Nach \`katze1 = null\` verschwinden die Varia
 5. Klick neben \`halten()\` auf **\`[[Ausführen]]\`**. Die Katze bleibt stehen.` },
         { k: 'output', md: `\`\`\`console
 > Objekt katze1 wurde erstellt.
-> katze1.essen()
+> katze1.essen("ewig")
   Die Katze frisst Fisch.
-> katze1.bewegen()
+> katze1.bewegen("ewig")
   Läuft auf vier Pfoten
 > katze1.halten()
   Katze bleibt stehen.
@@ -814,11 +827,11 @@ Im OOPlayground geht es schneller: Nach \`katze1 = null\` verschwinden die Varia
 3. Klick neben \`essen()\` auf **\`[[Ausführen]]\`** – zuerst bei \`katze1\`, dann bei \`krokodil1\`, dann bei \`mensch1\`.
 4. Klick neben \`halten()\` auf **\`[[Ausführen]]\`** – bei \`katze1\` und bei \`krokodil1\`.` },
         { k: 'output', md: `\`\`\`console
-> katze1.essen()
+> katze1.essen("ewig")
   Die Katze frisst Fisch.
-> krokodil1.essen()
+> krokodil1.essen("ewig")
   Das Krokodil frisst Fleisch.
-> mensch1.essen()
+> mensch1.essen("ewig")
   Der Mensch isst eine Pizza.
 > katze1.halten()
   Katze bleibt stehen.

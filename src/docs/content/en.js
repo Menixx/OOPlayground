@@ -49,7 +49,7 @@ Note: the class names in the app (\`Tier\`, \`Katze\`, \`Auto\` …) are always 
         { k: 'zones' },
         { k: 'md', md: `How to play: look at a blueprint, build objects from it, give the objects commands – and read their answers in the output.
 
-And if you want to know what happens inside: a small button at the bottom left opens [memory](#ui-speicher).` }
+And if you want to know what happens inside: a small button at the bottom left opens [memory](#ui-speicher). At the bottom right, a round speaker button turns the **sound** on and off (more on that under [Created objects](#ui-objekte)).` }
       ],
       related: [{ id: 'begriff-klasse', label: 'Class' }, { id: 'begriff-objekt', label: 'Object' }]
     },
@@ -63,7 +63,9 @@ And if you want to know what happens inside: a small button at the bottom left o
 - **The round color-scheme button** – each click switches in turn: ☀ light, ☾ dark and 🖥 like the system (the page then follows your computer’s setting).
 - **The language switch \`[[EN | DE]]\`** – it switches all texts between English and German. The names of classes and objects (for example \`Katze\` or \`auto1\`) always stay German. That's because they are names in the program code – and code doesn't get translated.
 
-OOPlayground remembers your language. If you switch it there, it also switches on this guide page.` }
+OOPlayground remembers your language. If you switch it there, it also switches on this guide page.
+
+**On a phone** these buttons are hidden behind the menu button (three dots). At the very bottom right of that menu you'll also find the **sound button**, which sits at the bottom right of the window on bigger screens.` }
       ]
     },
     {
@@ -92,6 +94,11 @@ Move your mouse over a symbol. The **class card** opens with all the details.` }
 - {{abstract}} – This ability exists, but **how** it works isn't written here yet. Each child has to decide that itself. Example: \`essen()\` (eat).
 - {{implemented}} – This ability is already finished and works the same for all children. Example: \`halten()\` (stop) in Tier, or \`drehen90()\` (rotate by 90°) in Figur.
 
+The brackets hold the **parameters** – what you can pass to the method when you call it:
+- \`essen(T dauer)\` and \`bewegen(T dauer)\` – for how long (\`dauer\` = duration), in seconds (for example \`5\`) or \`"ewig"\` (forever). \`T\` is a **generic type**: here it stands for a number **or** a text. That's why \`<T>\` comes before the method.
+- \`lautGeben(int anzahl)\` (make a sound) – how many times (\`anzahl\` = number) the animal makes its sound.
+- \`motorStarten()\`, \`halten()\` and \`drehen90()\` have no parameters.
+
 **3. Subclasses** – The children of this class, as buttons: for example \`[[Katze]]\`, \`[[Krokodil]]\`, \`[[Mensch]]\`. When you hover over one, it says **Instantiate**. One click builds a new object. It appears under **Created objects**.
 
 **4. The \`[[new Tier()]]\` button** – It tries to build an object directly from the abstract class. Its tooltip says: **Instantiate directly (forbidden)**. And indeed: it doesn't work, an error appears in the output. That's on purpose!
@@ -110,7 +117,11 @@ Move your mouse over a symbol. The **class card** opens with all the details.` }
 
 **The names count up:** if you build three cats, they're called \`katze1\`, \`katze2\` and \`katze3\`. That way you can easily tell them apart.
 
-**Movement:** when you give an animal or a vehicle a command, its picture moves – the cat eats, the car drives off. Shapes rotate when you run \`drehen90()\`.
+**Movement:** when you give an animal or a vehicle a command, its picture moves – the cat eats, the car drives off. Shapes rotate when you run \`drehen90()\`. How long the picture moves depends on the call: \`essen(5)\` takes five seconds, \`essen("ewig")\` lasts until you call \`halten()\`. \`motorStarten()\` plays its animation exactly once.
+
+**Sound:** with \`lautGeben()\` you can also hear the animal – the cat meows, the crocodile growls, the owl hoots. The **human** speaks in a **random language** each time, and the output says which one, for example \`The human speaks Ukrainian.\` With \`lautGeben(3)\` you hear the sound three times.
+
+At the start the sound is **off**: the round button at the bottom right shows a crossed-out speaker. One click turns the sound on, another click turns it off again. While the sound is off, the picture still moves and the output still writes everything down – you just don't hear anything. Each sound file is only loaded when it is needed for the first time.
 
 At the top of the area there are two buttons:
 - **\`[[Move all]]\`** – tells all animals and vehicles at the same time: "Move!" Each one moves in its own way. The button only becomes active when there is at least one animal or vehicle. Shapes don't join in – they have no \`bewegen()\` (move) method.
@@ -135,6 +146,8 @@ When the area is empty, a small hint tells you how to build your first object.` 
 - {{inherited}} – The method comes unchanged from the parents. Example: \`halten()\`.
 
 Next to every method there is a **\`[[Run]]\`** button. One click really calls the method. The answer appears in the **Output**.
+
+**Entering arguments:** if a method has a parameter, its line has a small input field – right inside the brackets, for example \`essen(T dauer = "ewig")\` or \`lautGeben(int anzahl = 1)\`. It already holds a **default value**. You can change it, for example to \`5\`, and then click **Run** or press Enter. \`dauer\` takes a number (seconds) or \`"ewig"\`, \`anzahl\` a whole number from 1. A wrong value leads to an error in the output – just like an \`IllegalArgumentException\` in Java.
 
 **The \`[[katze1 = null]]\` button** at the very bottom deletes this one object.
 
@@ -176,7 +189,7 @@ At the top of the card it says, for example, \`class Benzinmotor extends Motor\`
       blocks: [
         { k: 'md', md: `The output is the **program's diary**. Everything that happens is written here. There are three kinds of lines:
 
-- **Lines starting with \`>\`** – What was done. For example a command like \`> katze1.essen()\` or a message like \`> Object katze1 was created.\`
+- **Lines starting with \`>\`** – What was done. For example a command like \`> katze1.essen("ewig")\` or a message like \`> Object katze1 was created.\` A command also shows its arguments. If a method runs for a while, it reports once more when it's done: \`> katze1.essen(5) has finished.\`
 - **Indented lines** – The object's answer. For example \`The cat eats fish.\`
 - **Red lines** – An error. Something wasn't allowed, for example building an object from an abstract class.
 
@@ -184,7 +197,7 @@ This is what it looks like:
 
 \`\`\`console
 > Object katze1 was created.
-> katze1.essen()
+> katze1.essen("ewig")
   The cat eats fish.
 > new Tier()
 !! Abstract classes cannot be instantiated.
@@ -769,9 +782,9 @@ OOPlayground is quicker: after \`katze1 = null\` the variable on the stack and t
 5. Click **\`[[Run]]\`** next to \`halten()\`. The cat stops.` },
         { k: 'output', md: `\`\`\`console
 > Object katze1 was created.
-> katze1.essen()
+> katze1.essen("ewig")
   The cat eats fish.
-> katze1.bewegen()
+> katze1.bewegen("ewig")
   Walks on four paws
 > katze1.halten()
   Cat stops.
@@ -816,11 +829,11 @@ OOPlayground is quicker: after \`katze1 = null\` the variable on the stack and t
 3. Click **\`[[Run]]\`** next to \`essen()\` – first on \`katze1\`, then on \`krokodil1\`, then on \`mensch1\`.
 4. Click **\`[[Run]]\`** next to \`halten()\` – on \`katze1\` and on \`krokodil1\`.` },
         { k: 'output', md: `\`\`\`console
-> katze1.essen()
+> katze1.essen("ewig")
   The cat eats fish.
-> krokodil1.essen()
+> krokodil1.essen("ewig")
   The crocodile eats meat.
-> mensch1.essen()
+> mensch1.essen("ewig")
   The human eats a pizza.
 > katze1.halten()
   Cat stops.

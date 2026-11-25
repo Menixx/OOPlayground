@@ -117,7 +117,7 @@ export class ObjectManager {
       if (methode === 'halten') this.#beenden(id, 'halten');
       const ms = methode === 'halten' ? 0 : laufzeit(obj, info, werte);
       this.#starten(id, methode, werte, ms);
-      bus.emit('called', { id, methode, args: werte, ergebnis, dauerMs: ms }); // Animation anstoßen (und Pult: Ereignis senden)
+      bus.emit('called', { id, obj, methode, args: werte, ergebnis, dauerMs: ms }); // Animation anstoßen (und Pult: Ereignis senden)
       return ergebnis;
     } catch (e) {
       log('fehler', e.message);
@@ -137,7 +137,7 @@ export class ObjectManager {
         const ergebnis = obj.bewegen();                // Standardwert: dauer = "ewig"
         log('ergebnis', `${id}: ${ergebnis}.`);
         this.#starten(id, 'bewegen', [EWIG], null);
-        bus.emit('called', { id, methode: 'bewegen', args: [EWIG], ergebnis, dauerMs: null, teil: true }); // Teil von „Alle bewegen“
+        bus.emit('called', { id, obj, methode: 'bewegen', args: [EWIG], ergebnis, dauerMs: null, teil: true }); // Teil von „Alle bewegen“
       });
   }
 

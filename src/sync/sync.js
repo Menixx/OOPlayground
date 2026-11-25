@@ -5,7 +5,7 @@
 //   und antwortet mit „ack“. Er sendet nie eigene Ereignisse – so entstehen keine Echo-Schleifen.
 //
 // Ereignisse (event.kind):
-//   created {cls} · called {id, methode, args} · versucht {cls} · deleted {id} · deletedAll · movedAll
+//   created {cls} · called {id, methode, args, zufallSprache?} · versucht {cls} · deleted {id} · deletedAll · movedAll
 //   popover {key, offen}            – Karte geöffnet/geschlossen (Klasse, Objekt, Motor)
 //   klick {ziel}                    – Knopf mit data-sync (Ausgabe leeren, Motor-Knöpfe, „Nach oben“ …)
 //   eingabe {ziel, wert}            – Eingabefeld mit data-sync (Suche der Erklärung)
@@ -27,6 +27,8 @@ import { konsolenVerlauf, konsoleSetzen } from '../components/Console/Console.js
 import { el } from '../utils/dom.js';
 import { speicherZustand, speicherZustandSetzen, speicherAnwenden } from '../components/Memory/Memory.js';
 import { zeigeQr, schliesseQr, qrOffen, qrNeuZeichnen } from './qrDialog.js';
+import { spracheVorgeben } from '../models/sprachen.js';
+import { istStumm, setStumm } from '../services/Ton.js';
 
 const params = new URLSearchParams(location.search);
 export const ROLLE = params.get('rolle') === 'pult' ? 'pult' : 'bildschirm';
@@ -328,6 +330,7 @@ function zustand() {
   const ui = {
     thema: getModus(),
     sprache: getSprache(),
+    stumm: istStumm(),
     popovers: offenePopovers(),
     gedrueckt: alle('button[data-sync][aria-expanded="true"]').map((b) => b.dataset.sync),
     eingaben: Object.fromEntries(alle('input[data-sync]').map((i) => [i.dataset.sync, i.value])),
@@ -377,7 +380,11 @@ function pultEmpfang(msg) {
 if (ROLLE === 'pult') {
   // Fachliche Aktionen (ObjectManager)
   bus.on('created', ({ id, obj }) => ereignis({ kind: 'created', cls: obj.constructor.name }, { id }));
-  bus.on('called', ({ id, methode, args, ergebnis, teil }) => { if (!teil) ereignis({ kind: 'called', id, methode, args }, { ergebnis }); });
+  bus.on('called', ({ id, obj, methode, args, ergebnis, teil }) => {
+    if (teil) return;
+    const zufall = methode === 'lautGeben' && obj?.sprache ? { zufallSprache: obj.sprache } : {}; // Mensch: gewählte Sprache mitschicken
+    ereignis({ kind: 'called', id, methode, args, ...zufall }, { ergebnis });
+  });
   bus.on('aktion', (a) => ereignis(a)); // versucht / deleted / deletedAll / movedAll
   // Oberfläche
   bus.on('popover', ({ key, offen: auf }) => ereignis({ kind: 'popover', key, offen: auf }));
@@ -543,6 +550,7 @@ async function anwenden(ev) {
     }
     case 'called':
       nurPlayground();
+      if (ev.zufallSprache) spracheVorgeben(ev.zufallSprache); // dieselbe „zufällige“ Sprache wie auf dem Pult
       return { ergebnis: manager.aufrufen(ev.id, ev.methode, ev.args ?? []), sprache: getSprache() };
     case 'versucht': {
       nurPlayground();
@@ -585,6 +593,7 @@ async function snapshotAnwenden(s, snapSeq) {
   letzte = snapSeq;
   const ui = s.ui ?? {};
   if (ui.thema) setModus(ui.thema);
+  if (typeof ui.stumm === 'boolean') setStumm(ui.stumm);
   if (ui.sprache) await spracheUebernehmen(ui.sprache); // Erklärung wird dabei neu gezeichnet – danach erst den Rest
   const versuch = (f) => { try { f(); } catch (e) { console.warn('[sync]', e.message); } };
   if (ROUTE === '') {

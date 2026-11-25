@@ -2,7 +2,7 @@ import { t } from '../../i18n/i18n.js';
 import { Tier } from '../abstract/Tier.js';
 import { EWIG, dauerPruefen, anzahlPruefen, lautWiederholen } from '../parameter.js';
 export class Krokodil extends Tier {
-  static zyklen = { lautGeben: 2.4 }; // Sekunden für einen Laut (= ein Zyklus der Animation)
+  static zyklen = { lautGeben: 3 }; // Sekunden für einen Laut (= ein Zyklus der Animation)
   static eigeneFelder = [['anzahlZaehne', 'int']];
   constructor() {
     super();

@@ -145,23 +145,23 @@
     }
     /* ==========================================================================
        3. АНІМАЦІЯ ШИПІННЯ (.state-hiss, метод lautGeben())
-       Цикл 2.4 секунди: паща широко розкривається -> тремтіння і шипіння -> закривається
+       Цикл 3 секунди (= довжина crocodile.mp3): паща широко розкривається -> тремтіння і шипіння -> закривається
        ========================================================================== */
     #hiss-group { opacity: 0; }
     .state-hiss #upper-jaw {
-      animation: upperJawHiss 2.4s ease-in-out infinite;
+      animation: upperJawHiss 3s ease-in-out infinite;
     }
     .state-hiss #lower-jaw {
-      animation: lowerJawHiss 2.4s ease-in-out infinite;
+      animation: lowerJawHiss 3s ease-in-out infinite;
     }
     .state-hiss #mouth-interior {
-      animation: mouthInteriorHiss 2.4s ease-in-out infinite;
+      animation: mouthInteriorHiss 3s ease-in-out infinite;
     }
     .state-hiss #croc-body-group {
-      animation: bodyHiss 2.4s linear infinite;
+      animation: bodyHiss 3s linear infinite;
     }
     .state-hiss #hiss-group {
-      animation: hissVisible 2.4s ease-in-out infinite;
+      animation: hissVisible 3s ease-in-out infinite;
     }
     .state-hiss .hiss-line {
       animation: hissFlow 0.4s linear infinite;
